@@ -1,6 +1,6 @@
 ---
-title: 'Setting Up the DataBridge Server'
-description: 'API Reference to get started with DataBridge'
+title: 'Getting Started'
+description: 'Setting Up the DataBridge server'
 ---
 
 <Note>
@@ -9,9 +9,102 @@ If you're using Python, you can directly use the DataBridge SDK to interact with
 
 ## Prerequisites
 
+<Accordion title="Python">
 Please ensure that you have Python 3.12 installed on your machine. Guides for installing Python can be found on the [Python website](https://www.python.org/downloads/release/python-3129/). 
+</Accordion>
 
-## Installing and Running the Server
+<Accordion title="PostgreSQL">
+DataBridge requires PostgreSQL with the pgvector extension for vector storage and similarity search capabilities. Follow the installation instructions for your operating system:
+
+<Tabs>
+  <Tab title="macOS">
+    On macOS, you can use Homebrew to install PostgreSQL and pgvector:
+    
+    ```bash
+    brew install postgresql@14
+    brew install pgvector
+    ```
+    
+    Start the PostgreSQL service:
+    
+    ```bash
+    brew services start postgresql@14
+    ```
+    
+    Create a database and user for DataBridge:
+    
+    ```bash
+    createdb databridge
+    createuser -s postgres
+    ```
+    
+    These commands create a database named "databridge" and a superuser named "postgres" that the application will use to connect.
+  </Tab>
+  <Tab title="Ubuntu/Debian">
+    Install PostgreSQL from the official repositories:
+    
+    ```bash
+    sudo apt update
+    sudo apt install postgresql postgresql-contrib
+    ```
+    
+    Install pgvector by building from source:
+    
+    ```bash
+    git clone https://github.com/pgvector/pgvector.git
+    cd pgvector
+    make
+    sudo make install
+    ```
+    
+    Start and enable the PostgreSQL service:
+    
+    ```bash
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+    ```
+    
+    Create a database and user for DataBridge:
+    
+    ```bash
+    sudo -u postgres createdb databridge
+    sudo -u postgres createuser -s postgres
+    ```
+  </Tab>
+  <Tab title="Windows">
+    1. Download and install PostgreSQL from the [official website](https://www.postgresql.org/download/windows/).
+    
+    2. During installation, make note of the password you set for the postgres user.
+    
+    3. Install pgvector:
+       - Open pgAdmin (installed with PostgreSQL)
+       - Connect to your PostgreSQL server
+       - Right-click on "Extensions" and select "Create > Extension"
+       - Select "pgvector" from the dropdown and click "Save"
+    
+    4. Create a database for DataBridge:
+       - Right-click on "Databases" and select "Create > Database"
+       - Name it "databridge" and click "Save"
+  </Tab>
+</Tabs>
+
+After installation, verify that PostgreSQL is running correctly:
+
+```bash
+psql -U postgres -c "SELECT version();"
+```
+
+You should see the following output:
+
+```
+ version                                                            
+------------------------------------------------------------------------------------------------------------------------------
+<Your postgres version and some compilation details>
+```
+
+</Accordion>
+
+## Cloning the Repository
 
 To get started with DataBridge, we need to first setup the server. This involves cloning the [repository](https://github.com/databridge-org/databridge-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data!
 
@@ -37,6 +130,9 @@ cd databridge-core
 
 Next, you need to set up a virtual environment called `.venv`.
 
+## Setting Up the Environment
+
+### Installing Python Dependencies
 <Note>
 While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with DataBridge. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
 </Note>
@@ -77,9 +173,25 @@ After activation, your command prompt should be prefixed with `(.venv)`, indicat
 pip install -r requirements.txt
 ```
 
-You can now launch the DataBridge server. In case you want to customize the server - such as use a different embedding model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file. You can find more details about configuration [here](/api-reference/configuration).
+### Setting up the Server Parameters
 
-Finally! We are now ready to run the server. Just run the following command to start the server.
+At this point, you may want to customize the server - such as use a different embedding model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file. You can find more details about configuration [here](/configuration). 
+
+DataBridge uses environment variables to manage secrets and api keys. In order to ensure that any pre-set keys are available to the server, copy the `.env.example` file to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+In case you're using external models, you may have to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store. 
+
+```bash
+python quick_setup.py
+```
+
+## Launching the Server
+
+You are now ready to launch the DataBridge server! Just run the following command to start the server.
 
 ```bash
 python start_server.py
@@ -94,7 +206,26 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://localhost:8000 (Press CTRL+C to quit)
 ```
 
-This means that the server is running on `http://localhost:8000`. You can now interact with the server using the API.
+This means that the server is running on `http://localhost:8000`. You can now interact with the server using the API or the Python SDK.
+
+## Next Steps
+
+Now that you have the server running, you can explore the different ways to interact with the server.
+
+<CardGroup cols={2}>
+<Card icon="gear" title="Configure DataBridge" href="/configuration">
+  Configure DataBridge using the `databridge.toml` file.
+</Card>
+<Card icon="code" title="API" href="/api-reference/ingest-text">
+  Use the API to interact with the server.
+</Card>
+<Card icon="python" title="Python SDK" href="/python-sdk/introduction">
+  Use the Python SDK to interact with the server.
+</Card>
+<Card icon="react"title="DataBridge UI and CLI" href="/web-interface/introduction">
+  Use the DataBridge UI or CLI to interact with the server.
+</Card>
+</CardGroup>
 
 
 
