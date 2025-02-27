@@ -46,7 +46,7 @@
     "/ingest/text": {
       "post": {
         "summary": "Ingest Text",
-        "description": "Ingest a text document.\n\nArgs:\n    request: IngestTextRequest containing:\n        - content: Text content to ingest\n        - metadata: Optional metadata dictionary\n        - rules: Optional list of rules. Each rule should be either:\n               - MetadataExtractionRule: {\"type\": \"metadata_extraction\", \"schema\": {...}}\n               - NaturalLanguageRule: {\"type\": \"natural_language\", \"prompt\": \"...\"}\n    auth: Authentication context\n\nReturns:\n    Document: Metadata of ingested document",
+        "description": "Ingest a text document.",
         "operationId": "ingest_text_ingest_text_post",
         "parameters": [
           {
@@ -96,7 +96,7 @@
     "/ingest/file": {
       "post": {
         "summary": "Ingest File",
-        "description": "Ingest a file document.\n\nArgs:\n    file: File to ingest\n    metadata: JSON string of metadata\n    rules: JSON string of rules list. Each rule should be either:\n           - MetadataExtractionRule: {\"type\": \"metadata_extraction\", \"schema\": {...}}\n           - NaturalLanguageRule: {\"type\": \"natural_language\", \"prompt\": \"...\"}\n    auth: Authentication context\n\nReturns:\n    Document: Metadata of ingested document",
+        "description": "Ingest a file document.",
         "operationId": "ingest_file_ingest_file_post",
         "parameters": [
           {
