@@ -17,8 +17,7 @@
             "group": "Get Started",
             "pages": [
               "introduction",
-              "quickstart",
-              "development"
+              "getting-started"
             ]
           },
           {
@@ -36,7 +35,21 @@
       },
       {
         "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          }
+        ],
         "openapi": "api-reference/openapi.json"
+      },
+      {
+        "tab": "Python SDK",
+        "pages": [
+          "python-sdk/introduction"
+        ]
       }
     ],
     "global": {
