@@ -1,0 +1,426 @@
+---
+title: 'API Reference'
+description: 'Detailed API documentation for DataBridge Python SDK'
+---
+
+# API Reference
+
+This page provides detailed documentation for all classes and methods in the DataBridge Python SDK.
+
+## DataBridge
+
+The main client class for synchronous operations.
+
+```python
+DataBridge(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
+```
+
+### Parameters
+
+- `uri`: Optional connection URI in format `databridge://owner_id:token@host`
+- `timeout`: Request timeout in seconds (default: 30)
+- `is_local`: Whether connecting to a local development server (default: False)
+
+### Methods
+
+#### `ingest_text`
+
+```python
+ingest_text(
+    content: str,
+    metadata: Optional[Dict[str, Any]] = None,
+    rules: Optional[List[RuleOrDict]] = None,
+    use_colpali: bool = True
+) -> Document
+```
+
+Ingest a text document into DataBridge.
+
+**Parameters:**
+- `content`: Text content to ingest
+- `metadata`: Optional document metadata dictionary
+- `rules`: Optional list of rules to apply during ingestion
+- `use_colpali`: Whether to use ColPali-style embedding model (default: True)
+
+**Returns:** A `Document` object representing the ingested document
+
+---
+
+#### `ingest_file`
+
+```python
+ingest_file(
+    file: Union[str, bytes, BinaryIO, Path],
+    filename: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+    rules: Optional[List[RuleOrDict]] = None,
+    use_colpali: bool = True
+) -> Document
+```
+
+Ingest a file document into DataBridge.
+
+**Parameters:**
+- `file`: File to ingest (path string, bytes, file object, or Path)
+- `filename`: Name of the file (required if file is bytes or file object)
+- `metadata`: Optional document metadata dictionary
+- `rules`: Optional list of rules to apply during ingestion
+- `use_colpali`: Whether to use ColPali-style embedding model (default: True)
+
+**Returns:** A `Document` object representing the ingested document
+
+---
+
+#### `retrieve_chunks`
+
+```python
+retrieve_chunks(
+    query: str,
+    filters: Optional[Dict[str, Any]] = None,
+    k: int = 4,
+    min_score: float = 0.0,
+    use_colpali: bool = True
+) -> List[FinalChunkResult]
+```
+
+Retrieve relevant chunks based on a query.
+
+**Parameters:**
+- `query`: Search query text
+- `filters`: Optional metadata filters dictionary
+- `k`: Number of results to return (default: 4)
+- `min_score`: Minimum similarity threshold (default: 0.0)
+- `use_colpali`: Whether to use ColPali-style embedding model (default: True)
+
+**Returns:** List of `FinalChunkResult` objects
+
+---
+
+#### `retrieve_docs`
+
+```python
+retrieve_docs(
+    query: str,
+    filters: Optional[Dict[str, Any]] = None,
+    k: int = 4,
+    min_score: float = 0.0,
+    use_colpali: bool = True
+) -> List[DocumentResult]
+```
+
+Retrieve relevant documents based on a query.
+
+**Parameters:**
+- `query`: Search query text
+- `filters`: Optional metadata filters dictionary
+- `k`: Number of results to return (default: 4)
+- `min_score`: Minimum similarity threshold (default: 0.0)
+- `use_colpali`: Whether to use ColPali-style embedding model (default: True)
+
+**Returns:** List of `DocumentResult` objects
+
+---
+
+#### `query`
+
+```python
+query(
+    query: str,
+    filters: Optional[Dict[str, Any]] = None,
+    k: int = 4,
+    min_score: float = 0.0,
+    max_tokens: Optional[int] = None,
+    temperature: Optional[float] = None,
+    use_colpali: bool = True
+) -> CompletionResponse
+```
+
+Generate a completion using relevant chunks as context.
+
+**Parameters:**
+- `query`: Query text
+- `filters`: Optional metadata filters dictionary
+- `k`: Number of chunks to use as context (default: 4)
+- `min_score`: Minimum similarity threshold (default: 0.0)
+- `max_tokens`: Maximum tokens in completion (optional)
+- `temperature`: Model temperature (optional)
+- `use_colpali`: Whether to use ColPali-style embedding model (default: True)
+
+**Returns:** A `CompletionResponse` object
+
+---
+
+#### `list_documents`
+
+```python
+list_documents(
+    skip: int = 0,
+    limit: int = 100,
+    filters: Optional[Dict[str, Any]] = None
+) -> List[Document]
+```
+
+List accessible documents.
+
+**Parameters:**
+- `skip`: Number of documents to skip (default: 0)
+- `limit`: Maximum number of documents to return (default: 100)
+- `filters`: Optional filters dictionary
+
+**Returns:** List of `Document` objects
+
+---
+
+#### `get_document`
+
+```python
+get_document(document_id: str) -> Document
+```
+
+Get document metadata by ID.
+
+**Parameters:**
+- `document_id`: ID of the document
+
+**Returns:** A `Document` object
+
+---
+
+#### `create_cache`
+
+```python
+create_cache(
+    name: str,
+    model: str,
+    gguf_file: str,
+    filters: Optional[Dict[str, Any]] = None,
+    docs: Optional[List[str]] = None
+) -> Dict[str, Any]
+```
+
+Create a new cache with specified configuration.
+
+**Parameters:**
+- `name`: Name of the cache to create
+- `model`: Name of the model to use (e.g., "llama2")
+- `gguf_file`: Name of the GGUF file to use
+- `filters`: Optional metadata filters for document selection
+- `docs`: Optional list of specific document IDs to include
+
+**Returns:** Dictionary with cache configuration
+
+---
+
+#### `get_cache`
+
+```python
+get_cache(name: str) -> Cache
+```
+
+Get a cache by name.
+
+**Parameters:**
+- `name`: Name of the cache to retrieve
+
+**Returns:** A `Cache` object
+
+---
+
+## AsyncDataBridge
+
+The main client class for asynchronous operations. Has the same methods as `DataBridge` but with async/await support.
+
+```python
+AsyncDataBridge(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
+```
+
+## Cache
+
+Class for interacting with a cache.
+
+```python
+Cache(db: DataBridge, name: str)
+```
+
+### Methods
+
+#### `update`
+
+```python
+update() -> bool
+```
+
+Update the cache with the latest documents.
+
+**Returns:** Boolean indicating success
+
+---
+
+#### `add_docs`
+
+```python
+add_docs(docs: List[str]) -> bool
+```
+
+Add specific documents to the cache.
+
+**Parameters:**
+- `docs`: List of document IDs to add to the cache
+
+**Returns:** Boolean indicating success
+
+---
+
+#### `query`
+
+```python
+query(
+    query: str,
+    max_tokens: Optional[int] = None,
+    temperature: Optional[float] = None
+) -> CompletionResponse
+```
+
+Query the cache.
+
+**Parameters:**
+- `query`: Query text
+- `max_tokens`: Maximum tokens in completion (optional)
+- `temperature`: Model temperature (optional)
+
+**Returns:** A `CompletionResponse` object
+
+---
+
+## AsyncCache
+
+Asynchronous version of `Cache`. Has the same methods but with async/await support.
+
+## Rule Classes
+
+### MetadataExtractionRule
+
+```python
+MetadataExtractionRule(schema: Union[Type[BaseModel], Dict[str, Any]])
+```
+
+Rule for extracting metadata using a schema.
+
+**Parameters:**
+- `schema`: Pydantic model class or dictionary schema
+
+---
+
+### NaturalLanguageRule
+
+```python
+NaturalLanguageRule(prompt: str)
+```
+
+Rule for transforming content using natural language.
+
+**Parameters:**
+- `prompt`: Instruction for how to transform the content
+
+---
+
+## Data Models
+
+### Document
+
+```python
+Document(
+    external_id: str,
+    content_type: str,
+    filename: Optional[str] = None,
+    metadata: Dict[str, Any] = {},
+    storage_info: Dict[str, str] = {},
+    system_metadata: Dict[str, Any] = {},
+    access_control: Dict[str, Any] = {},
+    chunk_ids: List[str] = []
+)
+```
+
+Represents a document in DataBridge.
+
+---
+
+### ChunkResult
+
+```python
+ChunkResult(
+    content: str,
+    score: float,
+    document_id: str,
+    chunk_number: int,
+    metadata: Dict[str, Any] = {},
+    content_type: str,
+    filename: Optional[str] = None,
+    download_url: Optional[str] = None
+)
+```
+
+Represents a chunk result from a query.
+
+---
+
+### FinalChunkResult
+
+```python
+FinalChunkResult(
+    content: str | PILImage,
+    score: float,
+    document_id: str,
+    chunk_number: int,
+    metadata: Dict[str, Any] = {},
+    content_type: str,
+    filename: Optional[str] = None,
+    download_url: Optional[str] = None
+)
+```
+
+Represents a processed chunk result from a query, with support for images.
+
+---
+
+### DocumentResult
+
+```python
+DocumentResult(
+    score: float,
+    document_id: str,
+    metadata: Dict[str, Any] = {},
+    content: DocumentContent
+)
+```
+
+Represents a document result from a query.
+
+---
+
+### CompletionResponse
+
+```python
+CompletionResponse(
+    completion: str,
+    usage: Dict[str, int]
+)
+```
+
+Represents a completion response from a query.
+
+---
+
+## Exceptions
+
+### DataBridgeError
+
+Base exception for all DataBridge SDK errors.
+
+### AuthenticationError
+
+Exception raised for authentication-related issues.
+
+### ConnectionError
+
+Exception raised for connection-related issues. 

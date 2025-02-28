@@ -1,0 +1,198 @@
+---
+title: 'Image Handling'
+description: 'Working with images in DataBridge'
+---
+
+# Image Handling
+
+DataBridge offers robust support for working with images. This guide demonstrates how to ingest, retrieve, and work with image documents in DataBridge.
+
+## Ingesting Images
+
+You can ingest images just like any other file, using the `ingest_file` method:
+
+```python
+from databridge.sync import DataBridge
+
+with DataBridge() as db:
+    # Ingest an image file
+    doc = db.ingest_file(
+        "diagram.png",
+        metadata={
+            "type": "image",
+            "subject": "architecture",
+            "project": "office building",
+            "description": "Floor plan for second floor"
+        }
+    )
+    
+    print(f"Image ingested with ID: {doc.external_id}")
+```
+
+### Ingesting Images from Memory
+
+You can also ingest images directly from memory:
+
+```python
+from PIL import Image
+import io
+
+# Open an image with PIL
+image = Image.open("diagram.png")
+
+# Convert to bytes
+buffer = io.BytesIO()
+image.save(buffer, format="PNG")
+image_bytes = buffer.getvalue()
+
+# Ingest the image bytes
+doc = db.ingest_file(
+    image_bytes,
+    filename="diagram.png",
+    metadata={"type": "image"}
+)
+```
+
+## Retrieving Images
+
+When you retrieve chunks that contain images, the `content` field of each `FinalChunkResult` object will be a `PILImage` object for image chunks:
+
+```python
+from PIL.Image import Image as PILImage
+
+# Search for images
+chunks = db.retrieve_chunks(
+    "floor plan diagram",
+    filters={"type": "image"}
+)
+
+# Process the results
+for chunk in chunks:
+    print(f"Score: {chunk.score}")
+    print(f"Document ID: {chunk.document_id}")
+    
+    # Check if the content is an image
+    if isinstance(chunk.content, PILImage):
+        # It's an image - you can work with it using PIL
+        print(f"Image size: {chunk.content.size}")
+        
+        # Display the image (if in a notebook or GUI environment)
+        chunk.content.show()
+        
+        # Save the image
+        chunk.content.save(f"retrieved_image_{chunk.document_id}.png")
+    else:
+        # It's text content
+        print(chunk.content)
+```
+
+## Multimodal Queries
+
+DataBridge supports multimodal queries, where you can search for images based on text descriptions:
+
+```python
+# Find images that match a text description
+chunks = db.retrieve_chunks(
+    "architectural diagrams with open floor plans",
+    filters={"type": "image"},
+    k=5,
+    use_colpali=True  # Use ColPali for better text-to-image matching
+)
+```
+
+## Image Processing Examples
+
+### Example 1: Display Images in a Grid
+
+```python
+import matplotlib.pyplot as plt
+
+# Retrieve images
+chunks = db.retrieve_chunks("architectural diagrams", filters={"type": "image"}, k=4)
+
+# Set up a grid display
+fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+axes = axes.flatten()
+
+for i, chunk in enumerate(chunks):
+    if isinstance(chunk.content, PILImage) and i < 4:
+        axes[i].imshow(chunk.content)
+        axes[i].set_title(f"Score: {chunk.score:.2f}")
+        axes[i].axis('off')
+
+plt.tight_layout()
+plt.show()
+```
+
+### Example 2: Filter Images by Size
+
+```python
+# Retrieve images
+chunks = db.retrieve_chunks("architectural diagrams", filters={"type": "image"}, k=10)
+
+# Filter for large images only
+large_images = []
+for chunk in chunks:
+    if isinstance(chunk.content, PILImage):
+        width, height = chunk.content.size
+        if width >= 1000 and height >= 1000:
+            large_images.append(chunk)
+
+print(f"Found {len(large_images)} large images")
+```
+
+### Example 3: Converting Images
+
+```python
+# Convert color images to grayscale
+for chunk in chunks:
+    if isinstance(chunk.content, PILImage):
+        # Convert to grayscale
+        grayscale = chunk.content.convert('L')
+        
+        # Save the grayscale version
+        grayscale.save(f"grayscale_{chunk.document_id}.png")
+```
+
+## Best Practices for Images
+
+1. **Metadata**: Always include descriptive metadata with images to improve search accuracy.
+
+```python
+metadata = {
+    "type": "image",
+    "format": "png",
+    "subject": "architecture",
+    "description": "Detailed floor plan for the second floor of the office building",
+    "author": "Jane Smith",
+    "date_created": "2023-05-15"
+}
+```
+
+2. **Use ColPali**: Set `use_colpali=True` when ingesting and retrieving images for best results.
+
+3. **Image Size**: Be aware of image sizes when retrieving many images to avoid memory issues.
+
+```python
+# Resize large images to save memory
+for chunk in chunks:
+    if isinstance(chunk.content, PILImage):
+        # Check if image is very large
+        if chunk.content.width > 2000 or chunk.content.height > 2000:
+            # Resize to reasonable dimensions
+            chunk.content.thumbnail((1000, 1000))
+```
+
+4. **Batch Processing**: When working with many images, process them in batches.
+
+```python
+# Process images in batches
+batch_size = 5
+for i in range(0, len(document_ids), batch_size):
+    batch_ids = document_ids[i:i+batch_size]
+    
+    # Process each batch
+    for doc_id in batch_ids:
+        doc = db.get_document(doc_id)
+        # Process document...
+``` 

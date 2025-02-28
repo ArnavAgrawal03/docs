@@ -48,8 +48,28 @@
       },
       {
         "tab": "Python SDK",
-        "pages": [
-          "python-sdk/introduction"
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "python-sdk/introduction",
+              "python-sdk/quickstart"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "python-sdk/advanced",
+              "python-sdk/image-handling",
+              "python-sdk/async-usage"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "python-sdk/api-reference"
+            ]
+          }
         ]
       }
     ],

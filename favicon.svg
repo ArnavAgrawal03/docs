@@ -1,19 +1,32 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.06145 23.1079C5.26816 22.3769 -3.39077 20.6274 1.4173 5.06384C9.6344 6.09939 16.9728 14.0644 9.06145 23.1079Z" fill="url(#paint0_linear_17557_2021)"/>
-<path d="M8.91928 23.0939C5.27642 21.2223 0.78371 4.20891 17.0071 0C20.7569 7.19341 19.6212 16.5452 8.91928 23.0939Z" fill="url(#paint1_linear_17557_2021)"/>
-<path d="M8.91388 23.0788C8.73534 19.8817 10.1585 9.08525 23.5699 13.1107C23.1812 20.1229 18.984 26.4182 8.91388 23.0788Z" fill="url(#paint2_linear_17557_2021)"/>
-<defs>
-<linearGradient id="paint0_linear_17557_2021" x1="3.77557" y1="5.91571" x2="5.23185" y2="21.5589" gradientUnits="userSpaceOnUse">
-<stop stop-color="#18E299"/>
-<stop offset="1" stop-color="#15803D"/>
-</linearGradient>
-<linearGradient id="paint1_linear_17557_2021" x1="12.1711" y1="-0.718425" x2="10.1897" y2="22.9832" gradientUnits="userSpaceOnUse">
-<stop stop-color="#16A34A"/>
-<stop offset="1" stop-color="#4ADE80"/>
-</linearGradient>
-<linearGradient id="paint2_linear_17557_2021" x1="23.1327" y1="15.353" x2="9.33841" y2="18.5196" gradientUnits="userSpaceOnUse">
-<stop stop-color="#4ADE80"/>
-<stop offset="1" stop-color="#0D9373"/>
-</linearGradient>
-</defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="64" viewBox="0 0 240 64" fill="none">
+  <!-- Logo Container -->
+  <g id="databridge-logo">
+    <!-- Icon Part -->
+    <g id="icon">
+      <!-- Background Circle -->
+      <circle cx="32" cy="32" r="30" fill="#16A34A" />
+      
+      <!-- Bridge Structure -->
+      <path d="M12 36C12 36 22 26 32 36C42 46 52 36 52 36" stroke="white" stroke-width="4" stroke-linecap="round" />
+      
+      <!-- Data Flow Lines -->
+      <path d="M16 28L24 28" stroke="white" stroke-width="2" stroke-linecap="round" />
+      <path d="M40 28L48 28" stroke="white" stroke-width="2" stroke-linecap="round" />
+      <path d="M30 20L34 20" stroke="white" stroke-width="2" stroke-linecap="round" />
+      
+      <!-- Connection Nodes -->
+      <circle cx="16" cy="28" r="3" fill="white" />
+      <circle cx="48" cy="28" r="3" fill="white" />
+      <circle cx="32" cy="36" r="4" fill="#07C983" stroke="white" stroke-width="1" />
+      
+      <!-- Multi-modal Elements -->
+      <rect x="22" y="42" width="6" height="6" rx="1" fill="white" />
+      <circle cx="36" cy="45" r="3" fill="white" />
+      <path d="M42 42L46 46" stroke="white" stroke-width="2" stroke-linecap="round" />
+      <path d="M46 42L42 46" stroke="white" stroke-width="2" stroke-linecap="round" />
+    </g>
+    
+    <!-- Text Part -->
+    <text x="70" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#16A34A">DataBridge</text>
+  </g>
 </svg>
