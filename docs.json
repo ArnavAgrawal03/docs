@@ -21,14 +21,13 @@
             ]
           },
           {
-            "group": "Essentials",
+            "group": "Concepts",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
+              "concepts/naive-rag",
+              "concepts/knowledge-graphs",
+              "concepts/video-rag",
+              "concepts/colpali",
+              "concepts/mcp"
             ]
           },
           {
