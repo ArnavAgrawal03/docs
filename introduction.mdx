@@ -8,24 +8,24 @@ DataBridge is a database that makes it easy to create fast, versatile, and produ
 Key features include:
 
 - **First class support for Unstructured Data**: Unlike traditional databases, DataBridge allows users to directly ingest unstructured data of all forms - including (but not limited to) videos and PDFs. We've built research-driven custom algorithms to ensure state-of-the-art retrieval accuracy. 
-- **Persistent KV-caching**: For documents you reference often, you can process them once and *"freeze"* the LLM's internal state such that you can use it again later. This helps drastically reduce compute costs as well speed up model responses.
+- **Persistent KV-caching**: For documents you reference often, you can process them once and *freeze* the LLM's internal state such that you can use it again later. This helps drastically reduce compute costs as well speed up model responses.
 - **Out of the box MCP support**: DataBridge has [built in support](https://github.com/databridge-org/databridge-core/) for the open-source [Model Context Protocol](modelcontextprotocol.io/introduction) - so you can integrate your knowledge with any MCP client in a single click.
 - **Completely Open-source**: You can check out DataBridge core code [here!](https://github.com/databridge-org/databridge-core/).
 
-Get started with DataBridge with [our guide](/getting-started). Alternatively, check out some of our favorite features:
+Get started with DataBridge with [our guide](/getting-started). Alternatively, if you'd like more in-depth explanations for key concepts we apply, check out the guides below:
 
 <CardGroup cols={2}>
+<Card icon="brain" title="Retrieval Augmented Generation" href="/concepts/naive-rag">
+An explanation of the underlying ideas behind RAG
+</Card>
+<Card icon="video" title="Multimodal Data" href="/concepts/mutlimodal">
+What does Mutlimodal mean? How does DataBridge work with this kind of Data?
+</Card>
+<Card icon="database" title="Database Primitives" href="/concepts/databases">
+Why does treating unstructured knowledge-bases like Databases make sense?
+</Card>
 <Card icon="gear" title="Configure DataBridge" href="/configuration">
-  Configure DataBridge using the `databridge.toml` file.
-</Card>
-<Card icon="code" title="API" href="/api-reference/ingest-text">
-  Use the API to interact with the server.
-</Card>
-<Card icon="python" title="Python SDK" href="/python-sdk/introduction">
-  Use the Python SDK to interact with the server.
-</Card>
-<Card icon="react"title="DataBridge UI and CLI" href="/web-interface/introduction">
-  Use the DataBridge UI or CLI to interact with the server.
+  Customize DataBridge to your liking using the `databridge.toml` file.
 </Card>
 </CardGroup>
 
