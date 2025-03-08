@@ -71,21 +71,7 @@
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Community",
-          "href": "https://discord.gg/H7RN3XdGu3",
-          "icon": "discord"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -96,6 +82,14 @@
       {
         "label": "Support",
         "href": "mailto:databridgesuperuser@gmail.com"
+      },
+      {
+        "label": "Community",
+        "href": "https://discord.gg/H7RN3XdGu3"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/databridge-org/databridge-core"
       }
     ]
   },

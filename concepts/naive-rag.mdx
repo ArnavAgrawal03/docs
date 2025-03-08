@@ -7,19 +7,24 @@ description: 'An overview of Retrieval Augmented Generation with Vector Similari
 
 RAG stands for **R**etrieval **A**ugmented **G**eneration. It is a set of tools and techniques that allow us to provided additional context to an LLM given a query. 
 
-For example, let's say you're creating an app that helps users assemble furniture. If the user is stuck on a particular step, they may want to upload a picture of their current progress and ask follow-up questions to a chatbot. RAG would allow you to take that picture, as well as the user query, and then search over a pre-ingested knowledge base - a set of user manuals for different types of furniture, for instance - and *augment* the query with context from that knowledge base. So, instead of the response being *"oh, it looks like you've screwed the rear leg backwards"*, it would be something like *"seems like you're assembling chair CX-184. You may have skipped step 8 in the assembly process, since the rear leg is screwed backwards. Here is a step-by-step solution from the assembly guide: ..."*. 
+For example, let's say you're creating an app that helps users assemble furniture. If the user is stuck on a particular step, they may want to upload a picture of their current progress and ask follow-up questions to a chatbot. RAG would allow you to take that picture, as well as the user query, and then search over a pre-ingested knowledge base - a set of user manuals for different types of furniture, for instance - and *augment* the query with context from that knowledge base. So, instead of the response being 
 
-Note how both answers recognized the issue correctly, but since the LLM had additional context in the second answer, it was also able to provide a solution and more specific details. That's the jist of RAG - LLMs are generally **more helpful**, and **hallucinate less** when provided with context surrounding a query. 
+> "oh, it looks like you've screwed the rear leg backwards"
 
-While the core concept itself is simple, the complexity arises in *how* we can effectively retrieve the correct information. In the following sections, we explain one way to effectively perform RAG based on the concept of vector embeddings and similarity search (we'll explain what these mean!). 
+it would be something like 
+> "seems like you're assembling chair CX-184. You may have skipped step 8 in the assembly process, since the rear leg is screwed backwards. Here is a step-by-step solution from the assembly guide: ...". 
+
+Note how both answers recognized the issue correctly, but since the LLM had additional context in the second answer, it was also able to provide a solution and more specific details. That's the jist of RAG - LLMs provide **higher-quality responses** when provided with **more context** surrounding a query. 
+
+While the core concept itself is quite obvious, the complexity arises in *how* we can effectively retrieve the correct information. In the following sections, we explain one way to effectively perform RAG based on the concept of vector embeddings and similarity search (we'll explain what these mean!). 
 
 <Note>
-In reality, DataBridge uses a combination of different RAG techniques to achieve the best solution. We intend to talk about each of the techniques we implement in the [concepts](/concepts/) section of our documentation. If you're looking for a particular RAG technique, such as [ColPali](/concepts/colpali.mdx) or [Knowledge Graphs](/concepts/knowledge-graphs.mdx), you'll find it there. In this explainer, however, we'll restrict ourselves to talk about single-vector search based retrieval.
+In reality, DataBridge uses a combination of different RAG techniques to achieve the best solution. We intend to talk about each of the techniques we implement in the [concepts](/concepts/) section of our documentation. If you're looking for a particular RAG technique, such as [ColPali](/concepts/colpali.mdx) or [Knowledge Graphs](/concepts/knowledge-graphs.mdx), you'll find it there. In this explainer, however, we'll restrict ourselves to talk about single vector-search based retrieval.
 </Note>
 
 ## How does RAG work?
 
-RAG roughly consists of 4 actions: i) *ingesting* knowledge - such as code documentation, textbooks, or product catalogues - ii) *retrieving* relevant chunks from said knowledge, iii) using the retrieved information to *augment* the user query into a better prompt, and iv) *generating* a model response from the prompt. 
+RAG roughly consists of 4 actions: i) ingesting knowledge - such as code documentation, textbooks, or product catalogues - ii) *retrieving* relevant chunks from said knowledge, iii) using the retrieved information to *augment* the user query into a better prompt, and iv) *generating* a model response from the prompt. 
 
 ### Ingest
 
@@ -27,81 +32,68 @@ In order to help add context to a prompt, we first need that context to exist. T
 
 **Chunking** involves breaking down documents into smaller, manageable pieces. While LLMs have context windows that can handle thousands of tokens, we want to retrieve only the most relevant information for a given query. Chunking strategies vary based on the content type - code documentation might be chunked by function or class, while textbooks might be chunked by section or paragraph. The ideal chunk size balances granularity (smaller chunks for precise retrieval) with context preservation (larger chunks for maintaining semantic meaning).
 
-```pseudocode
-FUNCTION ChunkDocument(document)
-    // Different chunking strategies for different document types
-    IF document.type == "code"
-        chunks = SplitByFunction(document)
-    ELSE IF document.type == "article"
-        chunks = SplitByParagraph(document)
-    ELSE
-        chunks = SplitBySentenceWithOverlap(document, windowSize=500, overlap=100)
-    
-    FOR EACH chunk IN chunks
-        chunk.metadata = {
-            source: document.title,
-            type: document.type,
-            position: chunk.index
-        }
-    
-    RETURN chunks
-END FUNCTION
-```
-
 **Embedding** transforms these text chunks into vector representations - essentially converting semantic meaning into mathematical space. This is done using embedding models that distill the essence of text into dense vectors. The [math and ML behind embeddings](https://www.3blue1brown.com/lessons/gpt#embedding) is really interesting. They have a [long history](https://en.wikipedia.org/wiki/Word_embedding) of development - with origins as old as 1957. Over time, models that produce word embeddings have gone through mulitple iterations - different domains, novel neural network architectures, as well as different training paradigms. 
 
-```pseudocode
-FUNCTION EmbedChunks(chunks, embeddingModel)
-    embeddedChunks = []
-    
-    FOR EACH chunk IN chunks
-        vector = embeddingModel.embed(chunk.content)
-        embeddedChunks.APPEND({
-            content: chunk.content,
-            vector: vector,
-            metadata: chunk.metadata
-        })
-    
-    RETURN embeddedChunks
-END FUNCTION
-```
+Here's a gif we made using [Manim](https://www.manim.community/) to explain word embeddings:
 
-**Indexing** organizes these vectors for efficient similarity search. Options range from exact nearest-neighbor algorithms to approximate methods like HNSW (Hierarchical Navigable Small World) or IVF (Inverted File Index). Vector databases like Pinecone, Weaviate, or Qdrant handle this complexity, optimizing for the trade-off between search speed and accuracy.
+<img src="/assets/WordEmbeddings.gif" alt="Animation showing how word embeddings work" />
 
-```pseudocode
-FUNCTION IndexEmbeddings(embeddedChunks, vectorDB)
-    FOR EACH item IN embeddedChunks
-        vectorDB.upsert(
-            id: GenerateUUID(),
-            vector: item.vector,
-            metadata: {
-                content: item.content,
-                source: item.metadata.source,
-                type: item.metadata.type,
-                position: item.metadata.position
-            }
-        )
-    
-    // Build optimized index structure
-    vectorDB.buildIndex(
-        indexType: "HNSW",
-        parameters: {
-            m: 16,  // connections per layer
-            efConstruction: 200  // build-time accuracy vs. speed tradeoff
-        }
-    )
-    
-    RETURN success
-END FUNCTION
-```
+Now, if the embeddings space encodes meaning, it is reasonable to assume that words or text that mean similar things have embeddings that are close to each other. That is, *the closer the embeddings are to each other, the more similar the "embedees"*. This idea is the foundation of retrieval.
 
-The efficiency of your RAG system hinges on these ingestion decisions. Poorly chunked documents or low-quality embeddings can lead to irrelevant retrievals, while an inefficient index structure might impact latency. At DataBridge, we've optimized our ingestion pipeline through extensive experimentation with chunk sizes (typically 500-1000 tokens), embedding models benchmarked for domain-specific content, and vector index configurations tuned for our retrieval patterns.
+Once we have these embeddings, we can save them in a vector store. When a query comes in, we can embed it and find the chunks that are the closest to it. 
 
 ### Retrieve
 
+A natural question is, how do we quantify "closeness"? This ends up being the cosine distance. There's more information about this - i.e. why we use cosine distance - in the dropdown below. 
+
+<Accordion title="Why do we use cosine similarity?">
+ We could consider the distance between two embeddings. However, if we want direct similarities scores, we'd have to perform some kind of inverse transformation (if the distance is small, they are actually more similar). More importantly, regular distance computation suffers from the [curse of dimensionality](https://en.wikipedia.org/wiki/Curse_of_dimensionality). Instead, we could look at the *dot product* of two vectors instead. The closer two vectors are to each other, the higher their dot product value. However, since the dot product of two vectors is proportional to the length of the vectors, this also means that a larger vector (i.e. a vector whose magnitude is high) will be the most similar to other vectors. As a result, we can divide the dot product with the lengths of both vectors, obtaining the cosine distance.
+
+Computing cosine distance is expensive. So, in practice, most embedding models provide *normalized* embeddings (i.e. embeddings with length 1). Then, computing the dot product is the same as computing the cosine distance between two vectors.
+</Accordion>
+
+So, upto this point, we've taken documents, separated them into chunks, and embedded each chunk into a vector. We've also discussed how to compute vectors that are close to each other. As a result ...we now have a practical way to retrieve relevant context.
+
+When a user query arrives, it's first transformed into an embedding vector. Next, the retrieval system performs a similarity search in our vector database to find the most relevant chunks—these are the vectors closest in semantic meaning to the query. The number of retrieved chunks can vary, typically between three to ten, depending on the application's requirements and the desired comprehensiveness of context.
+
+### Augment
+
+With relevant chunks in hand, we now move to the augmentation step. Here, the original user query is combined with the retrieved chunks to construct an enriched prompt. This augmented prompt provides the LLM with additional context, guiding it toward more precise, accurate, and relevant responses.
+
+For example, if our furniture-assembly app receives the query:
+
+> "Why does the chair feel unstable?"
+
+The retrieval might return chunks like:
+
+- "Ensure that the screws (B3) from step 5 are tightened completely."
+- "Instability may result if the cross-bar (part D) from step 7 is incorrectly positioned."
+
+The augmented prompt passed to the LLM could be:
+
+> "User query: 'Why does the chair feel unstable?' Context from manual: 'Ensure screws (B3) from step 5 are tightened completely. Instability may result if the cross-bar (part D) from step 7 is incorrectly positioned.'"
+
+This detailed context enables the LLM to generate a highly informed, actionable response.
+
+### Generate
+
+Finally, the augmented prompt is passed to the LLM to generate the final answer. Because the LLM has access to highly relevant context, its responses are significantly more informative and actionable. Continuing our previous example, the response could be:
+
+> "The chair's instability is likely caused by loose screws (B3) from step 5 or an incorrectly positioned cross-bar (part D). Verify these areas, tightening screws fully and checking that part D matches the orientation shown in step 7 of the assembly manual."
+
+This demonstrates how RAG improves the response quality by leveraging external knowledge effectively.
+
+## Putting it all together
+
+To summarize, RAG leverages four key steps—ingestion, retrieval, augmentation, and generation—to significantly enhance the quality of LLM-generated responses. By converting knowledge bases into vector embeddings, performing efficient similarity searches, and providing detailed context to LLMs, RAG allows applications to deliver precise, context-rich interactions.
+
+In future articles, we'll delve deeper into specific RAG techniques, discuss optimization strategies for vector search, and explore how combining multiple retrieval methods can further enhance application performance.
+
+
+{/* 
 ### Augment 
 
 ### Generate
 
-## How can we implement RAG?
+## How can we implement RAG? */}
 
