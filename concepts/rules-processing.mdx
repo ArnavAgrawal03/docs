@@ -1,4 +1,7 @@
-# DataBridge: Rules-Based Document Ingestion
+---
+title: 'Rules'
+description: 'An overview of rules based ingestion in DataBridge'
+---
 
 Rules! Rules! Rules! LLMs are exceptionally good at transforming content and extracting relevant information, making them ideal building blocks for robust document processing. However, without clear rules, even the most advanced LLMs can struggle to deliver consistent and precise outcomes. DataBridge leverages the power of LLMs, guided by user-defined rules, eliminating the need for developers to create complex custom pipelines. With rules acting as straightforward instructions, we enable reliable, repeatable document processing to unlock the full potential of your unstructured data.
 
@@ -45,8 +48,8 @@ The rules engine works by:
 This rule type extracts structured data from document content according to a schema. It's perfect for converting unstructured documents into structured, queryable data.
 
 ```python
-from databridge-client import DataBridge
-from databridge-client.rules import MetadataExtractionRule
+from databridge import DataBridge
+from databridge.rules import MetadataExtractionRule
 from pydantic import BaseModel
 
 # Define a schema for the metadata you want to extract
@@ -81,8 +84,8 @@ print(f"Education: {len(doc.metadata['education'])} entries")
 This rule type transforms document content according to natural language instructions. It's perfect for redaction, summarization, formatting changes, etc.
 
 ```python
-from databridge-client import DataBridge
-from databridge-client.rules import NaturalLanguageRule
+from databridge import DataBridge
+from databridge.rules import NaturalLanguageRule
 
 # Connect to DataBridge
 db = DataBridge()
@@ -165,13 +168,15 @@ For large documents, DataBridge automatically chunks the content and processes r
 
 Larger batch sizes may improve throughput but require more memory, and with a huge batch size, we could run into unreliable results. For complex rules or larger documents, you might need to adjust this setting based on your hardware capabilities and the latency requirements of your application.
 
-## Use Case 1: Resume Processing System
+## Example Use cases
+
+### Resume Processing System
 
 Let's explore a complete example for processing resumes.
 
 ```python
-from databridge-client import DataBridge
-from databridge-client.rules import MetadataExtractionRule, NaturalLanguageRule
+from databridge import DataBridge
+from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
 from pydantic import BaseModel
 
 # Define resume schema
@@ -219,13 +224,13 @@ for candidate in candidates:
     print("---")
 ```
 
-## Use Case 2: Medical Document Processing with PII Redaction
+### Medical Document Processing with PII Redaction
 
 Medical documents often contain sensitive information that needs redaction while preserving clinical value.
 
 ```python
-from databridge-client import DataBridge
-from databridge-client.rules import MetadataExtractionRule, NaturalLanguageRule
+from databridge import DataBridge
+from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
 from pydantic import BaseModel
 
 # Define medical record schema
