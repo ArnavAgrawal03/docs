@@ -3,6 +3,8 @@ title: 'Getting Started'
 description: 'Setting Up the DataBridge server'
 ---
 
+# Direct Installation
+
 ## Prerequisites
 
 <Accordion title="Python">
@@ -84,6 +86,9 @@ DataBridge requires PostgreSQL with the pgvector extension for vector storage an
   </Tab>
 </Tabs>
 
+After installation, verify that Ollama is running correctly by making a simple query:
+
+
 After installation, verify that PostgreSQL is running correctly:
 
 ```bash
@@ -98,6 +103,61 @@ You should see the following output:
 <Your postgres version and some compilation details>
 ```
 
+</Accordion>
+
+<Accordion title="Installing Ollama">
+<Tabs>
+  <Tab title="macOS">
+    Install Ollama using Homebrew:
+    
+    ```bash
+    brew install ollama
+    ```
+    
+    Start Ollama:
+    
+    ```bash
+    ollama serve
+    ```
+    
+    Pull a model to use with DataBridge (in a new terminal):
+    
+    ```bash
+    ollama pull llama3.2
+    ```
+  </Tab>
+  <Tab title="Linux">
+    Install Ollama using the official installation script:
+    
+    ```bash
+    curl -fsSL https://ollama.com/install.sh | sh
+    ```
+    
+    Start Ollama:
+    
+    ```bash
+    ollama serve
+    ```
+    
+    Pull a model to use with DataBridge (in a new terminal):
+    
+    ```bash
+    ollama pull llama3.2
+    ```
+  </Tab>
+  <Tab title="Windows">
+    1. Download the Ollama installer from the [official website](https://ollama.com/download/windows).
+    
+    2. Run the installer and follow the on-screen instructions.
+    
+    3. After installation, Ollama will start automatically.
+    
+    4. Open Command Prompt or PowerShell and pull a model:
+       ```bash
+       ollama pull llama3.2
+       ```
+  </Tab>
+</Tabs>
 </Accordion>
 
 ## Cloning the Repository
@@ -223,6 +283,4 @@ Now that you have the server running, you can explore the different ways to inte
 </Card>
 </CardGroup>
 
-
-
-
+# Installing via Ollama

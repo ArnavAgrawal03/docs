@@ -17,7 +17,8 @@
             "group": "Get Started",
             "pages": [
               "introduction",
-              "getting-started"
+              "getting-started",
+              "configuration"
             ]
           },
           {
@@ -25,9 +26,8 @@
             "pages": [
               "concepts/naive-rag",
               "concepts/knowledge-graphs",
-              "concepts/video-rag",
-              "concepts/colpali",
-              "concepts/mcp"
+              "concepts/multimodal",
+              "concepts/databases"
             ]
           },
           {
@@ -36,7 +36,8 @@
               "cookbooks/cache-augmented-generation",
               "cookbooks/colpali",
               "cookbooks/knowledge-graphs",
-              "cookbooks/video-rag"
+              "cookbooks/video-rag",
+              "cookbooks/mcp"
             ]
           }
         ]
