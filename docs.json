@@ -25,6 +25,7 @@
             "group": "Concepts",
             "pages": [
               "concepts/naive-rag",
+              "concepts/rules-processing",
               "concepts/knowledge-graphs",
               "concepts/multimodal",
               "concepts/databases"
