@@ -1,0 +1,56 @@
+---
+title: 'Retrieving Images'
+description: 'Using Late-interaction and Contrastive learning to achieve state-of-the-art performance in visual retrieval'
+---
+
+## Introduction
+
+Upto now, we've seen RAG techniques that **i)** parse a given document, **ii)** convert it to text, and **iii)** embed the text for retrieval. These techniques have been particualrly text-heavy. Embedding models expect text in, knowledge graphs expect text in, and prasers break down when provided with documents that aren't text-dominant. This motivates the question:
+
+> When was the last time you looked at a document and only saw text?
+
+Most business documents, research papers, reports, and presentations we encounter daily are rich visual experiences: tables organizing crucial data, charts illuminating trends, infographics explaining complex concepts, and visual layouts that guide our understanding. These visual elements aren't just decorative—they're fundamental to how information is communicated. 
+
+However, most RAG systems treat these elements as second-class citizens. They are either ignored or captioned and embedded as text. This leads to poor retrieval performance - especially for tasks that require visual reasoning.
+
+In this guide, we'll explore a series of models, starting with *ColPali* that are built from the ground up to help retrieve images with the same fidelity as text. 
+
+## What is ColPali?
+
+The core idea behind ColPali is simple: the core bottleneck in retrieval is not the performance of the embedding model, but **prior data ingestion pipeline**. As a result, this new techniques proposes doing away with any data preprocessing - embedding the entire document as a list of images instead.  
+
+![ColPali Architecture](/assets/colpali.png)
+
+The diagram above shows the ColPali pipeline when compared with traditional layout-detection based data ingestion pipelines. Directly ingesting the document as a list of images significantly speeds up the time taken to ingest each document, while also ensuring higher retrieval quality.
+
+## How does it work?
+
+### Embedding Process
+The embedding process for ColPali borrows heavily from models like CLIP.  That is, the vision encoder part of the model (as seen in the diagram above) is trained via a technique called **Contrastive Learning**. As we've discussed in previous explainers, an encoder is a function (usually a neural network or a transformer) that maps a given input to a fixed-length vector. Contrastive learning is a technique that allows us to train two encoders of different input types (such as image and text) to produce vectors in the "same embedding space". That is, the embedding of the word "dog" would be very close the embedding of the image of a dog. The way we can achieve this is simple in theory:
+
+1) Take a large dataset of image and text pairs. 
+2) Pass the image and text through the vision and text encoders respectively.
+3) Compute the dot product of the image embeddings and text embeddings.
+4) Penalize the encoders for embeddings that are not close to each other (i.e. a low dot product).
+
+Over time, the encoders will learn to produce embeddings that project to the same space. As we scale this up, as researchers did with [SigLIP](https://arxiv.org/abs/2303.15343), we see that instead of just matching images of objects to their corresponding word, we can also match images of the handwritten version of the word to their corresponding word in text.
+
+So, we have a system that, given an image, can provide a vector embedding that lies in the same space as a text embedding.
+
+
+### Retrieval Process
+
+The retrieval process for ColPali borrows from late-interaction based reranking techniques such as [ColBERT](https://arxiv.org/abs/2004.12832). The idea is that instead of directly embedding an image or an entire block of text, we can embed individual patches or tokens instead. Then, instead of using the regular dot product or the cosine similarity, we can employ a slightly different scoring function. This scoring funciton looks at the most similar patches and tokens, and then sums those similarities up to obtain a final score.
+
+![ColBERT Architecture](/assets/colbert.png)
+
+
+
+
+
+
+
+
+
+
+

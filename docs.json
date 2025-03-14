@@ -27,7 +27,7 @@
               "concepts/naive-rag",
               "concepts/rules-processing",
               "concepts/knowledge-graphs",
-              "concepts/multimodal",
+              "concepts/colpali",
               "concepts/databases"
             ]
           },
@@ -35,7 +35,7 @@
             "group": "Cookbooks",
             "pages": [
               "cookbooks/cache-augmented-generation",
-              "cookbooks/colpali",
+              "cookbooks/multimodal",
               "cookbooks/knowledge-graphs",
               "cookbooks/video-rag",
               "cookbooks/mcp"
