@@ -1,0 +1,46 @@
+---
+title: "close"
+description: "Close the HTTP session"
+---
+
+# close
+
+Close the HTTP session.
+
+```python
+def close()
+```
+
+## Parameters
+
+None
+
+## Returns
+
+None
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+# Perform operations
+doc = db.ingest_text("Sample content")
+
+# Close the session when done
+db.close()
+```
+
+## Context Manager Alternative
+
+Instead of manually calling `close()`, you can use the DataBridge client as a context manager:
+
+```python
+from databridge.sync import DataBridge
+
+with DataBridge() as db:
+    doc = db.ingest_text("Sample content")
+    # Session is automatically closed when exiting the with block
+``` 

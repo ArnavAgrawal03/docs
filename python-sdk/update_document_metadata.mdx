@@ -1,0 +1,39 @@
+---
+title: "update_document_metadata"
+description: "Update a document's metadata only"
+---
+
+# update_document_metadata
+
+Update a document's metadata only.
+
+```python
+def update_document_metadata(
+    document_id: str,
+    metadata: Dict[str, Any],
+) -> Document
+```
+
+## Parameters
+
+- `document_id` (str): ID of the document to update
+- `metadata` (Dict[str, Any]): Metadata to update
+
+## Returns
+
+- `Document`: Updated document metadata
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+# Update just the metadata of a document
+updated_doc = db.update_document_metadata(
+    document_id="doc_123",
+    metadata={"status": "reviewed", "reviewer": "Jane Smith"}
+)
+print(f"Updated metadata: {updated_doc.metadata}")
+``` 

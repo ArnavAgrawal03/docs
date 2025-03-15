@@ -1,0 +1,52 @@
+---
+title: "get_cache"
+description: "Get a cache by name"
+---
+
+# get_cache
+
+Get a cache by name.
+
+```python
+def get_cache(name: str) -> Cache
+```
+
+## Parameters
+
+- `name` (str): Name of the cache to retrieve
+
+## Returns
+
+- `Cache`: A cache object that is used to interact with the cache.
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+cache = db.get_cache("programming_cache")
+
+# Update the cache with new documents
+cache.update()
+
+# Add specific documents to the cache
+cache.add_docs(["doc3", "doc4"])
+
+# Query the cache
+response = cache.query(
+    "What are the key concepts in functional programming?",
+    max_tokens=500,
+    temperature=0.7
+)
+print(response.completion)
+```
+
+## Cache Methods
+
+The `Cache` object returned by this method has the following methods:
+
+- `update()`: Update the cache with any new documents matching the original filters
+- `add_docs(docs: List[str])`: Add specific documents to the cache
+- `query(query: str, max_tokens: Optional[int] = None, temperature: Optional[float] = None)`: Query the cache 

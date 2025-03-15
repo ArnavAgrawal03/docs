@@ -1,0 +1,57 @@
+---
+title: "ingest_text"
+description: "Ingest a text document into DataBridge"
+---
+
+# ingest_text
+
+Ingest a text document into DataBridge.
+
+```python
+def ingest_text(
+    content: str,
+    filename: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+    rules: Optional[List[RuleOrDict]] = None,
+    use_colpali: bool = True,
+) -> Document
+```
+
+## Parameters
+
+- `content` (str): Text content to ingest
+- `filename` (str, optional): Optional filename for the document
+- `metadata` (Dict[str, Any], optional): Optional metadata dictionary
+- `rules` (List[RuleOrDict], optional): Optional list of rules to apply during ingestion. Can be:
+  - `MetadataExtractionRule`: Extract metadata using a schema
+  - `NaturalLanguageRule`: Transform content using natural language
+- `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to ingest the text (slower, but significantly better retrieval accuracy for text and images). Defaults to True.
+
+## Returns
+
+- `Document`: Metadata of the ingested document
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+from pydantic import BaseModel
+
+class DocumentInfo(BaseModel):
+    title: str
+    author: str
+    date: str
+
+db = DataBridge()
+
+doc = db.ingest_text(
+    "Machine learning is fascinating...",
+    metadata={"category": "tech"},
+    rules=[
+        # Extract metadata using schema
+        MetadataExtractionRule(schema=DocumentInfo),
+        # Transform content
+        NaturalLanguageRule(prompt="Shorten the content, use keywords")
+    ]
+) 

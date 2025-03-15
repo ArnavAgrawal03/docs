@@ -39,24 +39,53 @@
         "tab": "Python SDK",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Client",
             "pages": [
-              "python-sdk/introduction",
-              "python-sdk/quickstart"
+              "python-sdk/databridge",
+              "python-sdk/close"
             ]
           },
           {
-            "group": "Guides",
+            "group": "Document Ingestion",
             "pages": [
-              "python-sdk/advanced",
-              "python-sdk/image-handling",
-              "python-sdk/async-usage"
+              "python-sdk/ingest_text",
+              "python-sdk/ingest_file"
             ]
           },
           {
-            "group": "Reference",
+            "group": "Document Retrieval",
             "pages": [
-              "python-sdk/api-reference"
+              "python-sdk/retrieve_chunks",
+              "python-sdk/retrieve_docs",
+              "python-sdk/query",
+              "python-sdk/list_documents",
+              "python-sdk/get_document",
+              "python-sdk/get_document_by_filename"
+            ]
+          },
+          {
+            "group": "Document Updates",
+            "pages": [
+              "python-sdk/update_document_with_text",
+              "python-sdk/update_document_with_file",
+              "python-sdk/update_document_metadata",
+              "python-sdk/update_document_by_filename_with_text",
+              "python-sdk/update_document_by_filename_with_file",
+              "python-sdk/update_document_by_filename_metadata"
+            ]
+          },
+          {
+            "group": "Batch Operations",
+            "pages": [
+              "python-sdk/batch_get_documents",
+              "python-sdk/batch_get_chunks"
+            ]
+          },
+          {
+            "group": "Cache Management",
+            "pages": [
+              "python-sdk/create_cache",
+              "python-sdk/get_cache"
             ]
           }
         ]

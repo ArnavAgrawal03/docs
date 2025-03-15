@@ -1,0 +1,63 @@
+---
+title: "DataBridge"
+description: "Main client for document operations in DataBridge"
+---
+
+# DataBridge
+
+The `DataBridge` class is the main client for document operations in DataBridge.
+
+```python
+from databridge.sync import DataBridge
+
+# Without authentication
+db = DataBridge()
+
+# With authentication
+db = DataBridge("databridge://owner_id:token@api.databridge.ai")
+```
+
+## Constructor
+
+```python
+DataBridge(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
+```
+
+### Parameters
+
+- `uri` (str, optional): DataBridge URI in format "databridge://&lt;owner_id&gt;:&lt;token&gt;@&lt;host&gt;". If not provided, connects to http://localhost:8000 without authentication.
+- `timeout` (int, optional): Request timeout in seconds. Defaults to 30.
+- `is_local` (bool, optional): Whether connecting to local development server. Defaults to False.
+
+## Methods
+
+The DataBridge client provides the following methods for document operations:
+
+- [ingest_text](/python-sdk/ingest_text)
+- [ingest_file](/python-sdk/ingest_file)
+- [retrieve_chunks](/python-sdk/retrieve_chunks)
+- [retrieve_docs](/python-sdk/retrieve_docs)
+- [query](/python-sdk/query)
+- [list_documents](/python-sdk/list_documents)
+- [get_document](/python-sdk/get_document)
+- [get_document_by_filename](/python-sdk/get_document_by_filename)
+- [update_document_with_text](/python-sdk/update_document_with_text)
+- [update_document_with_file](/python-sdk/update_document_with_file)
+- [update_document_metadata](/python-sdk/update_document_metadata)
+- [update_document_by_filename_with_text](/python-sdk/update_document_by_filename_with_text)
+- [update_document_by_filename_with_file](/python-sdk/update_document_by_filename_with_file)
+- [update_document_by_filename_metadata](/python-sdk/update_document_by_filename_metadata)
+- [batch_get_documents](/python-sdk/batch_get_documents)
+- [batch_get_chunks](/python-sdk/batch_get_chunks)
+- [create_cache](/python-sdk/create_cache)
+- [get_cache](/python-sdk/get_cache)
+- [close](/python-sdk/close)
+
+## Context Manager
+
+The DataBridge client can be used as a context manager:
+
+```python
+with DataBridge() as db:
+    doc = db.ingest_text("Sample content")
+``` 

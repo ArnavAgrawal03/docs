@@ -1,0 +1,45 @@
+---
+title: "batch_get_documents"
+description: "Retrieve multiple documents by their IDs in a single batch operation"
+---
+
+# batch_get_documents
+
+Retrieve multiple documents by their IDs in a single batch operation.
+
+```python
+def batch_get_documents(document_ids: List[str]) -> List[Document]
+```
+
+## Parameters
+
+- `document_ids` (List[str]): List of document IDs to retrieve
+
+## Returns
+
+- `List[Document]`: List of document metadata for found documents
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+docs = db.batch_get_documents(["doc_123", "doc_456", "doc_789"])
+for doc in docs:
+    print(f"Document {doc.external_id}: {doc.metadata.get('title')}")
+```
+
+## Document Properties
+
+Each `Document` object in the returned list has the following properties:
+
+- `external_id` (str): Unique document identifier
+- `content_type` (str): Content type of the document
+- `filename` (Optional[str]): Original filename if available
+- `metadata` (Dict[str, Any]): User-defined metadata
+- `storage_info` (Dict[str, str]): Storage-related information
+- `system_metadata` (Dict[str, Any]): System-managed metadata
+- `access_control` (Dict[str, Any]): Access control information
+- `chunk_ids` (List[str]): IDs of document chunks 

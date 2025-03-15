@@ -1,0 +1,54 @@
+---
+title: "get_document_by_filename"
+description: "Get document metadata by filename"
+---
+
+# get_document_by_filename
+
+Get document metadata by filename. If multiple documents have the same filename, returns the most recently updated one.
+
+```python
+def get_document_by_filename(filename: str) -> Document
+```
+
+## Parameters
+
+- `filename` (str): Filename of the document to retrieve
+
+## Returns
+
+- `Document`: Document metadata
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+doc = db.get_document_by_filename("report.pdf")
+print(f"Document ID: {doc.external_id}")
+print(f"Content Type: {doc.content_type}")
+print(f"Metadata: {doc.metadata}")
+```
+
+## Document Properties
+
+The `Document` object returned by this method has the following properties:
+
+- `external_id` (str): Unique document identifier
+- `content_type` (str): Content type of the document
+- `filename` (Optional[str]): Original filename if available
+- `metadata` (Dict[str, Any]): User-defined metadata
+- `storage_info` (Dict[str, str]): Storage-related information
+- `system_metadata` (Dict[str, Any]): System-managed metadata
+- `access_control` (Dict[str, Any]): Access control information
+- `chunk_ids` (List[str]): IDs of document chunks
+
+## Document Methods
+
+The `Document` object also provides the following methods:
+
+- `update_with_text()`: Update the document with new text content
+- `update_with_file()`: Update the document with content from a file
+- `update_metadata()`: Update the document's metadata only 

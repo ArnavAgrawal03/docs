@@ -1,0 +1,42 @@
+---
+title: "update_document_by_filename_metadata"
+description: "Update a document's metadata using filename to identify the document"
+---
+
+# update_document_by_filename_metadata
+
+Update a document's metadata using filename to identify the document.
+
+```python
+def update_document_by_filename_metadata(
+    filename: str,
+    metadata: Dict[str, Any],
+    new_filename: Optional[str] = None,
+) -> Document
+```
+
+## Parameters
+
+- `filename` (str): Filename of the document to update
+- `metadata` (Dict[str, Any]): Metadata to update
+- `new_filename` (str, optional): Optional new filename to assign to the document
+
+## Returns
+
+- `Document`: Updated document metadata
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+# Update just the metadata of a document identified by filename
+updated_doc = db.update_document_by_filename_metadata(
+    filename="report.pdf",
+    metadata={"status": "reviewed", "reviewer": "Jane Smith"},
+    new_filename="reviewed_report.pdf"  # Optional: rename the file
+)
+print(f"Updated metadata: {updated_doc.metadata}")
+``` 

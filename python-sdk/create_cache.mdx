@@ -1,0 +1,48 @@
+---
+title: "create_cache"
+description: "Create a new cache with specified configuration"
+---
+
+# create_cache
+
+Create a new cache with specified configuration.
+
+```python
+def create_cache(
+    name: str,
+    model: str,
+    gguf_file: str,
+    filters: Optional[Dict[str, Any]] = None,
+    docs: Optional[List[str]] = None,
+) -> Dict[str, Any]
+```
+
+## Parameters
+
+- `name` (str): Name of the cache to create
+- `model` (str): Name of the model to use (e.g. "llama2")
+- `gguf_file` (str): Name of the GGUF file to use for the model
+- `filters` (Dict[str, Any], optional): Optional metadata filters to determine which documents to include. These filters will be applied in addition to any specific docs provided.
+- `docs` (List[str], optional): Optional list of specific document IDs to include. These docs will be included in addition to any documents matching the filters.
+
+## Returns
+
+- `Dict[str, Any]`: Created cache configuration
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+# This will include both:
+# 1. Any documents with category="programming"
+# 2. The specific documents "doc1" and "doc2" (regardless of their category)
+cache = db.create_cache(
+    name="programming_cache",
+    model="llama2",
+    gguf_file="llama-2-7b-chat.Q4_K_M.gguf",
+    filters={"category": "programming"},
+    docs=["doc1", "doc2"]
+) 

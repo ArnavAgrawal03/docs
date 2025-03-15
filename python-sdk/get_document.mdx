@@ -1,0 +1,54 @@
+---
+title: "get_document"
+description: "Get document metadata by ID"
+---
+
+# get_document
+
+Get document metadata by ID.
+
+```python
+def get_document(document_id: str) -> Document
+```
+
+## Parameters
+
+- `document_id` (str): ID of the document
+
+## Returns
+
+- `Document`: Document metadata
+
+## Example
+
+```python
+from databridge.sync import DataBridge
+
+db = DataBridge()
+
+doc = db.get_document("doc_123")
+print(f"Title: {doc.metadata.get('title')}")
+print(f"Content Type: {doc.content_type}")
+print(f"Filename: {doc.filename}")
+```
+
+## Document Properties
+
+The `Document` object returned by this method has the following properties:
+
+- `external_id` (str): Unique document identifier
+- `content_type` (str): Content type of the document
+- `filename` (Optional[str]): Original filename if available
+- `metadata` (Dict[str, Any]): User-defined metadata
+- `storage_info` (Dict[str, str]): Storage-related information
+- `system_metadata` (Dict[str, Any]): System-managed metadata
+- `access_control` (Dict[str, Any]): Access control information
+- `chunk_ids` (List[str]): IDs of document chunks
+
+## Document Methods
+
+The `Document` object also provides the following methods:
+
+- `update_with_text()`: Update the document with new text content
+- `update_with_file()`: Update the document with content from a file
+- `update_metadata()`: Update the document's metadata only 
