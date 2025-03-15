@@ -26,19 +26,7 @@
             "pages": [
               "concepts/naive-rag",
               "concepts/rules-processing",
-              "concepts/knowledge-graphs",
-              "concepts/colpali",
-              "concepts/databases"
-            ]
-          },
-          {
-            "group": "Cookbooks",
-            "pages": [
-              "cookbooks/cache-augmented-generation",
-              "cookbooks/multimodal",
-              "cookbooks/knowledge-graphs",
-              "cookbooks/video-rag",
-              "cookbooks/mcp"
+              "concepts/colpali"
             ]
           }
         ]
