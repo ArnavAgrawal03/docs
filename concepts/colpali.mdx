@@ -44,6 +44,30 @@ The retrieval process for ColPali borrows from late-interaction based reranking 
 
 ![ColBERT Architecture](/assets/colbert.png)
 
+<Note>
+In order to speed up the retrieval process, DataBridge uses a technique that computes the [hamming distance](https://en.wikipedia.org/wiki/Hamming_distance) between individual embeddings instead of the dot product. This is because the hamming distance is a much faster operation than the dot product, and helps scale the retrieval process to millions of documents. This technique is borrows from the amazing team at [Vespa](https://blog.vespa.ai/scaling-colpali-to-billions/).
+</Note>
+
+## How to use ColPali?
+
+With DataBridge, using ColPali is as simple as adding a single `true/false` parameter to the `ingest_file` function and the query function. Here is what an example ingestion pathway looks like:
+
+```python
+from databridge import DataBridge
+
+db = DataBridge("YOUR-URI-HERE")
+
+db.ingest_file("report_with_images_and_graphs.pdf", use_colpali=True)
+```
+
+Here is an example query pathway:
+
+```python
+db.query("At what time-step did we see the highest GDP growth rate?", use_colpali=True)
+```
+
+So instead of having to implement the ColPali pipeline from scratch, you can use DataBridge to do it for you in a single line of code!
+
 
 
 
