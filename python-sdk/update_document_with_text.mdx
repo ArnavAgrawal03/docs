@@ -3,21 +3,34 @@ title: "update_document_with_text"
 description: "Update a document with new text content"
 ---
 
-# update_document_with_text
-
-Update a document with new text content using the specified strategy.
-
-```python
-def update_document_with_text(
-    document_id: str,
-    content: str,
-    filename: Optional[str] = None,
-    metadata: Optional[Dict[str, Any]] = None,
-    rules: Optional[List] = None,
-    update_strategy: str = "add",
-    use_colpali: Optional[bool] = None,
-) -> Document
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def update_document_with_text(
+        document_id: str,
+        content: str,
+        filename: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        rules: Optional[List] = None,
+        update_strategy: str = "add",
+        use_colpali: Optional[bool] = None,
+    ) -> Document
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def update_document_with_text(
+        document_id: str,
+        content: str,
+        filename: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        rules: Optional[List] = None,
+        update_strategy: str = "add",
+        use_colpali: Optional[bool] = None,
+    ) -> Document
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -33,20 +46,40 @@ def update_document_with_text(
 
 - `Document`: Updated document metadata
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-# Add new content to an existing document
-updated_doc = db.update_document_with_text(
-    document_id="doc_123",
-    content="This is additional content that will be appended to the document.",
-    filename="updated_document.txt",
-    metadata={"category": "updated"},
-    update_strategy="add"
-)
-print(f"Document version: {updated_doc.system_metadata.get('version')}")
-``` 
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # Add new content to an existing document
+    updated_doc = db.update_document_with_text(
+        document_id="doc_123",
+        content="This is additional content that will be appended to the document.",
+        filename="updated_document.txt",
+        metadata={"category": "updated"},
+        update_strategy="add"
+    )
+    print(f"Document version: {updated_doc.system_metadata.get('version')}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Add new content to an existing document
+        updated_doc = await db.update_document_with_text(
+            document_id="doc_123",
+            content="This is additional content that will be appended to the document.",
+            filename="updated_document.txt",
+            metadata={"category": "updated"},
+            update_strategy="add"
+        )
+        print(f"Document version: {updated_doc.system_metadata.get('version')}")
+    ```
+  </Tab>
+</Tabs>

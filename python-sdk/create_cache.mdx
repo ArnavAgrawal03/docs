@@ -3,19 +3,30 @@ title: "create_cache"
 description: "Create a new cache with specified configuration"
 ---
 
-# create_cache
-
-Create a new cache with specified configuration.
-
-```python
-def create_cache(
-    name: str,
-    model: str,
-    gguf_file: str,
-    filters: Optional[Dict[str, Any]] = None,
-    docs: Optional[List[str]] = None,
-) -> Dict[str, Any]
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def create_cache(
+        name: str,
+        model: str,
+        gguf_file: str,
+        filters: Optional[Dict[str, Any]] = None,
+        docs: Optional[List[str]] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def create_cache(
+        name: str,
+        model: str,
+        gguf_file: str,
+        filters: Optional[Dict[str, Any]] = None,
+        docs: Optional[List[str]] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -29,20 +40,61 @@ def create_cache(
 
 - `Dict[str, Any]`: Created cache configuration
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # This will include both:
+    # 1. Any documents with category="programming"
+    # 2. The specific documents "doc1" and "doc2" (regardless of their category)
+    cache = db.create_cache(
+        name="programming_cache",
+        model="llama2",
+        gguf_file="llama-2-7b-chat.Q4_K_M.gguf",
+        filters={"category": "programming"},
+        docs=["doc1", "doc2"]
+    )
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # This will include both:
+        # 1. Any documents with category="programming"
+        # 2. The specific documents "doc1" and "doc2" (regardless of their category)
+        cache = await db.create_cache(
+            name="programming_cache",
+            model="llama2",
+            gguf_file="llama-2-7b-chat.Q4_K_M.gguf",
+            filters={"category": "programming"},
+            docs=["doc1", "doc2"]
+        )
+    ```
+  </Tab>
+</Tabs>
 
-db = DataBridge()
+## Cache Usage
 
-# This will include both:
-# 1. Any documents with category="programming"
-# 2. The specific documents "doc1" and "doc2" (regardless of their category)
-cache = db.create_cache(
-    name="programming_cache",
-    model="llama2",
-    gguf_file="llama-2-7b-chat.Q4_K_M.gguf",
-    filters={"category": "programming"},
-    docs=["doc1", "doc2"]
-) 
+After creating a cache, you can interact with it using the [`get_cache`](/python-sdk/get_cache) method, which returns a Cache object that provides methods for querying and updating the cache.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    cache = db.get_cache("programming_cache")
+    response = cache.query("Explain recursion in programming")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    cache = await db.get_cache("programming_cache")
+    response = await cache.query("Explain recursion in programming")
+    ```
+  </Tab>
+</Tabs>

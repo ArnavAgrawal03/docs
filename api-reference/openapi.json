@@ -267,10 +267,126 @@
         }
       }
     },
+    "/batch/documents": {
+      "post": {
+        "summary": "Batch Get Documents",
+        "description": "Retrieve multiple documents by their IDs in a single batch operation.",
+        "operationId": "batch_get_documents_batch_documents_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Document Ids"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Document"
+                  },
+                  "title": "Response Batch Get Documents Batch Documents Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/batch/chunks": {
+      "post": {
+        "summary": "Batch Get Chunks",
+        "description": "Retrieve specific chunks by their document ID and chunk number in a single batch operation.",
+        "operationId": "batch_get_chunks_batch_chunks_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ChunkSource"
+                },
+                "title": "Chunk Ids"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChunkResult"
+                  },
+                  "title": "Response Batch Get Chunks Batch Chunks Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/query": {
       "post": {
         "summary": "Query Completion",
-        "description": "Generate completion using relevant chunks as context.",
+        "description": "Generate completion using relevant chunks as context.\n\nWhen graph_name is provided, the query will leverage the knowledge graph \nto enhance retrieval by finding relevant entities and their connected documents.",
         "operationId": "query_completion_query_post",
         "parameters": [
           {
@@ -423,6 +539,259 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/filename/{filename}": {
+      "get": {
+        "summary": "Get Document By Filename",
+        "description": "Get document by filename.",
+        "operationId": "get_document_by_filename_documents_filename__filename__get",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}/update_text": {
+      "post": {
+        "summary": "Update Document Text",
+        "description": "Update a document with new text content using the specified strategy.\n\nArgs:\n    document_id: ID of the document to update\n    request: Text content and metadata for the update\n    update_strategy: Strategy for updating the document (default: 'add')\n    \nReturns:\n    Document: Updated document metadata",
+        "operationId": "update_document_text_documents__document_id__update_text_post",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "update_strategy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "add",
+              "title": "Update Strategy"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestTextRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}/update_file": {
+      "post": {
+        "summary": "Update Document File",
+        "description": "Update a document with content from a file using the specified strategy.\n\nArgs:\n    document_id: ID of the document to update\n    file: File to add to the document\n    metadata: JSON string of metadata to merge with existing metadata\n    rules: JSON string of rules to apply to the content\n    update_strategy: Strategy for updating the document (default: 'add')\n    use_colpali: Whether to use multi-vector embedding\n\nReturns:\n    Document: Updated document metadata",
+        "operationId": "update_document_file_documents__document_id__update_file_post",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "use_colpali",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Use Colpali"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_update_document_file_documents__document_id__update_file_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}/update_metadata": {
+      "post": {
+        "summary": "Update Document Metadata",
+        "description": "Update only a document's metadata.\n\nArgs:\n    document_id: ID of the document to update\n    metadata: New metadata to merge with existing metadata\n\nReturns:\n    Document: Updated document metadata",
+        "operationId": "update_document_metadata_documents__document_id__update_metadata_post",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Metadata"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -921,6 +1290,149 @@
         }
       }
     },
+    "/graph/create": {
+      "post": {
+        "summary": "Create Graph",
+        "description": "Create a graph from documents.\n\nThis endpoint extracts entities and relationships from documents\nmatching the specified filters or document IDs and creates a graph.\n\nArgs:\n    request: CreateGraphRequest containing:\n        - name: Name of the graph to create\n        - filters: Optional metadata filters to determine which documents to include\n        - documents: Optional list of specific document IDs to include\n    auth: Authentication context\n\nReturns:\n    Graph: The created graph object",
+        "operationId": "create_graph_graph_create_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGraphRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Graph"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/graph/{name}": {
+      "get": {
+        "summary": "Get Graph",
+        "description": "Get a graph by name.\n\nThis endpoint retrieves a graph by its name if the user has access to it.\n\nArgs:\n    name: Name of the graph to retrieve\n    auth: Authentication context\n\nReturns:\n    Graph: The requested graph object",
+        "operationId": "get_graph_graph__name__get",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Graph"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/graphs": {
+      "get": {
+        "summary": "List Graphs",
+        "description": "List all graphs the user has access to.\n\nThis endpoint retrieves all graphs the user has access to.\n\nArgs:\n    auth: Authentication context\n\nReturns:\n    List[Graph]: List of graph objects",
+        "operationId": "list_graphs_graphs_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Graph"
+                  },
+                  "title": "Response List Graphs Graphs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/local/generate_uri": {
       "post": {
         "summary": "Generate Local Uri",
@@ -1037,6 +1549,35 @@
         ],
         "title": "Body_ingest_file_ingest_file_post"
       },
+      "Body_update_document_file_documents__document_id__update_file_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "metadata": {
+            "type": "string",
+            "title": "Metadata",
+            "default": "{}"
+          },
+          "rules": {
+            "type": "string",
+            "title": "Rules",
+            "default": "[]"
+          },
+          "update_strategy": {
+            "type": "string",
+            "title": "Update Strategy",
+            "default": "add"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_update_document_file_documents__document_id__update_file_post"
+      },
       "ChunkResult": {
         "properties": {
           "content": {
@@ -1098,6 +1639,36 @@
         "title": "ChunkResult",
         "description": "Query result at chunk level"
       },
+      "ChunkSource": {
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "chunk_number": {
+            "type": "integer",
+            "title": "Chunk Number"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_id",
+          "chunk_number"
+        ],
+        "title": "ChunkSource",
+        "description": "Source information for a chunk used in completion"
+      },
       "CompletionQueryRequest": {
         "properties": {
           "query": {
@@ -1148,6 +1719,46 @@
               }
             ],
             "title": "Use Colpali"
+          },
+          "graph_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph Name",
+            "description": "Name of the graph to use for knowledge graph-enhanced retrieval"
+          },
+          "hop_depth": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3,
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hop Depth",
+            "description": "Number of relationship hops to traverse in the graph",
+            "default": 1
+          },
+          "include_paths": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Include Paths",
+            "description": "Whether to include relationship paths in the response",
+            "default": false
           },
           "max_tokens": {
             "anyOf": [
@@ -1202,6 +1813,25 @@
               }
             ],
             "title": "Finish Reason"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/ChunkSource"
+            },
+            "type": "array",
+            "title": "Sources",
+            "default": []
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
           }
         },
         "type": "object",
@@ -1211,6 +1841,48 @@
         ],
         "title": "CompletionResponse",
         "description": "Response from completion generation"
+      },
+      "CreateGraphRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name of the graph to create"
+          },
+          "filters": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filters",
+            "description": "Optional metadata filters to determine which documents to include"
+          },
+          "documents": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documents",
+            "description": "Optional list of specific document IDs to include"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "CreateGraphRequest",
+        "description": "Request model for creating a graph"
       },
       "Document": {
         "properties": {
@@ -1250,6 +1922,13 @@
             },
             "type": "object",
             "title": "Storage Info"
+          },
+          "storage_files": {
+            "items": {
+              "$ref": "#/components/schemas/StorageFileInfo"
+            },
+            "type": "array",
+            "title": "Storage Files"
           },
           "system_metadata": {
             "type": "object",
@@ -1353,6 +2032,131 @@
         "title": "DocumentResult",
         "description": "Query result at document level"
       },
+      "Entity": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "properties": {
+            "type": "object",
+            "title": "Properties"
+          },
+          "document_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Document Ids"
+          },
+          "chunk_sources": {
+            "additionalProperties": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Chunk Sources"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "type"
+        ],
+        "title": "Entity",
+        "description": "Represents an entity in a knowledge graph"
+      },
+      "Graph": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "entities": {
+            "items": {
+              "$ref": "#/components/schemas/Entity"
+            },
+            "type": "array",
+            "title": "Entities"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/Relationship"
+            },
+            "type": "array",
+            "title": "Relationships"
+          },
+          "metadata": {
+            "type": "object",
+            "title": "Metadata"
+          },
+          "document_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Document Ids"
+          },
+          "filters": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filters"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "owner": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Owner"
+          },
+          "access_control": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Access Control"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "Graph",
+        "description": "Represents a knowledge graph"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1371,6 +2175,17 @@
           "content": {
             "type": "string",
             "title": "Content"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
           },
           "metadata": {
             "type": "object",
@@ -1401,6 +2216,51 @@
         ],
         "title": "IngestTextRequest",
         "description": "Request model for ingesting text content"
+      },
+      "Relationship": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "source_id": {
+            "type": "string",
+            "title": "Source Id"
+          },
+          "target_id": {
+            "type": "string",
+            "title": "Target Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "document_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Document Ids"
+          },
+          "chunk_sources": {
+            "additionalProperties": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Chunk Sources"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source_id",
+          "target_id",
+          "type"
+        ],
+        "title": "Relationship",
+        "description": "Represents a relationship between entities in a knowledge graph"
       },
       "RetrieveRequest": {
         "properties": {
@@ -1452,6 +2312,46 @@
               }
             ],
             "title": "Use Colpali"
+          },
+          "graph_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph Name",
+            "description": "Name of the graph to use for knowledge graph-enhanced retrieval"
+          },
+          "hop_depth": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3,
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hop Depth",
+            "description": "Number of relationship hops to traverse in the graph",
+            "default": 1
+          },
+          "include_paths": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Include Paths",
+            "description": "Whether to include relationship paths in the response",
+            "default": false
           }
         },
         "type": "object",
@@ -1460,6 +2360,57 @@
         ],
         "title": "RetrieveRequest",
         "description": "Base retrieve request model"
+      },
+      "StorageFileInfo": {
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "title": "Bucket"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "default": 1
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bucket",
+          "key"
+        ],
+        "title": "StorageFileInfo",
+        "description": "Information about a file stored in storage"
       },
       "ValidationError": {
         "properties": {

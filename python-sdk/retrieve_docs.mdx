@@ -3,19 +3,30 @@ title: "retrieve_docs"
 description: "Retrieve relevant documents from DataBridge"
 ---
 
-# retrieve_docs
-
-Retrieve relevant documents from DataBridge.
-
-```python
-def retrieve_docs(
-    query: str,
-    filters: Optional[Dict[str, Any]] = None,
-    k: int = 4,
-    min_score: float = 0.0,
-    use_colpali: bool = True,
-) -> List[DocumentResult]
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def retrieve_docs(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        use_colpali: bool = True,
+    ) -> List[DocumentResult]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def retrieve_docs(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        use_colpali: bool = True,
+    ) -> List[DocumentResult]
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -29,26 +40,49 @@ def retrieve_docs(
 
 - `List[DocumentResult]`: List of document results
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-docs = db.retrieve_docs(
-    "machine learning",
-    k=5,
-    min_score=0.5
-)
-
-for doc in docs:
-    print(f"Score: {doc.score}")
-    print(f"Document ID: {doc.document_id}")
-    print(f"Metadata: {doc.metadata}")
-    print(f"Content: {doc.content}")
-    print("---")
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    docs = db.retrieve_docs(
+        "machine learning",
+        k=5,
+        min_score=0.5
+    )
+    
+    for doc in docs:
+        print(f"Score: {doc.score}")
+        print(f"Document ID: {doc.document_id}")
+        print(f"Metadata: {doc.metadata}")
+        print(f"Content: {doc.content}")
+        print("---")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        docs = await db.retrieve_docs(
+            "machine learning",
+            k=5,
+            min_score=0.5
+        )
+        
+        for doc in docs:
+            print(f"Score: {doc.score}")
+            print(f"Document ID: {doc.document_id}")
+            print(f"Metadata: {doc.metadata}")
+            print(f"Content: {doc.content}")
+            print("---")
+    ```
+  </Tab>
+</Tabs>
 
 ## DocumentResult Properties
 

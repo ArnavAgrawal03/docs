@@ -3,13 +3,18 @@ title: "batch_get_documents"
 description: "Retrieve multiple documents by their IDs in a single batch operation"
 ---
 
-# batch_get_documents
-
-Retrieve multiple documents by their IDs in a single batch operation.
-
-```python
-def batch_get_documents(document_ids: List[str]) -> List[Document]
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def batch_get_documents(document_ids: List[str]) -> List[Document]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def batch_get_documents(document_ids: List[str]) -> List[Document]
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -19,17 +24,31 @@ def batch_get_documents(document_ids: List[str]) -> List[Document]
 
 - `List[Document]`: List of document metadata for found documents
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-docs = db.batch_get_documents(["doc_123", "doc_456", "doc_789"])
-for doc in docs:
-    print(f"Document {doc.external_id}: {doc.metadata.get('title')}")
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    docs = db.batch_get_documents(["doc_123", "doc_456", "doc_789"])
+    for doc in docs:
+        print(f"Document {doc.external_id}: {doc.metadata.get('title')}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        docs = await db.batch_get_documents(["doc_123", "doc_456", "doc_789"])
+        for doc in docs:
+            print(f"Document {doc.external_id}: {doc.metadata.get('title')}")
+    ```
+  </Tab>
+</Tabs>
 
 ## Document Properties
 

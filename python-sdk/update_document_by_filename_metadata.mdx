@@ -3,17 +3,26 @@ title: "update_document_by_filename_metadata"
 description: "Update a document's metadata using filename to identify the document"
 ---
 
-# update_document_by_filename_metadata
-
-Update a document's metadata using filename to identify the document.
-
-```python
-def update_document_by_filename_metadata(
-    filename: str,
-    metadata: Dict[str, Any],
-    new_filename: Optional[str] = None,
-) -> Document
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def update_document_by_filename_metadata(
+        filename: str,
+        metadata: Dict[str, Any],
+        new_filename: Optional[str] = None,
+    ) -> Document
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def update_document_by_filename_metadata(
+        filename: str,
+        metadata: Dict[str, Any],
+        new_filename: Optional[str] = None,
+    ) -> Document
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -25,18 +34,36 @@ def update_document_by_filename_metadata(
 
 - `Document`: Updated document metadata
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-# Update just the metadata of a document identified by filename
-updated_doc = db.update_document_by_filename_metadata(
-    filename="report.pdf",
-    metadata={"status": "reviewed", "reviewer": "Jane Smith"},
-    new_filename="reviewed_report.pdf"  # Optional: rename the file
-)
-print(f"Updated metadata: {updated_doc.metadata}")
-``` 
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # Update just the metadata of a document identified by filename
+    updated_doc = db.update_document_by_filename_metadata(
+        filename="report.pdf",
+        metadata={"status": "reviewed", "reviewer": "Jane Smith"},
+        new_filename="reviewed_report.pdf"  # Optional: rename the file
+    )
+    print(f"Updated metadata: {updated_doc.metadata}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Update just the metadata of a document identified by filename
+        updated_doc = await db.update_document_by_filename_metadata(
+            filename="report.pdf",
+            metadata={"status": "reviewed", "reviewer": "Jane Smith"},
+            new_filename="reviewed_report.pdf"  # Optional: rename the file
+        )
+        print(f"Updated metadata: {updated_doc.metadata}")
+    ```
+  </Tab>
+</Tabs> 

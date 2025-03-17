@@ -3,19 +3,30 @@ title: "ingest_file"
 description: "Ingest a file document into DataBridge"
 ---
 
-# ingest_file
-
-Ingest a file document into DataBridge.
-
-```python
-def ingest_file(
-    file: Union[str, bytes, BinaryIO, Path],
-    filename: Optional[str] = None,
-    metadata: Optional[Dict[str, Any]] = None,
-    rules: Optional[List[RuleOrDict]] = None,
-    use_colpali: bool = True,
-) -> Document
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def ingest_file(
+        file: Union[str, bytes, BinaryIO, Path],
+        filename: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        rules: Optional[List[RuleOrDict]] = None,
+        use_colpali: bool = True,
+    ) -> Document
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def ingest_file(
+        file: Union[str, bytes, BinaryIO, Path],
+        filename: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        rules: Optional[List[RuleOrDict]] = None,
+        use_colpali: bool = True,
+    ) -> Document
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -31,26 +42,54 @@ def ingest_file(
 
 - `Document`: Metadata of the ingested document
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
-from pydantic import BaseModel
-
-class DocumentInfo(BaseModel):
-    title: str
-    author: str
-    department: str
-
-db = DataBridge()
-
-doc = db.ingest_file(
-    "document.pdf",
-    filename="document.pdf",
-    metadata={"category": "research"},
-    rules=[
-        MetadataExtractionRule(schema=DocumentInfo),
-        NaturalLanguageRule(prompt="Extract key points only")
-    ]
-) 
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from pydantic import BaseModel
+    
+    class DocumentInfo(BaseModel):
+        title: str
+        author: str
+        department: str
+    
+    db = DataBridge()
+    
+    doc = db.ingest_file(
+        "document.pdf",
+        filename="document.pdf",
+        metadata={"category": "research"},
+        rules=[
+            MetadataExtractionRule(schema=DocumentInfo),
+            NaturalLanguageRule(prompt="Extract key points only")
+        ]
+    )
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from pydantic import BaseModel
+    
+    class DocumentInfo(BaseModel):
+        title: str
+        author: str
+        department: str
+    
+    async with AsyncDataBridge() as db:
+        doc = await db.ingest_file(
+            "document.pdf",
+            filename="document.pdf",
+            metadata={"category": "research"},
+            rules=[
+                MetadataExtractionRule(schema=DocumentInfo),
+                NaturalLanguageRule(prompt="Extract key points only")
+            ]
+        )
+    ```
+  </Tab>
+</Tabs>

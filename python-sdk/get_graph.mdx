@@ -1,0 +1,111 @@
+---
+title: "get_graph"
+description: "Get a graph by name"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_graph(name: str) -> Graph
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_graph(name: str) -> Graph
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `name` (str): Name of the graph to retrieve
+
+## Returns
+
+- `Graph`: The requested graph object
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # Get a graph by name
+    graph = db.get_graph("finance_graph")
+    
+    print(f"Graph has {len(graph.entities)} entities and {len(graph.relationships)} relationships")
+    
+    # Access entities and relationships
+    for entity in graph.entities:
+        print(f"Entity: {entity.label} ({entity.type})")
+    
+    for relationship in graph.relationships:
+        source_entity = next((e for e in graph.entities if e.id == relationship.source_id), None)
+        target_entity = next((e for e in graph.entities if e.id == relationship.target_id), None)
+        if source_entity and target_entity:
+            print(f"Relationship: {source_entity.label} --{relationship.type}--> {target_entity.label}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Get a graph by name
+        graph = await db.get_graph("finance_graph")
+        
+        print(f"Graph has {len(graph.entities)} entities and {len(graph.relationships)} relationships")
+        
+        # Access entities and relationships
+        for entity in graph.entities:
+            print(f"Entity: {entity.label} ({entity.type})")
+        
+        for relationship in graph.relationships:
+            source_entity = next((e for e in graph.entities if e.id == relationship.source_id), None)
+            target_entity = next((e for e in graph.entities if e.id == relationship.target_id), None)
+            if source_entity and target_entity:
+                print(f"Relationship: {source_entity.label} --{relationship.type}--> {target_entity.label}")
+    ```
+  </Tab>
+</Tabs>
+
+## Graph Properties
+
+The returned `Graph` object has the following properties:
+
+- `id` (str): Unique graph identifier
+- `name` (str): Graph name
+- `entities` (List[Entity]): List of entities in the graph
+- `relationships` (List[Relationship]): List of relationships in the graph
+- `metadata` (Dict[str, Any]): Graph metadata
+- `document_ids` (List[str]): Source document IDs
+- `filters` (Dict[str, Any], optional): Document filters used to create the graph
+- `created_at` (datetime): Creation timestamp
+- `updated_at` (datetime): Last update timestamp
+- `owner` (Dict[str, str]): Graph owner information
+- `access_control` (Dict[str, List[str]]): Access control information
+
+### Entity Properties
+
+Each `Entity` object has the following properties:
+
+- `id` (str): Unique entity identifier
+- `label` (str): Display label for the entity
+- `type` (str): Entity type
+- `properties` (Dict[str, Any]): Entity properties
+- `document_ids` (List[str]): Source document IDs
+- `chunk_sources` (Dict[str, List[int]]): Source chunk numbers by document ID
+
+### Relationship Properties
+
+Each `Relationship` object has the following properties:
+
+- `id` (str): Unique relationship identifier
+- `source_id` (str): Source entity ID
+- `target_id` (str): Target entity ID
+- `type` (str): Relationship type
+- `document_ids` (List[str]): Source document IDs
+- `chunk_sources` (Dict[str, List[int]]): Source chunk numbers by document ID

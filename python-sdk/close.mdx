@@ -1,15 +1,20 @@
 ---
 title: "close"
-description: "Close the HTTP session"
+description: "Close the HTTP session or client"
 ---
 
-# close
-
-Close the HTTP session.
-
-```python
-def close()
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def close() -> None
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def close() -> None
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -19,28 +24,62 @@ None
 
 None
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-# Perform operations
-doc = db.ingest_text("Sample content")
-
-# Close the session when done
-db.close()
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # Perform operations
+    doc = db.ingest_text("Sample content")
+    
+    # Close the session when done
+    db.close()
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    import asyncio
+    from databridge.async_ import AsyncDataBridge
+    
+    async def main():
+        db = AsyncDataBridge()
+        
+        # Perform operations
+        doc = await db.ingest_text("Sample content")
+        
+        # Close the client when done
+        await db.close()
+    
+    asyncio.run(main())
+    ```
+  </Tab>
+</Tabs>
 
 ## Context Manager Alternative
 
 Instead of manually calling `close()`, you can use the DataBridge client as a context manager:
 
-```python
-from databridge.sync import DataBridge
-
-with DataBridge() as db:
-    doc = db.ingest_text("Sample content")
-    # Session is automatically closed when exiting the with block
-``` 
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    with DataBridge() as db:
+        doc = db.ingest_text("Sample content")
+        # Session is automatically closed when exiting the with block
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        doc = await db.ingest_text("Sample content")
+        # Client is automatically closed when exiting the with block
+    ```
+  </Tab>
+</Tabs>

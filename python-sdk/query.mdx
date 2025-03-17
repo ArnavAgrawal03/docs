@@ -7,17 +7,40 @@ description: "Generate completion using relevant chunks as context"
 
 Generate completion using relevant chunks as context.
 
-```python
-def query(
-    query: str,
-    filters: Optional[Dict[str, Any]] = None,
-    k: int = 4,
-    min_score: float = 0.0,
-    max_tokens: Optional[int] = None,
-    temperature: Optional[float] = None,
-    use_colpali: bool = True,
-) -> CompletionResponse
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def query(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        use_colpali: bool = True,
+        graph_name: Optional[str] = None,
+        hop_depth: int = 1,
+        include_paths: bool = False,
+    ) -> CompletionResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def query(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        use_colpali: bool = True,
+        graph_name: Optional[str] = None,
+        hop_depth: int = 1,
+        include_paths: bool = False,
+    ) -> CompletionResponse
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -28,30 +51,105 @@ def query(
 - `max_tokens` (int, optional): Maximum tokens in completion
 - `temperature` (float, optional): Model temperature
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to generate the completion (only works for documents ingested with `use_colpali=True`). Defaults to True.
+- `graph_name` (str, optional): Optional name of the graph to use for knowledge graph-enhanced retrieval
+- `hop_depth` (int, optional): Number of relationship hops to traverse in the graph (1-3). Defaults to 1.
+- `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
 
 ## Returns
 
 - `CompletionResponse`: Response containing the completion and source information
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
+### Standard Query
 
-db = DataBridge()
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    response = db.query(
+        "What are the key findings about customer satisfaction?",
+        filters={"department": "research"},
+        temperature=0.7
+    )
+    
+    print(response.completion)
+    
+    # Print the sources used for the completion
+    for source in response.sources:
+        print(f"Document ID: {source.document_id}, Chunk: {source.chunk_number}, Score: {source.score}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        response = await db.query(
+            "What are the key findings about customer satisfaction?",
+            filters={"department": "research"},
+            temperature=0.7
+        )
+        
+        print(response.completion)
+        
+        # Print the sources used for the completion
+        for source in response.sources:
+            print(f"Document ID: {source.document_id}, Chunk: {source.chunk_number}, Score: {source.score}")
+    ```
+  </Tab>
+</Tabs>
 
-response = db.query(
-    "What are the key findings about customer satisfaction?",
-    filters={"department": "research"},
-    temperature=0.7
-)
+### Knowledge Graph Enhanced Query
 
-print(response.completion)
-
-# Print the sources used for the completion
-for source in response.sources:
-    print(f"Document ID: {source.document_id}, Chunk: {source.chunk_number}, Score: {source.score}")
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # Use a knowledge graph to enhance the query
+    response = db.query(
+        "How does product X relate to customer segment Y?",
+        graph_name="market_graph",
+        hop_depth=2,
+        include_paths=True
+    )
+    
+    print(response.completion)
+    
+    # If include_paths=True, you can inspect the graph paths
+    if response.metadata and "graph" in response.metadata:
+        for path in response.metadata["graph"]["paths"]:
+            print(" -> ".join(path))
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Knowledge graph enhanced query
+        kg_response = await db.query(
+            "How does product X relate to customer segment Y?",
+            graph_name="market_graph",
+            hop_depth=2,
+            include_paths=True
+        )
+        
+        print(kg_response.completion)
+        
+        # If include_paths=True, you can inspect the graph paths
+        if kg_response.metadata and "graph" in kg_response.metadata:
+            for path in kg_response.metadata["graph"]["paths"]:
+                print(" -> ".join(path))
+    ```
+  </Tab>
+</Tabs>
 
 ## CompletionResponse Properties
 
@@ -59,4 +157,13 @@ The `CompletionResponse` object returned by this method has the following proper
 
 - `completion` (str): The generated completion text
 - `usage` (Dict[str, int]): Token usage information
-- `sources` (List[ChunkSource]): Sources of chunks used in the completion 
+- `sources` (List[ChunkSource]): Sources of chunks used in the completion
+- `metadata` (Dict[str, Any], optional): Additional metadata about the completion. When using a knowledge graph with `include_paths=True`, this contains graph traversal information.
+
+### ChunkSource Properties
+
+Each `ChunkSource` object in the `sources` list has the following properties:
+
+- `document_id` (str): ID of the source document
+- `chunk_number` (int): Chunk number within the document
+- `score` (Optional[float]): Relevance score (if available)

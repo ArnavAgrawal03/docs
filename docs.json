@@ -82,6 +82,14 @@
             ]
           },
           {
+            "group": "Knowledge Graph Operations",
+            "pages": [
+              "python-sdk/create_graph",
+              "python-sdk/get_graph",
+              "python-sdk/list_graphs"
+            ]
+          },
+          {
             "group": "Cache Management",
             "pages": [
               "python-sdk/create_cache",

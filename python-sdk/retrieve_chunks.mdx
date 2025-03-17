@@ -3,19 +3,30 @@ title: "retrieve_chunks"
 description: "Retrieve relevant chunks from DataBridge"
 ---
 
-# retrieve_chunks
-
-Retrieve relevant chunks from DataBridge.
-
-```python
-def retrieve_chunks(
-    query: str,
-    filters: Optional[Dict[str, Any]] = None,
-    k: int = 4,
-    min_score: float = 0.0,
-    use_colpali: bool = True,
-) -> List[FinalChunkResult]
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def retrieve_chunks(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        use_colpali: bool = True,
+    ) -> List[FinalChunkResult]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def retrieve_chunks(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        use_colpali: bool = True,
+    ) -> List[FinalChunkResult]
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -29,28 +40,53 @@ def retrieve_chunks(
 
 - `List[FinalChunkResult]`: List of chunk results
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-chunks = db.retrieve_chunks(
-    "What are the key findings?",
-    filters={"department": "research"},
-    k=5,
-    min_score=0.5
-)
-
-for chunk in chunks:
-    print(f"Score: {chunk.score}")
-    print(f"Content: {chunk.content}")
-    print(f"Document ID: {chunk.document_id}")
-    print(f"Chunk Number: {chunk.chunk_number}")
-    print(f"Metadata: {chunk.metadata}")
-    print("---")
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    chunks = db.retrieve_chunks(
+        "What are the key findings?",
+        filters={"department": "research"},
+        k=5,
+        min_score=0.5
+    )
+    
+    for chunk in chunks:
+        print(f"Score: {chunk.score}")
+        print(f"Content: {chunk.content}")
+        print(f"Document ID: {chunk.document_id}")
+        print(f"Chunk Number: {chunk.chunk_number}")
+        print(f"Metadata: {chunk.metadata}")
+        print("---")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        chunks = await db.retrieve_chunks(
+            "What are the key findings?",
+            filters={"department": "research"},
+            k=5,
+            min_score=0.5
+        )
+        
+        for chunk in chunks:
+            print(f"Score: {chunk.score}")
+            print(f"Content: {chunk.content}")
+            print(f"Document ID: {chunk.document_id}")
+            print(f"Chunk Number: {chunk.chunk_number}")
+            print(f"Metadata: {chunk.metadata}")
+            print("---")
+    ```
+  </Tab>
+</Tabs>
 
 ## FinalChunkResult Properties
 

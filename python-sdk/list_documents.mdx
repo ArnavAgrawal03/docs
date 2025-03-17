@@ -3,17 +3,26 @@ title: "list_documents"
 description: "List accessible documents in DataBridge"
 ---
 
-# list_documents
-
-List accessible documents in DataBridge.
-
-```python
-def list_documents(
-    skip: int = 0, 
-    limit: int = 100, 
-    filters: Optional[Dict[str, Any]] = None
-) -> List[Document]
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def list_documents(
+        skip: int = 0, 
+        limit: int = 100, 
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Document]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def list_documents(
+        skip: int = 0, 
+        limit: int = 100, 
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Document]
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -25,24 +34,45 @@ def list_documents(
 
 - `List[Document]`: List of accessible documents
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-# Get first page
-docs = db.list_documents(limit=10)
-for doc in docs:
-    print(f"Document ID: {doc.external_id}")
-    print(f"Filename: {doc.filename}")
-    print(f"Metadata: {doc.metadata}")
-    print("---")
-
-# Get next page
-next_page = db.list_documents(skip=10, limit=10, filters={"department": "research"})
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # Get first page
+    docs = db.list_documents(limit=10)
+    for doc in docs:
+        print(f"Document ID: {doc.external_id}")
+        print(f"Filename: {doc.filename}")
+        print(f"Metadata: {doc.metadata}")
+        print("---")
+    
+    # Get next page
+    next_page = db.list_documents(skip=10, limit=10, filters={"department": "research"})
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Get first page
+        docs = await db.list_documents(limit=10)
+        for doc in docs:
+            print(f"Document ID: {doc.external_id}")
+            print(f"Filename: {doc.filename}")
+            print(f"Metadata: {doc.metadata}")
+            print("---")
+        
+        # Get next page
+        next_page = await db.list_documents(skip=10, limit=10, filters={"department": "research"})
+    ```
+  </Tab>
+</Tabs>
 
 ## Document Properties
 

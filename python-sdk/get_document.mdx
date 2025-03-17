@@ -3,13 +3,18 @@ title: "get_document"
 description: "Get document metadata by ID"
 ---
 
-# get_document
-
-Get document metadata by ID.
-
-```python
-def get_document(document_id: str) -> Document
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_document(document_id: str) -> Document
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_document(document_id: str) -> Document
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -19,18 +24,33 @@ def get_document(document_id: str) -> Document
 
 - `Document`: Document metadata
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-doc = db.get_document("doc_123")
-print(f"Title: {doc.metadata.get('title')}")
-print(f"Content Type: {doc.content_type}")
-print(f"Filename: {doc.filename}")
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    doc = db.get_document("doc_123")
+    print(f"Title: {doc.metadata.get('title')}")
+    print(f"Content Type: {doc.content_type}")
+    print(f"Filename: {doc.filename}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        doc = await db.get_document("doc_123")
+        print(f"Title: {doc.metadata.get('title')}")
+        print(f"Content Type: {doc.content_type}")
+        print(f"Filename: {doc.filename}")
+    ```
+  </Tab>
+</Tabs>
 
 ## Document Properties
 
@@ -49,6 +69,15 @@ The `Document` object returned by this method has the following properties:
 
 The `Document` object also provides the following methods:
 
-- `update_with_text()`: Update the document with new text content
-- `update_with_file()`: Update the document with content from a file
-- `update_metadata()`: Update the document's metadata only 
+<Tabs>
+  <Tab title="Sync">
+    - `update_with_text()`: Update the document with new text content
+    - `update_with_file()`: Update the document with content from a file
+    - `update_metadata()`: Update the document's metadata only
+  </Tab>
+  <Tab title="Async">
+    - `update_with_text()`: Update the document with new text content (use with `await`)
+    - `update_with_file()`: Update the document with content from a file (use with `await`)
+    - `update_metadata()`: Update the document's metadata only (use with `await`)
+  </Tab>
+</Tabs>

@@ -1,0 +1,79 @@
+---
+title: "list_graphs"
+description: "List all graphs the user has access to"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def list_graphs() -> List[Graph]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def list_graphs() -> List[Graph]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+None
+
+## Returns
+
+- `List[Graph]`: List of graph objects
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # List all accessible graphs
+    graphs = db.list_graphs()
+    
+    for graph in graphs:
+        print(f"Graph: {graph.name}, Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}")
+        
+    # Find the most recent graph
+    latest_graph = max(graphs, key=lambda g: g.updated_at)
+    print(f"Most recently updated: {latest_graph.name} (updated {latest_graph.updated_at})")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # List all accessible graphs
+        graphs = await db.list_graphs()
+        
+        for graph in graphs:
+            print(f"Graph: {graph.name}, Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}")
+        
+        # Find the most recent graph
+        latest_graph = max(graphs, key=lambda g: g.updated_at)
+        print(f"Most recently updated: {latest_graph.name} (updated {latest_graph.updated_at})")
+    ```
+  </Tab>
+</Tabs>
+
+## Graph Properties
+
+Each `Graph` object in the returned list has the following properties:
+
+- `id` (str): Unique graph identifier
+- `name` (str): Graph name
+- `entities` (List[Entity]): List of entities in the graph
+- `relationships` (List[Relationship]): List of relationships in the graph
+- `metadata` (Dict[str, Any]): Graph metadata
+- `document_ids` (List[str]): Source document IDs
+- `filters` (Dict[str, Any], optional): Document filters used to create the graph
+- `created_at` (datetime): Creation timestamp
+- `updated_at` (datetime): Last update timestamp
+- `owner` (Dict[str, str]): Graph owner information
+- `access_control` (Dict[str, List[str]]): Access control information

@@ -1,0 +1,97 @@
+---
+title: "create_graph"
+description: "Create a graph from documents"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def create_graph(
+        name: str,
+        filters: Optional[Dict[str, Any]] = None,
+        documents: Optional[List[str]] = None,
+    ) -> Graph
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def create_graph(
+        name: str,
+        filters: Optional[Dict[str, Any]] = None,
+        documents: Optional[List[str]] = None,
+    ) -> Graph
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `name` (str): Name of the graph to create
+- `filters` (Dict[str, Any], optional): Optional metadata filters to determine which documents to include
+- `documents` (List[str], optional): Optional list of specific document IDs to include
+
+## Returns
+
+- `Graph`: The created graph object containing entities and relationships
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    # Create a graph from documents with category="research"
+    graph = db.create_graph(
+        name="research_graph",
+        filters={"category": "research"}
+    )
+    
+    # Create a graph from specific documents
+    graph = db.create_graph(
+        name="custom_graph",
+        documents=["doc1", "doc2", "doc3"]
+    )
+    
+    print(f"Created graph with {len(graph.entities)} entities and {len(graph.relationships)} relationships")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Create a graph from documents with category="research"
+        graph = await db.create_graph(
+            name="research_graph",
+            filters={"category": "research"}
+        )
+        
+        # Create a graph from specific documents
+        graph = await db.create_graph(
+            name="custom_graph",
+            documents=["doc1", "doc2", "doc3"]
+        )
+        
+        print(f"Created graph with {len(graph.entities)} entities and {len(graph.relationships)} relationships")
+    ```
+  </Tab>
+</Tabs>
+
+## Graph Properties
+
+The returned `Graph` object has the following properties:
+
+- `id` (str): Unique graph identifier
+- `name` (str): Graph name
+- `entities` (List[Entity]): List of entities in the graph
+- `relationships` (List[Relationship]): List of relationships in the graph
+- `metadata` (Dict[str, Any]): Graph metadata
+- `document_ids` (List[str]): Source document IDs
+- `filters` (Dict[str, Any], optional): Document filters used to create the graph
+- `created_at` (datetime): Creation timestamp
+- `updated_at` (datetime): Last update timestamp
+- `owner` (Dict[str, str]): Graph owner information
+- `access_control` (Dict[str, List[str]]): Access control information

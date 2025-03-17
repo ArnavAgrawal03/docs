@@ -3,13 +3,18 @@ title: "get_cache"
 description: "Get a cache by name"
 ---
 
-# get_cache
-
-Get a cache by name.
-
-```python
-def get_cache(name: str) -> Cache
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_cache(name: str) -> Cache
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_cache(name: str) -> AsyncCache
+    ```
+  </Tab>
+</Tabs>
 
 ## Parameters
 
@@ -17,36 +22,82 @@ def get_cache(name: str) -> Cache
 
 ## Returns
 
-- `Cache`: A cache object that is used to interact with the cache.
+<Tabs>
+  <Tab title="Sync">
+    `Cache`: A cache object that is used to interact with the cache
+  </Tab>
+  <Tab title="Async">
+    `AsyncCache`: An async cache object that is used to interact with the cache
+  </Tab>
+</Tabs>
 
-## Example
+## Examples
 
-```python
-from databridge.sync import DataBridge
-
-db = DataBridge()
-
-cache = db.get_cache("programming_cache")
-
-# Update the cache with new documents
-cache.update()
-
-# Add specific documents to the cache
-cache.add_docs(["doc3", "doc4"])
-
-# Query the cache
-response = cache.query(
-    "What are the key concepts in functional programming?",
-    max_tokens=500,
-    temperature=0.7
-)
-print(response.completion)
-```
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.sync import DataBridge
+    
+    db = DataBridge()
+    
+    cache = db.get_cache("programming_cache")
+    
+    # Update the cache with new documents
+    cache.update()
+    
+    # Add specific documents to the cache
+    cache.add_docs(["doc3", "doc4"])
+    
+    # Query the cache
+    response = cache.query(
+        "What are the key concepts in functional programming?",
+        max_tokens=500,
+        temperature=0.7
+    )
+    print(response.completion)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge.async_ import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        cache = await db.get_cache("programming_cache")
+        
+        # Update the cache with new documents
+        await cache.update()
+        
+        # Add specific documents to the cache
+        await cache.add_docs(["doc3", "doc4"])
+        
+        # Query the cache
+        response = await cache.query(
+            "What are the key concepts in functional programming?",
+            max_tokens=500,
+            temperature=0.7
+        )
+        print(response.completion)
+    ```
+  </Tab>
+</Tabs>
 
 ## Cache Methods
 
-The `Cache` object returned by this method has the following methods:
-
-- `update()`: Update the cache with any new documents matching the original filters
-- `add_docs(docs: List[str])`: Add specific documents to the cache
-- `query(query: str, max_tokens: Optional[int] = None, temperature: Optional[float] = None)`: Query the cache 
+<Tabs>
+  <Tab title="Sync">
+    The `Cache` object returned by the synchronous method has the following methods:
+    
+    - `update() -> bool`: Update the cache with any new documents matching the original filters
+    - `add_docs(docs: List[str]) -> bool`: Add specific documents to the cache
+    - `query(query: str, max_tokens: Optional[int] = None, temperature: Optional[float] = None) -> CompletionResponse`: Query the cache
+  </Tab>
+  <Tab title="Async">
+    The `AsyncCache` object returned by the asynchronous method has the following methods:
+    
+    - `update() -> bool`: Update the cache with any new documents matching the original filters
+    - `add_docs(docs: List[str]) -> bool`: Add specific documents to the cache
+    - `query(query: str, max_tokens: Optional[int] = None, temperature: Optional[float] = None) -> CompletionResponse`: Query the cache
+    
+    These methods have the same parameters and return values as their synchronous counterparts, but are called with `await`.
+  </Tab>
+</Tabs>
