@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "DataBridge Documentation",
+  "name": "Morphik Documentation",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -27,6 +27,14 @@
               "concepts/naive-rag",
               "concepts/rules-processing",
               "concepts/colpali"
+            ]
+          },
+          {
+            "group": "Using Morphik",
+            "pages": [
+              "using-morphik/morphik-ui",
+              "using-morphik/morphik-shell",
+              "using-morphik/code"
             ]
           }
         ]
@@ -108,7 +116,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:databridgesuperuser@gmail.com"
+        "href": "mailto:founders@morphik.ai"
       },
       {
         "label": "Community",
@@ -116,14 +124,14 @@
       },
       {
         "label": "GitHub",
-        "href": "https://github.com/databridge-org/databridge-core"
+        "href": "https://github.com/morphik-org/morphik-core"
       }
     ]
   },
   "footer": {
     "socials": {
       "x": "https://x.com/ArnavAgrawal03",
-      "github": "https://github.com/databridge-org/databridge-core"
+      "github": "https://github.com/morphik-org/morphik-core"
     }
   }
 }

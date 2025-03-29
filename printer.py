@@ -102,7 +102,7 @@ def aggregate_documentation_files(
 
     with open(output_file, "w", encoding="utf-8") as outfile:
         # Write header information
-        header = f"""DataBridge Documentation Aggregation
+        header = f"""Morphik Documentation Aggregation
 {'=' * 80}
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 Mode: {mode}
