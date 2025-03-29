@@ -3,17 +3,78 @@ title: 'Morphik UI'
 description: 'Learn how to use the Morphik UI interface'
 ---
 
-# Morphik UI
+Morphik provides a graphical user interface so that you can interact directly with your ingested data. This includes support for ingesting documents, retrieving relevant information, chatting with your documents, and visualizing/creating knowledge graphs. In this guide, we'll walk you through how you can setup the Morphik UI and start ingesting!
 
-The Morphik UI provides a user-friendly interface for interacting with Morphik's powerful features.
+## Prerequisites
 
-## Overview
+### Morphik Server
 
-This page will contain detailed information about the Morphik UI, including:
+Before you begin, ensure that you have the Morphik server running. You can do this by following the instructions in the [Getting Started](/getting-started) guide. To verify that the Morphik server is running, check the `[api]` header in the `databridge.toml` file (found in the root of the `morphik-core` repository). If you see the server options when you open `http://<host>:<port>/docs`, then the server is live! By default, the heading should look like:
 
-- Getting started with the UI
-- Navigation and layout
-- Key features and functionality
-- Best practices and tips
+```toml
+[api]
+host = "localhost" # Needs to be "0.0.0.0" for docker
+port = 8000
+```
 
-*Content for this page is coming soon.*
+So, if the configuration is the same as above, we can navigate to [`http://localhost:8000/docs`](http://localhost:8000/docs) to access the Morphik UI. Here's what is should look like:
+
+![Morphik API screenshot](/images/ui-guide/api-screenshot.png)
+
+Excuse the additional tabs on chrome - who knew running an open-source repo full-time required so much context switching? (No seriously, I'm asking 🤣) 
+
+In case you don't see this, and have followed all the steps in the [Getting Started](/getting-started) guide, feel free to [contact us](mailto:founders@morphik.ai).
+
+### Node and NPM
+
+In order to launch the UI, ensure that you have `node` and `npm` installed. A good way to check this is just by running `node -v` and `npm -v` in your terminal. If you don't have `node` installed, you can view installation instructions [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+## Running the UI
+You're ready to launch the UI once you have the server running and `npm` installed. In a new terminal (ensure that the server is running and not stopped), navigate to the root of the `morphik-core` repository that you launched the server from. From here change directory into the `ui-component` folder:
+```bash
+cd ui-component
+```
+Now, installed teh required node dependencies:
+```bash
+npm i
+```
+Finally, you're ready to run the UI component:
+```bash
+npm run dev
+```
+You should see the following output (or something similar):
+```bash
+(base) arnav@Arnavs-MacBook-Air ui-component % npm run dev
+
+> @databridge/ui@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.26
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 1560ms
+```
+
+If that's the case, you've done it! Navigate to [`http://localhost:3000`](http://localhost:3000), and you should be greeted with Morphik's UI! It should look something like this:
+
+![Morphik UI screenshot](/images/ui-guide/document-view.png)
+
+Clicking on a file should get you some of its information on the right. 
+
+## Using the UI - Features we ❤️
+
+Morphik has support for **automatic metadata extraction** at file ingestion time. You can define a `json schema`, and then Morphik will automatically extract the metadata from the file:
+
+![Morphik UI metadata extraction](/images/ui-guide/metadata-extraction.png)
+
+**Chunk searching** - perfect for testing and iterating on retrieval strategies:
+
+![Morphik UI chunk searching](/images/ui-guide/searching-chunks.png)
+
+Visualize your **knowledge graphs** to better understand the relationships between your data:
+
+![Morphik UI knowledge graph](/images/ui-guide/knowledge-graph.png)
+
+
+
