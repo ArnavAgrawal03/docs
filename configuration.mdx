@@ -2,3 +2,368 @@
 title: 'Configure Morphik'
 description: 'Get the most out of Morphik by customizing it to your needs'
 ---
+
+# Morphik Configuration Guide
+
+Morphik's behavior can be fully customized through the `databridge.toml` configuration file. This file is the central place to configure all aspects of the system, from API settings to model providers, database connections, and processing options.
+
+## Configuration Basics
+
+The `databridge.toml` file uses the TOML format (Tom's Obvious Minimal Language) to organize settings into logical sections. Each section controls a specific component of the Morphik system:
+
+```toml
+[section_name]
+setting1 = "value1"
+setting2 = 123
+```
+
+When you first set up Morphik, you can:
+- Run `python quick_setup.py` for an interactive setup process
+- Copy and modify the example `databridge.toml` file
+- Create your own configuration file manually
+
+## Core Configuration Sections
+
+### API Server Settings
+
+Controls how the API server runs:
+
+```toml
+[api]
+host = "localhost"  # Use "0.0.0.0" for Docker
+port = 8000
+reload = true       # Hot reload for development
+```
+
+### Authentication
+
+Controls user authentication and permissions:
+
+```toml
+[auth]
+jwt_algorithm = "HS256"
+dev_mode = true  # Enables simplified auth for local development
+dev_entity_id = "dev_user"
+dev_entity_type = "developer"
+dev_permissions = ["read", "write", "admin"]
+```
+
+### LLM Completion Settings
+
+Configure the model used for generating text:
+
+```toml
+# Ollama (local) configuration
+[completion]
+provider = "ollama"
+model_name = "llama3.2-vision"
+default_max_tokens = "1000"
+default_temperature = 0.7
+base_url = "http://localhost:11434"
+
+# OpenAI configuration
+[completion]
+provider = "openai"
+model_name = "gpt-4o"
+default_max_tokens = "1000"
+default_temperature = 0.7
+```
+
+### Custom OpenAI Base URL
+
+Morphik supports a global setting to customize the OpenAI API endpoint:
+
+```toml
+# OpenAI configuration
+openai_base_url = "https://api.openai.com/v1"  # Override the base URL for all OpenAI API calls
+```
+
+This setting applies to all OpenAI services, enabling:
+- Integration with Azure OpenAI Service
+- Using OpenAI-compatible API providers
+- Working with corporate proxies
+- Using different regional endpoints
+
+For Azure OpenAI:
+```toml
+openai_base_url = "https://{your-resource-name}.openai.azure.com/openai/deployments/{deployment-name}"
+```
+
+### Database Connection
+
+Choose your document metadata database:
+
+```toml
+[database]
+provider = "postgres"
+
+# Or for MongoDB
+[database]
+provider = "mongodb"
+database_name = "databridge"
+collection_name = "documents"
+```
+
+### Embedding Configuration
+
+Configure vector embeddings generation:
+
+```toml
+# Local embeddings with Ollama
+[embedding]
+provider = "ollama"
+model_name = "nomic-embed-text"
+dimensions = 768
+similarity_metric = "cosine"
+base_url = "http://localhost:11434"
+
+# OpenAI embeddings
+[embedding]
+provider = "openai"
+model_name = "text-embedding-3-small"
+dimensions = 1536
+similarity_metric = "dotProduct"
+```
+
+### Document Parsing
+
+Control how documents are processed and chunked:
+
+```toml
+[parser]
+chunk_size = 1000        # Characters per chunk
+chunk_overlap = 200      # Overlap between chunks
+use_unstructured_api = false
+use_contextual_chunking = false
+```
+
+### Vision Processing
+
+Configure multimodal processing for images and videos:
+
+```toml
+[parser.vision]
+provider = "ollama"      # or "openai"
+model_name = "llama3.2-vision"  # or "gpt-4o-mini"
+frame_sample_rate = -1   # Set to -1 to disable frame captioning
+base_url = "http://localhost:11434"  # Only for Ollama
+```
+
+### Reranking
+
+Configure the cross-encoder reranker for improved retrieval:
+
+```toml
+# Enable reranking
+[reranker]
+use_reranker = true
+provider = "flag"
+model_name = "BAAI/bge-reranker-large"
+query_max_length = 256
+passage_max_length = 512
+use_fp16 = true
+device = "mps"  # "cpu", "cuda", or "mps"
+
+# Disable reranking
+[reranker]
+use_reranker = false
+```
+
+### Document Storage
+
+Choose where to store your document files:
+
+```toml
+# Local storage
+[storage]
+provider = "local"
+storage_path = "./storage"
+
+# AWS S3 storage
+[storage]
+provider = "aws-s3"
+region = "us-east-2"
+bucket_name = "databridge-storage"
+```
+
+### Vector Database
+
+Configure where vector embeddings are stored:
+
+```toml
+# PostgreSQL with pgvector
+[vector_store]
+provider = "pgvector"
+
+# MongoDB Atlas
+[vector_store]
+provider = "mongodb"
+database_name = "databridge"
+collection_name = "document_chunks"
+```
+
+### Rules Engine
+
+Configure document processing with rules:
+
+```toml
+[rules]
+provider = "ollama"    # or "openai"
+model_name = "llama3.2"  # or "gpt-4o"
+batch_size = 4096
+```
+
+### Knowledge Graph
+
+Configure entity extraction and graph building:
+
+```toml
+[graph]
+provider = "ollama"    # or "openai"
+model_name = "llama3.2"  # or "gpt-4o-mini"
+```
+
+### General DataBridge Settings
+
+Control core platform features:
+
+```toml
+[databridge]
+enable_colpali = true    # Enable advanced retrieval
+mode = "self_hosted"     # "cloud" or "self_hosted"
+```
+
+### Telemetry
+
+Configure observability settings:
+
+```toml
+[telemetry]
+enabled = true
+honeycomb_enabled = true
+honeycomb_endpoint = "https://api.honeycomb.io"
+honeycomb_proxy_endpoint = "https://otel-proxy.onrender.com"
+service_name = "databridge-core"
+otlp_timeout = 10
+otlp_max_retries = 3
+otlp_retry_delay = 1
+otlp_max_export_batch_size = 512
+otlp_schedule_delay_millis = 5000
+otlp_max_queue_size = 2048
+```
+
+## Environment Variables
+
+Morphik uses environment variables for sensitive credentials and configuration that shouldn't be stored in the configuration file:
+
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `JWT_SECRET_KEY`: Secret for authentication tokens
+- `POSTGRES_URI`: PostgreSQL connection string
+- `MONGODB_URI`: MongoDB connection string
+- `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY`: For S3 storage
+- `ASSEMBLYAI_API_KEY`: For video transcription
+- `ANTHROPIC_API_KEY`: For contextual chunking (optional)
+- `UNSTRUCTURED_API_KEY`: For enhanced document parsing (optional)
+- `HONEYCOMB_API_KEY`: For telemetry (optional)
+
+## Complete Configuration Example
+
+Here's a complete example showing the structure of a databridge.toml file:
+
+```toml
+[api]
+host = "localhost"  # Use "0.0.0.0" for Docker
+port = 8000
+reload = true
+
+[auth]
+jwt_algorithm = "HS256"
+dev_mode = true
+dev_entity_id = "dev_user"
+dev_entity_type = "developer"
+dev_permissions = ["read", "write", "admin"]
+
+[completion]
+provider = "ollama"  # or "openai"
+model_name = "llama3.2-vision"
+default_max_tokens = "1000"
+default_temperature = 0.7
+base_url = "http://localhost:11434"  # Only for Ollama
+
+[database]
+provider = "postgres"  # or "mongodb"
+
+[embedding]
+provider = "ollama"  # or "openai"
+model_name = "nomic-embed-text"
+dimensions = 768
+similarity_metric = "cosine"
+base_url = "http://localhost:11434"  # Only for Ollama
+
+[parser]
+chunk_size = 1000
+chunk_overlap = 200
+use_unstructured_api = false
+use_contextual_chunking = false
+
+[parser.vision]
+provider = "ollama"  # or "openai"
+model_name = "llama3.2-vision"
+frame_sample_rate = -1
+base_url = "http://localhost:11434"  # Only for Ollama
+
+[reranker]
+use_reranker = true
+provider = "flag"
+model_name = "BAAI/bge-reranker-large"
+query_max_length = 256
+passage_max_length = 512
+use_fp16 = true
+device = "mps"  # "cpu", "cuda", or "mps"
+
+[storage]
+provider = "local"  # or "aws-s3"
+storage_path = "./storage"
+
+[vector_store]
+provider = "pgvector"  # or "mongodb"
+
+[rules]
+provider = "ollama"  # or "openai"
+model_name = "llama3.2"
+batch_size = 4096
+
+[databridge]
+enable_colpali = true
+mode = "self_hosted"  # "cloud" or "self_hosted"
+
+[graph]
+provider = "ollama"  # or "openai"
+model_name = "llama3.2"
+
+[telemetry]
+enabled = true
+honeycomb_enabled = true
+honeycomb_endpoint = "https://api.honeycomb.io"
+honeycomb_proxy_endpoint = "https://otel-proxy.onrender.com"
+service_name = "databridge-core"
+```
+
+## Docker Configuration Adjustments
+
+When using Docker, make these changes:
+
+1. Set `host = "0.0.0.0"` in the `[api]` section
+2. For Ollama integration, use `base_url = "http://ollama:11434"`
+3. Use container names in your database connection strings
+
+For more details on Docker deployment, check out the `DOCKER.md` file in the repository.
+
+## Need Help?
+
+If you're having trouble with your configuration:
+
+1. Check the logs for error messages
+2. Run `python quick_setup.py` for guided setup
+3. Join our [Discord community](https://discord.gg/BwMtv3Zaju)
+4. Open an issue on our [GitHub repository](https://github.com/morphik-org/morphik-core)
