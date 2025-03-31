@@ -105,6 +105,49 @@ You should see the following output:
 
 </Accordion>
 
+<Accordion title="Additional Dependencies">
+Some system-level dependencies might be required for processing various document types:
+
+<Tabs>
+  <Tab title="macOS">
+    ```bash
+    # Install via Homebrew
+    brew install poppler tesseract libmagic
+    ```
+  </Tab>
+  <Tab title="Ubuntu/Debian">
+    ```bash
+    # Install via apt
+    sudo apt-get update
+    sudo apt-get install -y poppler-utils tesseract-ocr libmagic-dev
+    ```
+  </Tab>
+  <Tab title="Windows">
+    For Windows, you may need to install these dependencies manually:
+    
+    1. **Poppler**: Download from [poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/)
+    2. **Tesseract**: Download the installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
+    3. **libmagic**: This is included in the python-magic-bin package which will be installed with pip
+  </Tab>
+</Tabs>
+
+You may also need additional Python packages or NLTK resources:
+
+```bash
+# If using Python 3.12+, you might need a specific version of unstructured
+pip install unstructured==0.16.10
+
+# Download required NLTK resources
+python -m nltk.downloader averaged_perceptron_tagger punkt
+```
+
+If you encounter database initialization issues, you may need to manually initialize the schema:
+
+```bash
+psql -U postgres -d databridge -a -f init.sql
+```
+</Accordion>
+
 <Accordion title="Installing Ollama">
 <Tabs>
   <Tab title="macOS">
@@ -191,6 +234,8 @@ Next, you need to set up a virtual environment called `.venv`.
 ### Installing Python Dependencies
 <Note>
 While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
+
+Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
 </Note>
 
 ```bash
@@ -264,9 +309,14 @@ INFO:     Uvicorn running on http://localhost:8000 (Press CTRL+C to quit)
 
 This means that the server is running on `http://localhost:8000`. You can now interact with the server using the API or the Python SDK.
 
+
+
 ## Next Steps
 
 Now that you have the server running, you can explore the different ways to interact with the server.
+
+
+**Special thanks to rex777 from the Morphik Discord community for help with troubleshooting and improving these setup instructions!!!**
 
 <CardGroup cols={2}>
 <Card icon="gear" title="Configure Morphik" href="/configuration">
