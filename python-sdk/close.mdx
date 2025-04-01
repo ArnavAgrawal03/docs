@@ -29,7 +29,7 @@ None
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -43,7 +43,7 @@ None
   <Tab title="Async">
     ```python
     import asyncio
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async def main():
         db = AsyncDataBridge()
@@ -66,7 +66,7 @@ Instead of manually calling `close()`, you can use the DataBridge client as a co
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     with DataBridge() as db:
         doc = db.ingest_text("Sample content")
@@ -75,7 +75,7 @@ Instead of manually calling `close()`, you can use the DataBridge client as a co
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         doc = await db.ingest_text("Sample content")

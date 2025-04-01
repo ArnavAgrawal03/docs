@@ -47,7 +47,7 @@ description: "Ingest a file document into DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
     from pydantic import BaseModel
     
@@ -71,7 +71,7 @@ description: "Ingest a file document into DataBridge"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
     from pydantic import BaseModel
     

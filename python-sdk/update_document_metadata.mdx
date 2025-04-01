@@ -36,7 +36,7 @@ description: "Update a document's metadata only"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -50,7 +50,7 @@ description: "Update a document's metadata only"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         # Update just the metadata of a document

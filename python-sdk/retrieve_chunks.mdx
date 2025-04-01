@@ -45,7 +45,7 @@ description: "Retrieve relevant chunks from DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -67,7 +67,7 @@ description: "Retrieve relevant chunks from DataBridge"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         chunks = await db.retrieve_chunks(

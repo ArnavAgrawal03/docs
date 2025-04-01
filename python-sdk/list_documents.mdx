@@ -39,7 +39,7 @@ description: "List accessible documents in DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -57,7 +57,7 @@ description: "List accessible documents in DataBridge"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         # Get first page

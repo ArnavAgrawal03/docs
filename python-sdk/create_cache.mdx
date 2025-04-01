@@ -45,7 +45,7 @@ description: "Create a new cache with specified configuration"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -63,7 +63,7 @@ description: "Create a new cache with specified configuration"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         # This will include both:

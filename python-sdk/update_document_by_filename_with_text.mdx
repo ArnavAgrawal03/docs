@@ -51,7 +51,7 @@ description: "Update a document identified by filename with new text content"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -68,7 +68,7 @@ description: "Update a document identified by filename with new text content"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         # Add new content to an existing document identified by filename

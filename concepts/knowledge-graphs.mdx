@@ -72,6 +72,96 @@ async def resolve_entities(self, entities: List[Entity]) -> Tuple[List[Entity], 
 
 This ensures that the knowledge graph accurately represents unique entities and their relationships, even when they're referenced inconsistently across documents.
 
+### Custom Prompts and Examples
+
+Knowledge graphs in Morphik can be enhanced with custom prompts and examples to improve entity extraction and resolution:
+
+- **Entity Extraction Customization**: You can provide examples and custom prompt templates to guide how entities and relationships are identified, making the extraction process more domain-specific.
+- **Entity Resolution Customization**: You can provide examples of how entity variants should be recognized and merged, helping the system correctly identify when different terms refer to the same entity.
+
+This customization allows for more precise knowledge graph creation, ensuring that the extracted entities and relationships align with your specific information needs and domain terminology.
+
+Here's an example of creating a knowledge graph with custom prompts and examples:
+
+```python
+from databridge import DataBridge
+from databridge.models import (
+    EntityExtractionExample, 
+    EntityResolutionExample,
+    EntityExtractionPromptOverride, 
+    EntityResolutionPromptOverride,
+    GraphPromptOverrides
+)
+
+# Connect to Morphik
+db = DataBridge()
+
+# Create a knowledge graph with custom entity extraction and resolution
+graph = db.create_graph(
+    name="medical_knowledge_graph",
+    filters={"domain": "medical"},
+    prompt_overrides=GraphPromptOverrides(
+        # Customize entity extraction
+        entity_extraction=EntityExtractionPromptOverride(
+            # Custom examples to guide entity extraction toward medical domain
+            examples=[
+                EntityExtractionExample(
+                    label="Type 2 Diabetes", 
+                    type="CONDITION"
+                ),
+                EntityExtractionExample(
+                    label="Metformin", 
+                    type="MEDICATION",
+                    properties={"class": "biguanide"}
+                ),
+                EntityExtractionExample(
+                    label="Cardiovascular Disease", 
+                    type="CONDITION"
+                )
+            ],
+            # Optional custom prompt template
+            prompt_template=(
+                "Extract medical entities and relationships from the following text.\n"
+                "Focus on conditions, medications, treatments, and healthcare providers.\n"
+                "{examples}\n\n"
+                "Text to analyze:\n{content}\n\n"
+                "Return your analysis as JSON with 'entities' and 'relationships' arrays."
+            )
+        ),
+        # Customize entity resolution
+        entity_resolution=EntityResolutionPromptOverride(
+            # Examples of how entity variants should be resolved
+            examples=[
+                EntityResolutionExample(
+                    canonical="Type 2 Diabetes",
+                    variants=["T2DM", "type 2 diabetes", "Type II Diabetes"]
+                ),
+                EntityResolutionExample(
+                    canonical="Metformin",
+                    variants=["Glucophage", "metformin hydrochloride"]
+                )
+            ]
+        )
+    )
+)
+
+# Query the graph with relationship paths
+response = db.query(
+    "What medications are used to treat diabetes and what complications are associated with it?",
+    graph_name="medical_knowledge_graph",
+    hop_depth=2,  # Follow connections up to 2 relationships away
+    include_paths=True  # Include relationship paths in response
+)
+```
+
+In this example, we provide custom guidance for both entity extraction and entity resolution:
+
+1. **Entity Extraction**: We provide examples of medical entities to extract (conditions and medications) and a custom prompt template that focuses the extraction on medical terminology.
+
+2. **Entity Resolution**: We provide examples of how different terms for the same medical concept should be merged (e.g., "T2DM" and "Type II Diabetes" should be treated as "Type 2 Diabetes").
+
+This approach is particularly valuable for specialized domains with complex terminology where the default extraction might miss important entities or relationships.
+
 ### Graph Construction and Storage
 
 The extracted entities and relationships are stored in a graph structure:

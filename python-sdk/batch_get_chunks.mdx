@@ -29,7 +29,7 @@ description: "Retrieve specific chunks by their document ID and chunk number"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     from databridge.models import ChunkSource
     
     db = DataBridge()
@@ -53,7 +53,7 @@ description: "Retrieve specific chunks by their document ID and chunk number"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     from databridge.models import ChunkSource
     
     async with AsyncDataBridge() as db:

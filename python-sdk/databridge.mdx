@@ -1,6 +1,6 @@
 ---
-title: "DataBridge"
-description: "Main client for document operations in DataBridge"
+title: "Morphik"
+description: "Main client for document operations in Morphik"
 ---
 
 ## Usage
@@ -8,7 +8,7 @@ description: "Main client for document operations in DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     # Without authentication
     db = DataBridge()
@@ -19,7 +19,7 @@ description: "Main client for document operations in DataBridge"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     # Without authentication
     async with AsyncDataBridge() as db:
@@ -62,6 +62,7 @@ DataBridge provides the following methods. Each method page includes both synchr
 ### Document Operations
 - [ingest_text](/python-sdk/ingest_text)
 - [ingest_file](/python-sdk/ingest_file)
+- [ingest_files](/python-sdk/ingest_files)
 - [retrieve_chunks](/python-sdk/retrieve_chunks)
 - [retrieve_docs](/python-sdk/retrieve_docs)
 - [query](/python-sdk/query)
@@ -74,6 +75,8 @@ DataBridge provides the following methods. Each method page includes both synchr
 - [update_document_by_filename_with_text](/python-sdk/update_document_by_filename_with_text)
 - [update_document_by_filename_with_file](/python-sdk/update_document_by_filename_with_file)
 - [update_document_by_filename_metadata](/python-sdk/update_document_by_filename_metadata)
+- [delete_document](/python-sdk/delete_document)
+- [delete_document_by_filename](/python-sdk/delete_document_by_filename)
 - [batch_get_documents](/python-sdk/batch_get_documents)
 - [batch_get_chunks](/python-sdk/batch_get_chunks)
 
@@ -81,6 +84,7 @@ DataBridge provides the following methods. Each method page includes both synchr
 - [create_graph](/python-sdk/create_graph)
 - [get_graph](/python-sdk/get_graph)
 - [list_graphs](/python-sdk/list_graphs)
+- [update_graph](/python-sdk/update_graph)
 
 ### Cache Operations
 - [create_cache](/python-sdk/create_cache)

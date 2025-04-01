@@ -1,0 +1,309 @@
+---
+title: "update_graph"
+description: "Update an existing knowledge graph with new documents"
+---
+
+## Usage
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge import DataBridge
+    
+    db = DataBridge()
+    
+    # Update a graph with additional documents
+    updated_graph = db.update_graph(
+        name="research_graph",
+        additional_filters={"category": "new_research"},
+        additional_documents=["doc_123", "doc_456"]
+    )
+    
+    print(f"Graph now has {len(updated_graph.entities)} entities")
+    print(f"Graph now has {len(updated_graph.relationships)} relationships")
+    ```
+  </Tab>
+  
+  <Tab title="Async">
+    ```python
+    from databridge import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Update a graph with additional documents
+        updated_graph = await db.update_graph(
+            name="research_graph",
+            additional_filters={"category": "new_research"},
+            additional_documents=["doc_123", "doc_456"]
+        )
+        
+        print(f"Graph now has {len(updated_graph.entities)} entities")
+        print(f"Graph now has {len(updated_graph.relationships)} relationships")
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `name` (str): Name of the graph to update
+- `additional_filters` (Dict[str, Any], optional): Optional additional metadata filters to determine which new documents to include
+- `additional_documents` (List[str], optional): Optional list of additional document IDs to include
+- `prompt_overrides` (GraphPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction and resolution prompts
+
+## Returns
+
+A Graph object representing the updated knowledge graph.
+
+## Description
+
+This method processes additional documents matching the original or new filters, extracts entities and relationships, and updates the graph with new information.
+
+The graph update operation:
+1. Retrieves additional documents based on filters and/or specific document IDs
+2. Extracts entities and relationships from these documents
+3. Intelligently merges new entities and relationships with the existing graph
+4. Returns the updated graph with all entities and relationships
+
+## Advanced Examples
+
+### With Entity Resolution Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.models import EntityResolutionPromptOverride, EntityResolutionExample, GraphPromptOverrides
+    
+    # Update with custom entity resolution examples
+    updated_graph = db.update_graph(
+        name="research_graph",
+        additional_documents=["doc_123"],
+        prompt_overrides=GraphPromptOverrides(
+            entity_resolution=EntityResolutionPromptOverride(
+                examples=[
+                    EntityResolutionExample(
+                        canonical="Machine Learning", 
+                        variants=["ML", "machine learning", "AI/ML"]
+                    ),
+                    EntityResolutionExample(
+                        canonical="Natural Language Processing", 
+                        variants=["NLP", "natural language processing", "text processing"]
+                    )
+                ]
+            )
+        )
+    )
+    
+    # With custom entity resolution prompt template
+    updated_graph = db.update_graph(
+        name="research_graph",
+        additional_filters={"year": "2025"},
+        prompt_overrides=GraphPromptOverrides(
+            entity_resolution=EntityResolutionPromptOverride(
+                prompt_template="""I have extracted the following entities from the text:
+                
+{entities_str}
+
+Here are examples of how different entity references can be grouped together:
+
+{examples_json}
+
+Please resolve these entities by identifying which mentions refer to the same entity.
+Group them together, selecting a canonical/preferred form for each group.
+Return your resolution in JSON format with the canonical form and all its variants.
+""",
+                examples=[
+                    EntityResolutionExample(
+                        canonical="General AI", 
+                        variants=["AGI", "General Artificial Intelligence", "General AI"]
+                    )
+                ]
+            )
+        )
+    )
+    ```
+  </Tab>
+  
+  <Tab title="Async">
+    ```python
+    from databridge.models import EntityResolutionPromptOverride, EntityResolutionExample, GraphPromptOverrides
+    
+    # Update with custom entity resolution examples
+    updated_graph = await db.update_graph(
+        name="research_graph",
+        additional_documents=["doc_123"],
+        prompt_overrides=GraphPromptOverrides(
+            entity_resolution=EntityResolutionPromptOverride(
+                examples=[
+                    EntityResolutionExample(
+                        canonical="Machine Learning", 
+                        variants=["ML", "machine learning", "AI/ML"]
+                    ),
+                    EntityResolutionExample(
+                        canonical="Natural Language Processing", 
+                        variants=["NLP", "natural language processing", "text processing"]
+                    )
+                ]
+            )
+        )
+    )
+    
+    # With custom entity resolution prompt template
+    updated_graph = await db.update_graph(
+        name="research_graph",
+        additional_filters={"year": "2025"},
+        prompt_overrides=GraphPromptOverrides(
+            entity_resolution=EntityResolutionPromptOverride(
+                prompt_template="""I have extracted the following entities from the text:
+                
+{entities_str}
+
+Here are examples of how different entity references can be grouped together:
+
+{examples_json}
+
+Please resolve these entities by identifying which mentions refer to the same entity.
+Group them together, selecting a canonical/preferred form for each group.
+Return your resolution in JSON format with the canonical form and all its variants.
+""",
+                examples=[
+                    EntityResolutionExample(
+                        canonical="General AI", 
+                        variants=["AGI", "General Artificial Intelligence", "General AI"]
+                    )
+                ]
+            )
+        )
+    )
+    ```
+  </Tab>
+</Tabs>
+
+### With Entity Extraction Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+    
+    # Update with custom entity extraction examples
+    updated_graph = db.update_graph(
+        name="medical_graph",
+        additional_filters={"category": "new_medical_data"},
+        prompt_overrides=GraphPromptOverrides(
+            entity_extraction=EntityExtractionPromptOverride(
+                examples=[
+                    EntityExtractionExample(label="Insulin", type="MEDICATION"),
+                    EntityExtractionExample(label="Diabetes", type="CONDITION"),
+                    EntityExtractionExample(label="Heart rate", type="VITAL_SIGN"),
+                    EntityExtractionExample(label="Cardiology", type="SPECIALTY")
+                ]
+            )
+        )
+    )
+    
+    # With custom entity extraction template
+    updated_graph = db.update_graph(
+        name="legal_graph",
+        additional_documents=["contract1", "contract2"],
+        prompt_overrides=GraphPromptOverrides(
+            entity_extraction=EntityExtractionPromptOverride(
+                prompt_template="""Extract legal entities from the following document:
+
+{content}
+
+Focus on these types of entities:
+{examples}
+
+Return the extracted entities in JSON format with the following structure:
+[
+  {"label": "entity name", "type": "ENTITY_TYPE", "properties": {"key": "value"}}
+]
+""",
+                examples=[
+                    EntityExtractionExample(
+                        label="John Smith",
+                        type="PERSON",
+                        properties={"role": "Plaintiff"}
+                    ),
+                    EntityExtractionExample(
+                        label="Acme Corporation",
+                        type="ORGANIZATION",
+                        properties={"type": "Corporation"}
+                    ),
+                    EntityExtractionExample(
+                        label="January 15, 2025",
+                        type="DATE"
+                    )
+                ]
+            )
+        )
+    )
+    ```
+  </Tab>
+  
+  <Tab title="Async">
+    ```python
+    from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+    
+    # Update with custom entity extraction examples
+    updated_graph = await db.update_graph(
+        name="medical_graph",
+        additional_filters={"category": "new_medical_data"},
+        prompt_overrides=GraphPromptOverrides(
+            entity_extraction=EntityExtractionPromptOverride(
+                examples=[
+                    EntityExtractionExample(label="Insulin", type="MEDICATION"),
+                    EntityExtractionExample(label="Diabetes", type="CONDITION"),
+                    EntityExtractionExample(label="Heart rate", type="VITAL_SIGN"),
+                    EntityExtractionExample(label="Cardiology", type="SPECIALTY")
+                ]
+            )
+        )
+    )
+    
+    # With custom entity extraction template
+    updated_graph = await db.update_graph(
+        name="legal_graph",
+        additional_documents=["contract1", "contract2"],
+        prompt_overrides=GraphPromptOverrides(
+            entity_extraction=EntityExtractionPromptOverride(
+                prompt_template="""Extract legal entities from the following document:
+
+{content}
+
+Focus on these types of entities:
+{examples}
+
+Return the extracted entities in JSON format with the following structure:
+[
+  {"label": "entity name", "type": "ENTITY_TYPE", "properties": {"key": "value"}}
+]
+""",
+                examples=[
+                    EntityExtractionExample(
+                        label="John Smith",
+                        type="PERSON",
+                        properties={"role": "Plaintiff"}
+                    ),
+                    EntityExtractionExample(
+                        label="Acme Corporation",
+                        type="ORGANIZATION",
+                        properties={"type": "Corporation"}
+                    ),
+                    EntityExtractionExample(
+                        label="January 15, 2025",
+                        type="DATE"
+                    )
+                ]
+            )
+        )
+    )
+    ```
+  </Tab>
+</Tabs>
+
+## Notes
+
+- The graph name must match an existing graph that the user has access to.
+- Either `additional_filters` or `additional_documents` (or both) should be provided; otherwise, no new content will be added to the graph.
+- When using `additional_filters`, these are applied in addition to any filters used during graph creation.
+- The `prompt_overrides` are applied only to this update operation and do not permanently change the configuration of the graph.

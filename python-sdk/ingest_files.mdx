@@ -1,0 +1,241 @@
+---
+title: "ingest_files"
+description: "Batch ingest multiple files into DataBridge"
+---
+
+## Usage
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge import DataBridge
+    
+    db = DataBridge()
+    
+    # Batch ingest files with shared metadata
+    result = db.ingest_files(
+        files=["document1.pdf", "document2.docx", "image.png"], 
+        metadata={"category": "reports"},
+        use_colpali=True,
+        parallel=True
+    )
+    
+    # Process the results
+    for doc in result["documents"]:
+        print(f"Successfully ingested: {doc.filename} (ID: {doc.external_id})")
+    
+    # Check for errors
+    for error in result["errors"]:
+        print(f"Error ingesting {error.get('filename')}: {error.get('error')}")
+    ```
+  </Tab>
+  
+  <Tab title="Async">
+    ```python
+    from databridge import AsyncDataBridge
+    
+    async with AsyncDataBridge() as db:
+        # Batch ingest files with shared metadata
+        result = await db.ingest_files(
+            files=["document1.pdf", "document2.docx", "image.png"], 
+            metadata={"category": "reports"},
+            use_colpali=True,
+            parallel=True
+        )
+        
+        # Process the results
+        for doc in result["documents"]:
+            print(f"Successfully ingested: {doc.filename} (ID: {doc.external_id})")
+        
+        # Check for errors
+        for error in result["errors"]:
+            print(f"Error ingesting {error.get('filename')}: {error.get('error')}")
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `files` (List[Union[str, bytes, BinaryIO, Path]]): List of files to ingest (path strings, bytes, file objects, or Path objects)
+- `metadata` (Dict[str, Any] | List[Dict[str, Any]], optional): Metadata to apply to the files. Can be either:
+   - A single dict to apply to all files
+   - A list of dicts, one per file (must match the length of `files`)
+- `rules` (List, optional): Rules to apply during ingestion. Can be either:
+   - A single list of rules to apply to all files
+   - A list of rule lists, one per file
+- `use_colpali` (bool, optional): Whether to use ColPali-style embedding model. Defaults to True.
+- `parallel` (bool, optional): Whether to process files in parallel. Defaults to True.
+
+## Returns
+
+An object containing:
+- `documents`: List of successfully ingested [Document](/python-sdk/document) objects
+- `errors`: List of errors encountered during ingestion (each error is a dict with 'filename' and 'error' keys)
+
+## Advanced Examples
+
+### Per-File Metadata
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    # Ingest files with different metadata for each file
+    files = ["report.pdf", "data.csv", "presentation.pptx"]
+    
+    # Metadata must match the length of files list
+    metadata_list = [
+        {"category": "reports", "author": "Alice"},
+        {"category": "data", "source": "database"},
+        {"category": "presentations", "department": "marketing"}
+    ]
+    
+    result = db.ingest_files(
+        files=files,
+        metadata=metadata_list
+    )
+    ```
+  </Tab>
+  
+  <Tab title="Async">
+    ```python
+    # Ingest files with different metadata for each file
+    files = ["report.pdf", "data.csv", "presentation.pptx"]
+    
+    # Metadata must match the length of files list
+    metadata_list = [
+        {"category": "reports", "author": "Alice"},
+        {"category": "data", "source": "database"},
+        {"category": "presentations", "department": "marketing"}
+    ]
+    
+    result = await db.ingest_files(
+        files=files,
+        metadata=metadata_list
+    )
+    ```
+  </Tab>
+</Tabs>
+
+### Per-File Rules
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from pydantic import BaseModel
+    
+    class ReportMetadata(BaseModel):
+        title: str
+        author: str
+        
+    class DataMetadata(BaseModel):
+        rows: int
+        columns: int
+        
+    # Define different rules for each file
+    rules_list = [
+        [MetadataExtractionRule(schema=ReportMetadata)],
+        [MetadataExtractionRule(schema=DataMetadata)],
+        [NaturalLanguageRule(prompt="Extract key points only")]
+    ]
+    
+    files = ["report.pdf", "data.csv", "presentation.pptx"]
+    
+    result = db.ingest_files(
+        files=files,
+        rules=rules_list,
+        parallel=True
+    )
+    ```
+  </Tab>
+  
+  <Tab title="Async">
+    ```python
+    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from pydantic import BaseModel
+    
+    class ReportMetadata(BaseModel):
+        title: str
+        author: str
+        
+    class DataMetadata(BaseModel):
+        rows: int
+        columns: int
+        
+    # Define different rules for each file
+    rules_list = [
+        [MetadataExtractionRule(schema=ReportMetadata)],
+        [MetadataExtractionRule(schema=DataMetadata)],
+        [NaturalLanguageRule(prompt="Extract key points only")]
+    ]
+    
+    files = ["report.pdf", "data.csv", "presentation.pptx"]
+    
+    result = await db.ingest_files(
+        files=files,
+        rules=rules_list,
+        parallel=True
+    )
+    ```
+  </Tab>
+</Tabs>
+
+### Using Different File Input Types
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    import io
+    from pathlib import Path
+    
+    # Mixing different file input types
+    file1 = "document.pdf"                       # Path string
+    file2 = Path("image.png")                    # Path object
+    file3 = open("data.csv", "rb")               # File object
+    file4 = b"Hello, world!"                     # Bytes (requires filename)
+    file5 = io.BytesIO(b"Some in-memory data")   # BytesIO (requires filename)
+    
+    result = db.ingest_files(
+        files=[file1, file2, file3, file4, file5],
+        metadata=[
+            {"type": "document"},
+            {"type": "image"},
+            {"type": "data"},
+            {"type": "text", "filename": "hello.txt"},
+            {"type": "text", "filename": "memory-data.txt"}
+        ]
+    )
+    
+    # Don't forget to close file objects
+    file3.close()
+    ```
+  </Tab>
+  
+  <Tab title="Async">
+    ```python
+    import io
+    from pathlib import Path
+    
+    # Mixing different file input types
+    file1 = "document.pdf"                       # Path string
+    file2 = Path("image.png")                    # Path object
+    file3 = open("data.csv", "rb")               # File object
+    file4 = b"Hello, world!"                     # Bytes (requires filename)
+    file5 = io.BytesIO(b"Some in-memory data")   # BytesIO (requires filename)
+    
+    result = await db.ingest_files(
+        files=[file1, file2, file3, file4, file5],
+        metadata=[
+            {"type": "document"},
+            {"type": "image"},
+            {"type": "data"},
+            {"type": "text", "filename": "hello.txt"},
+            {"type": "text", "filename": "memory-data.txt"}
+        ]
+    )
+    
+    # Don't forget to close file objects
+    file3.close()
+    ```
+  </Tab>
+</Tabs>

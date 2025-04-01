@@ -10,6 +10,7 @@ description: "Create a graph from documents"
         name: str,
         filters: Optional[Dict[str, Any]] = None,
         documents: Optional[List[str]] = None,
+        prompt_overrides: Optional[Union[GraphPromptOverrides, Dict[str, Any]]] = None,
     ) -> Graph
     ```
   </Tab>
@@ -19,6 +20,7 @@ description: "Create a graph from documents"
         name: str,
         filters: Optional[Dict[str, Any]] = None,
         documents: Optional[List[str]] = None,
+        prompt_overrides: Optional[Union[GraphPromptOverrides, Dict[str, Any]]] = None,
     ) -> Graph
     ```
   </Tab>
@@ -29,6 +31,7 @@ description: "Create a graph from documents"
 - `name` (str): Name of the graph to create
 - `filters` (Dict[str, Any], optional): Optional metadata filters to determine which documents to include
 - `documents` (List[str], optional): Optional list of specific document IDs to include
+- `prompt_overrides` (GraphPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction and resolution prompts
 
 ## Returns
 
@@ -39,7 +42,7 @@ description: "Create a graph from documents"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -55,12 +58,53 @@ description: "Create a graph from documents"
         documents=["doc1", "doc2", "doc3"]
     )
     
+    # With custom entity extraction examples
+    from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+    
+    # Example with only entity extraction examples
+    graph = db.create_graph(
+        name="medical_graph", 
+        filters={"category": "medical"},
+        prompt_overrides=GraphPromptOverrides(
+            entity_extraction=EntityExtractionPromptOverride(
+                examples=[
+                    EntityExtractionExample(label="Insulin", type="MEDICATION"),
+                    EntityExtractionExample(label="Diabetes", type="CONDITION")
+                ]
+            )
+        )
+    )
+    
+    # Example with custom entity extraction prompt template and examples
+    graph = db.create_graph(
+        name="financial_graph",
+        documents=["doc1", "doc2"],
+        prompt_overrides=GraphPromptOverrides(
+            entity_extraction=EntityExtractionPromptOverride(
+                prompt_template="Extract financial entities from the following text:\n\n{content}\n\nFocus on these types of entities:\n{examples}\n\nReturn in JSON format.",
+                examples=[
+                    EntityExtractionExample(label="Apple Inc.", type="COMPANY", properties={"sector": "Technology"}),
+                    EntityExtractionExample(label="Q3 2024", type="TIME_PERIOD"),
+                    EntityExtractionExample(label="Revenue Growth", type="METRIC")
+                ]
+            ),
+            entity_resolution=EntityResolutionPromptOverride(
+                examples=[
+                    EntityResolutionExample(
+                        canonical="Apple Inc.", 
+                        variants=["Apple", "AAPL", "Apple Computer"]
+                    )
+                ]
+            )
+        )
+    )
+    
     print(f"Created graph with {len(graph.entities)} entities and {len(graph.relationships)} relationships")
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         # Create a graph from documents with category="research"
@@ -73,6 +117,47 @@ description: "Create a graph from documents"
         graph = await db.create_graph(
             name="custom_graph",
             documents=["doc1", "doc2", "doc3"]
+        )
+        
+        # With custom entity extraction examples
+        from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+        
+        # Example with only entity extraction examples
+        graph = await db.create_graph(
+            name="medical_graph", 
+            filters={"category": "medical"},
+            prompt_overrides=GraphPromptOverrides(
+                entity_extraction=EntityExtractionPromptOverride(
+                    examples=[
+                        EntityExtractionExample(label="Insulin", type="MEDICATION"),
+                        EntityExtractionExample(label="Diabetes", type="CONDITION")
+                    ]
+                )
+            )
+        )
+        
+        # Example with custom entity extraction prompt template and examples
+        graph = await db.create_graph(
+            name="financial_graph",
+            documents=["doc1", "doc2"],
+            prompt_overrides=GraphPromptOverrides(
+                entity_extraction=EntityExtractionPromptOverride(
+                    prompt_template="Extract financial entities from the following text:\n\n{content}\n\nFocus on these types of entities:\n{examples}\n\nReturn in JSON format.",
+                    examples=[
+                        EntityExtractionExample(label="Apple Inc.", type="COMPANY", properties={"sector": "Technology"}),
+                        EntityExtractionExample(label="Q3 2024", type="TIME_PERIOD"),
+                        EntityExtractionExample(label="Revenue Growth", type="METRIC")
+                    ]
+                ),
+                entity_resolution=EntityResolutionPromptOverride(
+                    examples=[
+                        EntityResolutionExample(
+                            canonical="Apple Inc.", 
+                            variants=["Apple", "AAPL", "Apple Computer"]
+                        )
+                    ]
+                )
+            )
         )
         
         print(f"Created graph with {len(graph.entities)} entities and {len(graph.relationships)} relationships")

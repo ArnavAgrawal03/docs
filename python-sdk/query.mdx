@@ -21,6 +21,7 @@ Generate completion using relevant chunks as context.
         graph_name: Optional[str] = None,
         hop_depth: int = 1,
         include_paths: bool = False,
+        prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -37,6 +38,7 @@ Generate completion using relevant chunks as context.
         graph_name: Optional[str] = None,
         hop_depth: int = 1,
         include_paths: bool = False,
+        prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -54,6 +56,7 @@ Generate completion using relevant chunks as context.
 - `graph_name` (str, optional): Optional name of the graph to use for knowledge graph-enhanced retrieval
 - `hop_depth` (int, optional): Number of relationship hops to traverse in the graph (1-3). Defaults to 1.
 - `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
+- `prompt_overrides` (QueryPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction, resolution, and query prompts
 
 ## Returns
 
@@ -66,7 +69,7 @@ Generate completion using relevant chunks as context.
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -85,7 +88,7 @@ Generate completion using relevant chunks as context.
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         response = await db.query(
@@ -108,7 +111,7 @@ Generate completion using relevant chunks as context.
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -130,7 +133,7 @@ Generate completion using relevant chunks as context.
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         # Knowledge graph enhanced query
@@ -147,6 +150,71 @@ Generate completion using relevant chunks as context.
         if kg_response.metadata and "graph" in kg_response.metadata:
             for path in kg_response.metadata["graph"]["paths"]:
                 print(" -> ".join(path))
+    ```
+  </Tab>
+</Tabs>
+
+### With Custom Prompt Overrides
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from databridge import DataBridge
+    from databridge.models import QueryPromptOverride, QueryPromptOverrides
+    
+    db = DataBridge()
+    
+    # Using the QueryPromptOverrides object
+    response = db.query(
+        "What are the key findings?",
+        filters={"category": "research"},
+        prompt_overrides=QueryPromptOverrides(
+            query=QueryPromptOverride(
+                prompt_template="Answer the question in a formal, academic tone: {question}\n\nContext:\n{context}\n\nAnswer:"
+            )
+        )
+    )
+    
+    # Alternatively, using a dictionary
+    response = db.query(
+        "What are the key findings?",
+        filters={"category": "research"},
+        prompt_overrides={
+            "query": {
+                "prompt_template": "Answer the question in a formal, academic tone: {question}\n\nContext:\n{context}\n\nAnswer:"
+            }
+        }
+    )
+    
+    print(response.completion)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from databridge import AsyncDataBridge
+    from databridge.models import QueryPromptOverride, EntityExtractionPromptOverride, QueryPromptOverrides
+    
+    async with AsyncDataBridge() as db:
+        # Example with both query and entity extraction customization
+        response = await db.query(
+            "How does the medication affect diabetes?",
+            graph_name="medical_graph",
+            prompt_overrides=QueryPromptOverrides(
+                # Customize how responses are generated
+                query=QueryPromptOverride(
+                    prompt_template="Provide a concise, medically accurate answer: {question}\n\nContext:\n{context}\n\nAnswer:"
+                ),
+                # Customize entity extraction
+                entity_extraction=EntityExtractionPromptOverride(
+                    examples=[
+                        {"label": "Insulin", "type": "MEDICATION"},
+                        {"label": "Diabetes", "type": "CONDITION"}
+                    ]
+                )
+            )
+        )
+        
+        print(response.completion)
     ```
   </Tab>
 </Tabs>

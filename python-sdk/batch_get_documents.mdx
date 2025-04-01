@@ -29,7 +29,7 @@ description: "Retrieve multiple documents by their IDs in a single batch operati
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.sync import DataBridge
+    from databridge import DataBridge
     
     db = DataBridge()
     
@@ -40,7 +40,7 @@ description: "Retrieve multiple documents by their IDs in a single batch operati
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge.async_ import AsyncDataBridge
+    from databridge import AsyncDataBridge
     
     async with AsyncDataBridge() as db:
         docs = await db.batch_get_documents(["doc_123", "doc_456", "doc_789"])
