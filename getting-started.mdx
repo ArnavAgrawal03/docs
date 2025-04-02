@@ -141,7 +141,7 @@ pip install unstructured==0.16.10
 python -m nltk.downloader averaged_perceptron_tagger punkt
 ```
 
-If you encounter database initialization issues, you may need to manually initialize the schema:
+If you encounter database initialization issues within Docker, you may need to manually initialize the schema:
 
 ```bash
 psql -U postgres -d databridge -a -f init.sql
