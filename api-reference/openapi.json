@@ -1390,7 +1390,7 @@
     "/graph/create": {
       "post": {
         "summary": "Create Graph",
-        "description": "Create a graph from documents.\n\nThis endpoint extracts entities and relationships from documents\nmatching the specified filters or document IDs and creates a graph.\n\nArgs:\n    request: CreateGraphRequest containing:\n        - name: Name of the graph to create\n        - filters: Optional metadata filters to determine which documents to include\n        - documents: Optional list of specific document IDs to include\n    auth: Authentication context\n\nReturns:\n    Graph: The created graph object",
+        "description": "Create a graph from documents. \n This endpoint extracts entities and relationships from documents matching the specified filters or document IDs and creates a graph. Args:    request: CreateGraphRequest containing:\n        - name: Name of the graph to create\n        - filters: Optional metadata filters to determine which documents to include - documents: Optional list of specific document IDs to include\n    auth: Authentication context\n\nReturns:\n    Graph: The created graph object",
         "operationId": "create_graph_graph_create_post",
         "parameters": [
           {
