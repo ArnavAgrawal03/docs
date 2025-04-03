@@ -1,0 +1,98 @@
+---
+title: 'Model Context Protocol (MCP)'
+description: 'Enable Claude and other AI assistants to access your Morphik knowledge base'
+---
+
+## Overview
+
+Morphik provides native support for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) - an open standard that allows AI models like Claude to directly access structured data and knowledge bases.
+
+With Morphik's MCP integration, you can:
+
+- Let Claude, or other MCP supported models to search through your documents based on natural language queries
+- Retrieve knowledge from your Morphik database without writing complex code
+- Give AI models direct access to your organization's information
+- Enable more accurate, context-aware responses using your own data
+
+## Setup
+
+Morphik's MCP support is provided through the `@morphik/mcp` package, which acts as a bridge between Morphik and MCP-compatible AI assistants. 
+
+### Prerequisites
+
+- A running Morphik server (local or cloud)
+- Node.js 16.0.0 or higher
+
+## Configuration with Claude Desktop
+
+To integrate Morphik with Claude Desktop:
+
+1. Open your Claude Desktop configuration file:
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+2. Add the Morphik MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "morphik": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@morphik/mcp",
+        "--uri=your-morphik-server-uri"
+      ]
+    }
+  }
+}
+```
+
+For local Morphik server, you can either omit the `--uri` parameter or use `--uri=local`:
+
+```json
+{
+  "mcpServers": {
+    "morphik": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@morphik/mcp"
+      ]
+    }
+  }
+}
+```
+
+## Using with Claude
+
+Once configured:
+
+1. Close and restart Claude Desktop.
+2. Claude will now have access to the following tools:
+   - `retrieve-chunks`: Search for relevant chunks from your knowledge base
+   - `retrieve-docs`: Search for entire documents in your knowledge base
+   - `query`: Generate a completion using relevant context
+   - `list-documents`: List available documents
+   - `get-document`: Get a specific document's details
+   - `ingest-text`: Add new text to your knowledge base
+   - `delete-document`: Remove a document from your knowledge base
+
+{/* TODO: Add screenshot of Claude Desktop with Morphik MCP
+
+## Example Interaction
+
+Here's how a typical interaction with Claude using Morphik MCP might look: */}
+
+{/* ```
+User: /mcp morphik
+Claude: I've connected to the Morphik MCP server. I can now access your documents and knowledge base. What would you like to know?
+
+User: What documents do I have available?
+Claude: [Claude uses list-documents tool to show available documents]
+
+User: Tell me about quantum computing based on my documents
+Claude: [Claude uses retrieve-chunks to find relevant information about quantum computing from your documents]
+```
+
+TODO: Add actual Claude interaction screenshot */}
