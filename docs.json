@@ -7,6 +7,13 @@
     "light": "#07C983",
     "dark": "#15803D"
   },
+  "api": {
+    "openapi": "api-reference/openapi.json",
+    "playground": {
+      "display": "interactive",
+      "proxy": true
+    }
+  },
   "favicon": "/favicon.png",
   "navigation": {
     "tabs": [

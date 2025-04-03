@@ -131,16 +131,6 @@ Some system-level dependencies might be required for processing various document
   </Tab>
 </Tabs>
 
-You may also need additional Python packages or NLTK resources:
-
-```bash
-# If using Python 3.12+, you might need a specific version of unstructured
-pip install unstructured==0.16.10
-
-# Download required NLTK resources
-python -m nltk.downloader averaged_perceptron_tagger punkt
-```
-
 If you encounter database initialization issues within Docker, you may need to manually initialize the schema:
 
 ```bash
@@ -272,6 +262,18 @@ After activation, your command prompt should be prefixed with `(.venv)`, indicat
 
 ```bash
 pip install -r requirements.txt
+```
+
+### Python Dependencies for Document Processing
+
+You may also need additional Python packages or NLTK resources for processing various document types:
+
+```bash
+# If using Python 3.12+, you might need a specific version of unstructured
+pip install unstructured==0.16.10
+
+# Download required NLTK resources
+python -m nltk.downloader averaged_perceptron_tagger punkt
 ```
 
 ### Setting up the Server Parameters
