@@ -1,30 +1,31 @@
 ---
-title: 'Introduction to RAG'
-description: 'An overview of Retrieval Augmented Generation with Vector Similarity Search'
+title: "Introduction to RAG"
+description: "An overview of Retrieval Augmented Generation with Vector Similarity Search"
 ---
 
 ## What is RAG?
 
-RAG stands for **R**etrieval **A**ugmented **G**eneration. It is a set of tools and techniques that allow us to provided additional context to an LLM given a query. 
+RAG stands for **R**etrieval **A**ugmented **G**eneration. It is a set of tools and techniques that allow us to provide additional context to an LLM given a query.
 
-For example, let's say you're creating an app that helps users assemble furniture. If the user is stuck on a particular step, they may want to upload a picture of their current progress and ask follow-up questions to a chatbot. RAG would allow you to take that picture, as well as the user query, and then search over a pre-ingested knowledge base - a set of user manuals for different types of furniture, for instance - and *augment* the query with context from that knowledge base. So, instead of the response being 
+For example, let's say you're creating an app that helps users assemble furniture. If the user is stuck on a particular step, they may want to upload a picture of their current progress and ask follow-up questions to a chatbot. RAG would allow you to take that picture, as well as the user query, and then search over a pre-ingested knowledge base - a set of user manuals for different types of furniture, for instance - and _augment_ the query with context from that knowledge base. So, instead of the response being
 
 > "oh, it looks like you've screwed the rear leg backwards"
 
-it would be something like 
-> "seems like you're assembling chair CX-184. You may have skipped step 8 in the assembly process, since the rear leg is screwed backwards. Here is a step-by-step solution from the assembly guide: ...". 
+it would be something like
 
-Note how both answers recognized the issue correctly, but since the LLM had additional context in the second answer, it was also able to provide a solution and more specific details. That's the jist of RAG - LLMs provide **higher-quality responses** when provided with **more context** surrounding a query. 
+> "seems like you're assembling chair CX-184. You may have skipped step 8 in the assembly process, since the rear leg is screwed backwards. Here is a step-by-step solution from the assembly guide: ...".
 
-While the core concept itself is quite obvious, the complexity arises in *how* we can effectively retrieve the correct information. In the following sections, we explain one way to effectively perform RAG based on the concept of vector embeddings and similarity search (we'll explain what these mean!). 
+Note how both answers recognized the issue correctly, but since the LLM had additional context in the second answer, it was also able to provide a solution and more specific details. That's the jist of RAG - LLMs provide **higher-quality responses** when provided with **more context** surrounding a query.
+
+While the core concept itself is quite obvious, the complexity arises in _how_ we can effectively retrieve the correct information. In the following sections, we explain one way to effectively perform RAG based on the concept of vector embeddings and similarity search (we'll explain what these mean\!).
 
 <Note>
-In reality, DataBridge uses a combination of different RAG techniques to achieve the best solution. We intend to talk about each of the techniques we implement in the [concepts](/concepts/) section of our documentation. If you're looking for a particular RAG technique, such as [ColPali](/concepts/colpali.mdx) or [Knowledge Graphs](/concepts/knowledge-graphs.mdx), you'll find it there. In this explainer, however, we'll restrict ourselves to talk about single vector-search based retrieval.
+  In reality, DataBridge uses a combination of different RAG techniques to achieve the best solution. We intend to talk about each of the techniques we implement in the [concepts](/concepts/) section of our documentation. If you're looking for a particular RAG technique, such as [ColPali](/concepts/colpali.mdx) or [Knowledge Graphs](/concepts/knowledge-graphs.mdx), you'll find it there. In this explainer, however, we'll restrict ourselves to talk about single vector-search based retrieval.
 </Note>
 
 ## How does RAG work?
 
-RAG roughly consists of 4 actions: i) ingesting knowledge - such as code documentation, textbooks, or product catalogues - ii) *retrieving* relevant chunks from said knowledge, iii) using the retrieved information to *augment* the user query into a better prompt, and iv) *generating* a model response from the prompt. 
+RAG roughly consists of 4 actions: i) ingesting knowledge - such as code documentation, textbooks, or product catalogues - ii) _retrieving_ relevant chunks from said knowledge, iii) using the retrieved information to _augment_ the user query into a better prompt, and iv) _generating_ a model response from the prompt.
 
 ### Ingest
 
@@ -32,24 +33,24 @@ In order to help add context to a prompt, we first need that context to exist. T
 
 **Chunking** involves breaking down documents into smaller, manageable pieces. While LLMs have context windows that can handle thousands of tokens, we want to retrieve only the most relevant information for a given query. Chunking strategies vary based on the content type - code documentation might be chunked by function or class, while textbooks might be chunked by section or paragraph. The ideal chunk size balances granularity (smaller chunks for precise retrieval) with context preservation (larger chunks for maintaining semantic meaning).
 
-**Embedding** transforms these text chunks into vector representations - essentially converting semantic meaning into mathematical space. This is done using embedding models that distill the essence of text into dense vectors. The [math and ML behind embeddings](https://www.3blue1brown.com/lessons/gpt#embedding) is really interesting. They have a [long history](https://en.wikipedia.org/wiki/Word_embedding) of development - with origins as old as 1957. Over time, models that produce word embeddings have gone through mulitple iterations - different domains, novel neural network architectures, as well as different training paradigms. 
+**Embedding** transforms these text chunks into vector representations - essentially converting semantic meaning into mathematical space. This is done using embedding models that distill the essence of text into dense vectors. The [math and ML behind embeddings](https://www.3blue1brown.com/lessons/gpt#embedding) is really interesting. They have a [long history](https://en.wikipedia.org/wiki/Word_embedding) of development - with origins as old as 1957. Over time, models that produce word embeddings have gone through mulitple iterations - different domains, novel neural network architectures, as well as different training paradigms.
 
 Here's a gif we made using [Manim](https://www.manim.community/) to explain word embeddings:
 
-<img src="/assets/WordEmbeddings.gif" alt="Animation showing how word embeddings work" />
+![Animation showing how word embeddings work](/assets/WordEmbeddings.gif)
 
-Now, if the embeddings space encodes meaning, it is reasonable to assume that words or text that mean similar things have embeddings that are close to each other. That is, *the closer the embeddings are to each other, the more similar the "embedees"*. This idea is the foundation of retrieval.
+Now, if the embeddings space encodes meaning, it is reasonable to assume that words or text that mean similar things have embeddings that are close to each other. That is, _the closer the embeddings are to each other, the more similar the "embedees"_. This idea is the foundation of retrieval.
 
-Once we have these embeddings, we can save them in a vector store. When a query comes in, we can embed it and find the chunks that are the closest to it. 
+Once we have these embeddings, we can save them in a vector store. When a query comes in, we can embed it and find the chunks that are the closest to it.
 
 ### Retrieve
 
-A natural question is, how do we quantify "closeness"? This ends up being the cosine distance. There's more information about this - i.e. why we use cosine distance - in the dropdown below. 
+A natural question is, how do we quantify "closeness"? This ends up being the cosine distance. There's more information about this - i.e. why we use cosine distance - in the dropdown below.
 
 <Accordion title="Why do we use cosine similarity?">
- We could consider the distance between two embeddings. However, if we want direct similarities scores, we'd have to perform some kind of inverse transformation (if the distance is small, they are actually more similar). More importantly, regular distance computation suffers from the [curse of dimensionality](https://en.wikipedia.org/wiki/Curse_of_dimensionality). Instead, we could look at the *dot product* of two vectors instead. The closer two vectors are to each other, the higher their dot product value. However, since the dot product of two vectors is proportional to the length of the vectors, this also means that a larger vector (i.e. a vector whose magnitude is high) will be the most similar to other vectors. As a result, we can divide the dot product with the lengths of both vectors, obtaining the cosine distance.
+  We could consider the distance between two embeddings. However, if we want direct similarities scores, we'd have to perform some kind of inverse transformation (if the distance is small, they are actually more similar). More importantly, regular distance computation suffers from the [curse of dimensionality](https://en.wikipedia.org/wiki/Curse_of_dimensionality). Instead, we could look at the _dot product_ of two vectors instead. The closer two vectors are to each other, the higher their dot product value. However, since the dot product of two vectors is proportional to the length of the vectors, this also means that a larger vector (i.e. a vector whose magnitude is high) will be the most similar to other vectors. As a result, we can divide the dot product with the lengths of both vectors, obtaining the cosine distance.
 
-Computing cosine distance is expensive. So, in practice, most embedding models provide *normalized* embeddings (i.e. embeddings with length 1). Then, computing the dot product is the same as computing the cosine distance between two vectors.
+  Computing cosine distance is expensive. So, in practice, most embedding models provide _normalized_ embeddings (i.e. embeddings with length 1). Then, computing the dot product is the same as computing the cosine distance between two vectors.
 </Accordion>
 
 So, upto this point, we've taken documents, separated them into chunks, and embedded each chunk into a vector. We've also discussed how to compute vectors that are close to each other. As a result ...we now have a practical way to retrieve relevant context.
@@ -89,11 +90,9 @@ To summarize, RAG leverages four key steps—ingestion, retrieval, augmentation,
 
 In future articles, we'll delve deeper into specific RAG techniques, discuss optimization strategies for vector search, and explore how combining multiple retrieval methods can further enhance application performance.
 
-
 {/* 
 ### Augment 
 
 ### Generate
 
 ## How can we implement RAG? */}
-
