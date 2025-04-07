@@ -45,6 +45,12 @@
               "using-morphik/mcp",
               "using-morphik/code"
             ]
+          },
+          {
+            "group": "Morphik Community",
+            "pages": [
+              "special-thanks.mdx"
+            ]
           }
         ]
       },
