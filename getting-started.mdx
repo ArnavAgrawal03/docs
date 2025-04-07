@@ -1,6 +1,6 @@
 ---
-title: 'Getting Started'
-description: 'Setting Up the Morphik server'
+title: "Getting Started"
+description: "Setting Up the Morphik server"
 ---
 
 # Direct Installation
@@ -8,194 +8,185 @@ description: 'Setting Up the Morphik server'
 ## Prerequisites
 
 <Accordion title="Python">
-Please ensure that you have Python 3.12 installed on your machine. Guides for installing Python can be found on the [Python website](https://www.python.org/downloads/release/python-3129/). 
+  Please ensure that you have Python 3.12 installed on your machine. Guides for installing Python can be found on the [Python website](https://www.python.org/downloads/release/python-3129/).
 </Accordion>
 
 <Accordion title="PostgreSQL">
-Morphik requires PostgreSQL with the pgvector extension for vector storage and similarity search capabilities. Follow the installation instructions for your operating system:
+  Morphik requires PostgreSQL with the pgvector extension for vector storage and similarity search capabilities. Follow the installation instructions for your operating system:
 
-<Tabs>
-  <Tab title="macOS">
-    On macOS, you can use Homebrew to install PostgreSQL and pgvector:
-    
-    ```bash
-    brew install postgresql@14
-    brew install pgvector
-    ```
-    
-    Start the PostgreSQL service:
-    
-    ```bash
-    brew services start postgresql@14
-    ```
-    
-    Create a database and user for DataBridge:
-    
-    ```bash
-    createdb databridge
-    createuser -s postgres
-    ```
-    
-    These commands create a database named "databridge" and a superuser named "postgres" that the application will use to connect.
-  </Tab>
-  <Tab title="Ubuntu/Debian">
-    Install PostgreSQL from the official repositories:
-    
-    ```bash
-    sudo apt update
-    sudo apt install postgresql postgresql-contrib
-    ```
-    
-    Install pgvector by building from source:
-    
-    ```bash
-    git clone https://github.com/pgvector/pgvector.git
-    cd pgvector
-    make
-    sudo make install
-    ```
-    
-    Start and enable the PostgreSQL service:
-    
-    ```bash
-    sudo systemctl start postgresql
-    sudo systemctl enable postgresql
-    ```
-    
-    Create a database and user for DataBridge:
-    
-    ```bash
-    sudo -u postgres createdb databridge
-    sudo -u postgres createuser -s postgres
-    ```
-  </Tab>
-  <Tab title="Windows">
-    1. Download and install PostgreSQL from the [official website](https://www.postgresql.org/download/windows/).
-    
-    2. During installation, make note of the password you set for the postgres user.
-    
-    3. Install pgvector:
-       - Open pgAdmin (installed with PostgreSQL)
-       - Connect to your PostgreSQL server
-       - Right-click on "Extensions" and select "Create > Extension"
-       - Select "pgvector" from the dropdown and click "Save"
-    
-    4. Create a database for DataBridge:
-       - Right-click on "Databases" and select "Create > Database"
-       - Name it "databridge" and click "Save"
-  </Tab>
-</Tabs>
+  <Tabs>
+    <Tab title="macOS">
+      On macOS, you can use Homebrew to install PostgreSQL and pgvector:
 
-After installation, verify that Ollama is running correctly by making a simple query:
+      ```bash
+      brew install postgresql@14
+      brew install pgvector
+      ```
 
+      Start the PostgreSQL service:
 
-After installation, verify that PostgreSQL is running correctly:
+      ```bash
+      brew services start postgresql@14
+      ```
 
-```bash
-psql -U postgres -c "SELECT version();"
-```
+      Create a database and user for DataBridge:
 
-You should see the following output:
+      ```bash
+      createdb databridge
+      createuser -s postgres
+      ```
 
-```
- version                                                            
-------------------------------------------------------------------------------------------------------------------------------
-<Your postgres version and some compilation details>
-```
+      These commands create a database named "databridge" and a superuser named "postgres" that the application will use to connect.
+    </Tab>
+    <Tab title="Ubuntu/Debian">
+      Install PostgreSQL from the official repositories. We recommend version 14. Other versions may work, but haven't been extensively tested\!
 
+      ```bash
+      sudo apt update
+      sudo apt install postgresql postgresql-contrib
+      ```
+
+      Install pgvector by building from source:
+
+      ```bash
+      git clone https://github.com/pgvector/pgvector.git
+      cd pgvector
+      make
+      sudo make install
+      ```
+
+      Start and enable the PostgreSQL service:
+
+      ```bash
+      sudo systemctl start postgresql
+      sudo systemctl enable postgresql
+      ```
+
+      Create a database and user for DataBridge:
+
+      ```bash
+      sudo -u postgres createdb databridge
+      sudo -u postgres createuser -s postgres
+      ```
+    </Tab>
+    <Tab title="Windows">
+      1. Download and install PostgreSQL from the [official website](https://www.postgresql.org/download/windows/).
+      2. During installation, make note of the password you set for the postgres user.
+      3. Install pgvector:
+         - Open pgAdmin (installed with PostgreSQL)
+         - Connect to your PostgreSQL server
+         - Right-click on "Extensions" and select "Create \> Extension"
+         - Select "pgvector" from the dropdown and click "Save"
+      4. Create a database for DataBridge:
+         - Right-click on "Databases" and select "Create \> Database"
+         - Name it "databridge" and click "Save"
+    </Tab>
+  </Tabs>
+  After installation, verify that Ollama is running correctly by making a simple query:
+
+  After installation, verify that PostgreSQL is running correctly:
+
+  ```bash
+  psql -U postgres -c "SELECT version();"
+  ```
+
+  You should see the following output:
+
+  ```
+   version                                                            
+  ------------------------------------------------------------------------------------------------------------------------------
+  <Your postgres version and some compilation details>
+  ```
 </Accordion>
 
 <Accordion title="Additional Dependencies">
-Some system-level dependencies might be required for processing various document types:
+  Some system-level dependencies might be required for processing various document types:
 
-<Tabs>
-  <Tab title="macOS">
-    ```bash
-    # Install via Homebrew
-    brew install poppler tesseract libmagic
-    ```
-  </Tab>
-  <Tab title="Ubuntu/Debian">
-    ```bash
-    # Install via apt
-    sudo apt-get update
-    sudo apt-get install -y poppler-utils tesseract-ocr libmagic-dev
-    ```
-  </Tab>
-  <Tab title="Windows">
-    For Windows, you may need to install these dependencies manually:
-    
-    1. **Poppler**: Download from [poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/)
-    2. **Tesseract**: Download the installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
-    3. **libmagic**: This is included in the python-magic-bin package which will be installed with pip
-  </Tab>
-</Tabs>
+  <Tabs>
+    <Tab title="macOS">
+      ```bash
+      # Install via Homebrew
+      brew install poppler tesseract libmagic
+      ```
+    </Tab>
+    <Tab title="Ubuntu/Debian">
+      ```bash
+      # Install via apt
+      sudo apt-get update
+      sudo apt-get install -y poppler-utils tesseract-ocr libmagic-dev
+      ```
+    </Tab>
+    <Tab title="Windows">
+      For Windows, you may need to install these dependencies manually:
 
-If you encounter database initialization issues within Docker, you may need to manually initialize the schema:
+      1. **Poppler**: Download from [poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/)
+      2. **Tesseract**: Download the installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
+      3. **libmagic**: This is included in the python-magic-bin package which will be installed with pip
+    </Tab>
+  </Tabs>
+  If you encounter database initialization issues within Docker, you may need to manually initialize the schema:
 
-```bash
-psql -U postgres -d databridge -a -f init.sql
-```
+  ```bash
+  psql -U postgres -d databridge -a -f init.sql
+  ```
 </Accordion>
 
 <Accordion title="Installing Ollama">
-<Tabs>
-  <Tab title="macOS">
-    Install Ollama using Homebrew:
-    
-    ```bash
-    brew install ollama
-    ```
-    
-    Start Ollama:
-    
-    ```bash
-    ollama serve
-    ```
-    
-    Pull a model to use with Morphik (in a new terminal):
-    
-    ```bash
-    ollama pull llama3.2
-    ```
-  </Tab>
-  <Tab title="Linux">
-    Install Ollama using the official installation script:
-    
-    ```bash
-    curl -fsSL https://ollama.com/install.sh | sh
-    ```
-    
-    Start Ollama:
-    
-    ```bash
-    ollama serve
-    ```
-    
-    Pull a model to use with Morphik (in a new terminal):
-    
-    ```bash
-    ollama pull llama3.2
-    ```
-  </Tab>
-  <Tab title="Windows">
-    1. Download the Ollama installer from the [official website](https://ollama.com/download/windows).
-    
-    2. Run the installer and follow the on-screen instructions.
-    
-    3. After installation, Ollama will start automatically.
-    
-    4. Open Command Prompt or PowerShell and pull a model:
-       ```bash
-       ollama pull llama3.2
-       ```
-  </Tab>
-</Tabs>
+  <Tabs>
+    <Tab title="macOS">
+      Install Ollama using Homebrew:
+
+      ```bash
+      brew install ollama
+      ```
+
+      Start Ollama:
+
+      ```bash
+      ollama serve
+      ```
+
+      Pull a model to use with Morphik (in a new terminal):
+
+      ```bash
+      ollama pull llama3.2
+      ```
+    </Tab>
+    <Tab title="Linux">
+      Install Ollama using the official installation script:
+
+      ```bash
+      curl -fsSL https://ollama.com/install.sh | sh
+      ```
+
+      Start Ollama:
+
+      ```bash
+      ollama serve
+      ```
+
+      Pull a model to use with Morphik (in a new terminal):
+
+      ```bash
+      ollama pull llama3.2
+      ```
+    </Tab>
+    <Tab title="Windows">
+      1. Download the Ollama installer from the [official website](https://ollama.com/download/windows).
+      2. Run the installer and follow the on-screen instructions.
+      3. After installation, Ollama will start automatically.
+      4. Open Command Prompt or PowerShell and pull a model:
+
+         ```bash
+         ollama pull llama3.2
+         ```
+    </Tab>
+  </Tabs>
 </Accordion>
 
 ## Cloning the Repository
 
-To get started with Morphik, we need to first setup the server. This involves cloning the [repository](https://github.com/morphik-org/morphik-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data!
+To get started with Morphik, we need to first setup the server. This involves cloning the [repository](https://github.com/morphik-org/morphik-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data\!
 
 First, let's clone the repository from GitHub.
 
@@ -222,10 +213,11 @@ Next, you need to set up a virtual environment called `.venv`.
 ## Setting Up the Environment
 
 ### Installing Python Dependencies
-<Note>
-While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
 
-Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
+<Note>
+  While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
+
+  Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
 </Note>
 
 ```bash
@@ -238,7 +230,7 @@ Now, you need to activate the virtual environment. The activation command differ
   <Tab title="Linux/macOS">
     ```bash
     source .venv/bin/activate
-    ```    
+    ```
   </Tab>
   <Tab title="Windows (Command Prompt)">
     ```bash
@@ -278,7 +270,7 @@ python -m nltk.downloader averaged_perceptron_tagger punkt
 
 ### Setting up the Server Parameters
 
-At this point, you may want to customize the server - such as use a different embedding model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file. You can find more details about configuration [here](/configuration). 
+At this point, you may want to customize the server - such as use a different embedding model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file. You can find more details about configuration [here](/configuration).
 
 Morphik uses environment variables to manage secrets and api keys. In order to ensure that any pre-set keys are available to the server, copy the `.env.example` file to `.env`:
 
@@ -286,7 +278,7 @@ Morphik uses environment variables to manage secrets and api keys. In order to e
 cp .env.example .env
 ```
 
-In case you're using external models, you may have to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store. 
+In case you're using external models, you may have to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store.
 
 ```bash
 python quick_setup.py
@@ -294,7 +286,7 @@ python quick_setup.py
 
 ## Launching the Server
 
-You are now ready to launch the Morphik server! Just run the following command to start the server.
+You are now ready to launch the Morphik server\! Just run the following command to start the server.
 
 ```bash
 python start_server.py
@@ -311,26 +303,23 @@ INFO:     Uvicorn running on http://localhost:8000 (Press CTRL+C to quit)
 
 This means that the server is running on `http://localhost:8000`. You can now interact with the server using the API or the Python SDK.
 
-
-
 ## Next Steps
 
 Now that you have the server running, you can explore the different ways to interact with the server.
 
+**Special thanks to rex777 from the Morphik Discord community for help with troubleshooting and improving these setup instructions\!\!\!**
 
-**Special thanks to rex777 from the Morphik Discord community for help with troubleshooting and improving these setup instructions!!!**
-
-<CardGroup cols={2}>
-<Card icon="gear" title="Configure Morphik" href="/configuration">
-  Configure Morphik using the `databridge.toml` file.
-</Card>
-<Card icon="code" title="API" href="/api-reference/ingest-text">
-  Use the API to interact with the server.
-</Card>
-<Card icon="python" title="Python SDK" href="/python-sdk/introduction">
-  Use the Python SDK to interact with the server.
-</Card>
-<Card icon="react"title="Morphik UI and CLI" href="/web-interface/introduction">
-  Use the Morphik UI or CLI to interact with the server.
-</Card>
+<CardGroup cols="2">
+  <Card title="Configure Morphik" icon="gear" href="/configuration">
+    Configure Morphik using the `databridge.toml` file.
+  </Card>
+  <Card title="API" icon="code" href="/api-reference/ingest-text">
+    Use the API to interact with the server.
+  </Card>
+  <Card title="Python SDK" icon="python" href="/python-sdk/introduction">
+    Use the Python SDK to interact with the server.
+  </Card>
+  <Card title="Morphik UI and CLI" icon="react" href="/web-interface/introduction">
+    Use the Morphik UI or CLI to interact with the server.
+  </Card>
 </CardGroup>
