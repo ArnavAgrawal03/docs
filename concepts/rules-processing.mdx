@@ -115,14 +115,22 @@ DataBridge supports multiple LLM providers:
 1. **OpenAI**: For high-quality results with cloud-based processing
 2. **Ollama**: For self-hosted, private LLM deployments
 
-The LLM provider is configured in your `databridge.toml` file:
+The LLM for rules processing is configured in your `databridge.toml` file using the registered models approach:
 
 ```toml
+# First, register your models in the registered_models section
+[registered_models]
+openai_gpt4 = { model_name = "gpt-4" }
+claude_sonnet = { model_name = "claude-3-sonnet-20240229" }
+ollama_llama = { model_name = "ollama_chat/llama3.2", api_base = "http://localhost:11434" }
+
+# Then reference a registered model in the rules section
 [rules]
-provider = "openai"  # or "ollama" for self-hosted
-model = "gpt-4o"     # or your preferred model
+model = "openai_gpt4"  # Reference to a key in registered_models
 batch_size = 4096      # Size of content to process at once
 ```
+
+This approach allows you to easily switch between different models for rules processing. You can use a powerful model like GPT-4 for complex rule processing, or a smaller, faster model for simpler tasks.
 
 ### Rules Processing Logic
 

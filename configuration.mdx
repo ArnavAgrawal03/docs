@@ -22,6 +22,72 @@ When you first set up Morphik, you can:
 - Copy and modify the example `databridge.toml` file
 - Create your own configuration file manually
 
+## Registered Models Approach
+
+Morphik uses a registered models approach which allows you to define hundreds of different models and reference them throughout your configuration. This makes it easy to:
+
+- Use different models for different tasks
+- Mix and match models based on your needs (e.g. smaller models for simpler tasks)
+- Configure model-specific settings in one place
+- Switch between providers without changing the rest of your configuration
+
+### Defining Registered Models
+
+First, register your models in the `[registered_models]` section:
+
+```toml
+[registered_models]
+# OpenAI models
+openai_gpt4o = { model_name = "gpt-4o" }
+openai_gpt4 = { model_name = "gpt-4" }
+
+# Azure OpenAI models
+azure_gpt4 = { model_name = "gpt-4", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-4-deployment" }
+azure_gpt35 = { model_name = "gpt-3.5-turbo", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-35-turbo-deployment" }
+
+# Anthropic models
+claude_opus = { model_name = "claude-3-opus-20240229" }
+claude_sonnet = { model_name = "claude-3-sonnet-20240229" }
+
+# Ollama models
+ollama_llama = { model_name = "ollama_chat/llama3.2", api_base = "http://localhost:11434" }
+ollama_llama_docker = { model_name = "ollama_chat/llama3.2", api_base = "http://ollama:11434" }
+ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
+
+# Embedding models
+openai_embedding = { model_name = "text-embedding-3-small" }
+openai_embedding_large = { model_name = "text-embedding-3-large" }
+azure_embedding = { model_name = "text-embedding-ada-002", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "embedding-ada-002" }
+ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
+```
+
+### Using Registered Models
+
+Then reference these models by their key in different sections:
+
+```toml
+[completion]
+model = "ollama_llama"  # Reference to a key in registered_models
+default_max_tokens = "1000"
+default_temperature = 0.5
+
+[embedding]
+model = "ollama_embedding"  # Reference to registered model
+dimensions = 768
+similarity_metric = "cosine"
+
+[parser.vision]
+model = "ollama_llama_vision"  # Reference to a key in registered_models
+
+[rules]
+model = "ollama_llama"
+
+[graph]
+model = "ollama_llama"
+```
+
+This approach gives you maximum flexibility to use different models for different components, and even switch between local and cloud models as needed.
+
 ## Core Configuration Sections
 
 ### API Server Settings
@@ -53,40 +119,10 @@ dev_permissions = ["read", "write", "admin"]
 Configure the model used for generating text:
 
 ```toml
-# Ollama (local) configuration
 [completion]
-provider = "ollama"
-model_name = "llama3.2-vision"
+model = "claude_sonnet"  # Reference to a key in registered_models
 default_max_tokens = "1000"
-default_temperature = 0.7
-base_url = "http://localhost:11434"
-
-# OpenAI configuration
-[completion]
-provider = "openai"
-model_name = "gpt-4o"
-default_max_tokens = "1000"
-default_temperature = 0.7
-```
-
-### Custom OpenAI Base URL
-
-Morphik supports a global setting to customize the OpenAI API endpoint:
-
-```toml
-# OpenAI configuration
-openai_base_url = "https://api.openai.com/v1"  # Override the base URL for all OpenAI API calls
-```
-
-This setting applies to all OpenAI services, enabling:
-- Integration with Azure OpenAI Service
-- Using OpenAI-compatible API providers
-- Working with corporate proxies
-- Using different regional endpoints
-
-For Azure OpenAI:
-```toml
-openai_base_url = "https://{your-resource-name}.openai.azure.com/openai/deployments/{deployment-name}"
+default_temperature = 0.5
 ```
 
 ### Database Connection
@@ -109,20 +145,10 @@ collection_name = "documents"
 Configure vector embeddings generation:
 
 ```toml
-# Local embeddings with Ollama
 [embedding]
-provider = "ollama"
-model_name = "nomic-embed-text"
-dimensions = 768
-similarity_metric = "cosine"
-base_url = "http://localhost:11434"
-
-# OpenAI embeddings
-[embedding]
-provider = "openai"
-model_name = "text-embedding-3-small"
+model = "openai_embedding"  # Reference to registered model
 dimensions = 1536
-similarity_metric = "dotProduct"
+similarity_metric = "cosine"
 ```
 
 ### Document Parsing
@@ -135,6 +161,7 @@ chunk_size = 1000        # Characters per chunk
 chunk_overlap = 200      # Overlap between chunks
 use_unstructured_api = false
 use_contextual_chunking = false
+contextual_chunking_model = "ollama_llama"  # Reference to a key in registered_models
 ```
 
 ### Vision Processing
@@ -143,10 +170,8 @@ Configure multimodal processing for images and videos:
 
 ```toml
 [parser.vision]
-provider = "ollama"      # or "openai"
-model_name = "llama3.2-vision"  # or "gpt-4o-mini"
+model = "ollama_llama_vision"  # Reference to a key in registered_models
 frame_sample_rate = -1   # Set to -1 to disable frame captioning
-base_url = "http://localhost:11434"  # Only for Ollama
 ```
 
 ### Reranking
@@ -208,8 +233,7 @@ Configure document processing with rules:
 
 ```toml
 [rules]
-provider = "ollama"    # or "openai"
-model_name = "llama3.2"  # or "gpt-4o"
+model = "openai_gpt4"  # Reference to a key in registered_models
 batch_size = 4096
 ```
 
@@ -219,8 +243,8 @@ Configure entity extraction and graph building:
 
 ```toml
 [graph]
-provider = "ollama"    # or "openai"
-model_name = "llama3.2"  # or "gpt-4o-mini"
+model = "claude_sonnet"  # Reference to a key in registered_models
+enable_entity_resolution = true
 ```
 
 ### General DataBridge Settings
@@ -257,18 +281,18 @@ otlp_max_queue_size = 2048
 Morphik uses environment variables for sensitive credentials and configuration that shouldn't be stored in the configuration file:
 
 - `OPENAI_API_KEY`: Your OpenAI API key
+- `ANTHROPIC_API_KEY`: Your Anthropic API key
 - `JWT_SECRET_KEY`: Secret for authentication tokens
 - `POSTGRES_URI`: PostgreSQL connection string
 - `MONGODB_URI`: MongoDB connection string
 - `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY`: For S3 storage
 - `ASSEMBLYAI_API_KEY`: For video transcription
-- `ANTHROPIC_API_KEY`: For contextual chunking (optional)
 - `UNSTRUCTURED_API_KEY`: For enhanced document parsing (optional)
 - `HONEYCOMB_API_KEY`: For telemetry (optional)
 
 ## Complete Configuration Example
 
-Here's a complete example showing the structure of a databridge.toml file:
+Here's a complete example showing the structure of a databridge.toml file with registered models:
 
 ```toml
 [api]
@@ -283,34 +307,50 @@ dev_entity_id = "dev_user"
 dev_entity_type = "developer"
 dev_permissions = ["read", "write", "admin"]
 
+[registered_models]
+# OpenAI models
+openai_gpt4o = { model_name = "gpt-4o" }
+openai_gpt4 = { model_name = "gpt-4" }
+
+# Azure OpenAI models
+azure_gpt4 = { model_name = "gpt-4", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-4-deployment" }
+azure_gpt35 = { model_name = "gpt-3.5-turbo", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-35-turbo-deployment" }
+
+# Anthropic models
+claude_opus = { model_name = "claude-3-opus-20240229" }
+claude_sonnet = { model_name = "claude-3-sonnet-20240229" }
+
+# Ollama models
+ollama_llama = { model_name = "ollama_chat/llama3.2", api_base = "http://localhost:11434" }
+ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
+
+# Embedding models
+openai_embedding = { model_name = "text-embedding-3-small" }
+ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
+
 [completion]
-provider = "ollama"  # or "openai"
-model_name = "llama3.2-vision"
+model = "ollama_llama"  # Reference to a key in registered_models
 default_max_tokens = "1000"
-default_temperature = 0.7
-base_url = "http://localhost:11434"  # Only for Ollama
+default_temperature = 0.5
 
 [database]
 provider = "postgres"  # or "mongodb"
 
 [embedding]
-provider = "ollama"  # or "openai"
-model_name = "nomic-embed-text"
+model = "ollama_embedding"  # Reference to registered model
 dimensions = 768
 similarity_metric = "cosine"
-base_url = "http://localhost:11434"  # Only for Ollama
 
 [parser]
 chunk_size = 1000
 chunk_overlap = 200
 use_unstructured_api = false
 use_contextual_chunking = false
+contextual_chunking_model = "ollama_llama"  # Reference to a key in registered_models
 
 [parser.vision]
-provider = "ollama"  # or "openai"
-model_name = "llama3.2-vision"
+model = "ollama_llama_vision"  # Reference to a key in registered_models
 frame_sample_rate = -1
-base_url = "http://localhost:11434"  # Only for Ollama
 
 [reranker]
 use_reranker = true
@@ -329,8 +369,7 @@ storage_path = "./storage"
 provider = "pgvector"  # or "mongodb"
 
 [rules]
-provider = "ollama"  # or "openai"
-model_name = "llama3.2"
+model = "ollama_llama"
 batch_size = 4096
 
 [databridge]
@@ -338,8 +377,8 @@ enable_colpali = true
 mode = "self_hosted"  # "cloud" or "self_hosted"
 
 [graph]
-provider = "ollama"  # or "openai"
-model_name = "llama3.2"
+model = "ollama_llama"
+enable_entity_resolution = true
 
 [telemetry]
 enabled = true
@@ -349,12 +388,34 @@ honeycomb_proxy_endpoint = "https://otel-proxy.onrender.com"
 service_name = "databridge-core"
 ```
 
+## Mixing and Matching Models
+
+With the registered models approach, you can easily optimize your configuration:
+
+- Use powerful models like Claude Opus for knowledge graph generation
+- Use smaller, faster models for simple parsing tasks
+- Use OpenAI models for some tasks and Anthropic models for others
+- Use Ollama for local development and cloud models for production
+
+For example:
+
+```toml
+[parser.vision]
+model = "openai_gpt4o"  # Use GPT-4o for image analysis
+
+[rules]
+model = "claude_sonnet"  # Use Claude Sonnet for rules processing
+
+[completion]
+model = "ollama_llama"  # Use Llama local model for general completion
+```
+
 ## Docker Configuration Adjustments
 
 When using Docker, make these changes:
 
 1. Set `host = "0.0.0.0"` in the `[api]` section
-2. For Ollama integration, use `base_url = "http://ollama:11434"`
+2. For Ollama integration, use models with api_base set to `"http://ollama:11434"`
 3. Use container names in your database connection strings
 
 For more details on Docker deployment, check out the `DOCKER.md` file in the repository.

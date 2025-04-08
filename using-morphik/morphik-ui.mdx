@@ -9,12 +9,13 @@ Morphik provides a graphical user interface so that you can interact directly wi
 
 ### Morphik Server
 
-Before you begin, ensure that you have the Morphik server running. You can do this by following the instructions in the [Getting Started](/getting-started) guide. To verify that the Morphik server is running, check the `[api]` header in the `databridge.toml` file (found in the root of the `morphik-core` repository). If you see the server options when you open `http://<host>:<port>/docs`, then the server is live! By default, the heading should look like:
+Before you begin, ensure that you have the Morphik server running. You can do this by following the instructions in the [Getting Started](/getting-started) guide. To verify that the Morphik server is running, check the `[api]` section in the `databridge.toml` file (found in the root of the `morphik-core` repository). If you see the server options when you open `http://<host>:<port>/docs`, then the server is live! By default, the section should look like:
 
 ```toml
 [api]
 host = "localhost" # Needs to be "0.0.0.0" for docker
 port = 8000
+reload = true
 ```
 
 So, if the configuration is the same as above, we can navigate to [`http://localhost:8000/docs`](http://localhost:8000/docs) to access the Morphik UI. Here's what it should look like:
