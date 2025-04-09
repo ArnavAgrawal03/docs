@@ -14,7 +14,6 @@ description: "Setting Up the Morphik server"
     <Accordion title="Python">
       Please ensure that you have Python 3.12 installed on your machine. Guides for installing Python can be found on the [Python website](https://www.python.org/downloads/release/python-3129/).
     </Accordion>
-
     <Accordion title="PostgreSQL">
       Morphik requires PostgreSQL with the pgvector extension for vector storage and similarity search capabilities. Follow the installation instructions for your operating system:
 
@@ -43,20 +42,17 @@ description: "Setting Up the Morphik server"
           These commands create a database named "databridge" and a superuser named "postgres" that the application will use to connect.
         </Tab>
         <Tab title="Ubuntu/Debian">
-          Install PostgreSQL from the official repositories.**We recommend version 14** . Other versions may work, but haven't been extensively tested!
+          Install PostgreSQL from the official repositories.**We recommend version 14** . Other versions may work, but haven't been extensively tested\!
 
           ```bash
           sudo apt update
           sudo apt install postgresql postgresql-contrib
           ```
 
-          Install pgvector by building from source:
+          Install pgvector:
 
           ```bash
-          git clone https://github.com/pgvector/pgvector.git
-          cd pgvector
-          make
-          sudo make install
+          sudo apt install postgresql-14-pgvector
           ```
 
           Start and enable the PostgreSQL service:
@@ -86,7 +82,6 @@ description: "Setting Up the Morphik server"
              - Name it "databridge" and click "Save"
         </Tab>
       </Tabs>
-
       After installation, verify that PostgreSQL is running correctly:
 
       ```bash
@@ -101,7 +96,6 @@ description: "Setting Up the Morphik server"
       <Your postgres version and some compilation details>
       ```
     </Accordion>
-
     <Accordion title="Additional Dependencies">
       Some system-level dependencies might be required for processing various document types:
 
@@ -133,7 +127,6 @@ description: "Setting Up the Morphik server"
       psql -U postgres -d databridge -a -f init.sql
       ```
     </Accordion>
-
     <Accordion title="Installing Ollama">
       <Tabs>
         <Tab title="macOS">
@@ -186,10 +179,9 @@ description: "Setting Up the Morphik server"
         </Tab>
       </Tabs>
     </Accordion>
-
     ### Cloning the Repository
 
-    To get started with Morphik, we need to first setup the server. This involves cloning the [repository](https://github.com/morphik-org/morphik-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data!
+    To get started with Morphik, we need to first setup the server. This involves cloning the [repository](https://github.com/morphik-org/morphik-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data\!
 
     First, let's clone the repository from GitHub.
 
@@ -216,12 +208,12 @@ description: "Setting Up the Morphik server"
     ### Setting Up the Environment
 
     #### Installing Python Dependencies
+
     <Note>
-    While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
+      While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
 
-    Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
+      Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
     </Note>
-
     ```bash
     python3.12 -m venv .venv
     ```
@@ -232,7 +224,7 @@ description: "Setting Up the Morphik server"
       <Tab title="Linux/macOS">
         ```bash
         source .venv/bin/activate
-        ```    
+        ```
       </Tab>
       <Tab title="Windows (Command Prompt)">
         ```bash
@@ -251,7 +243,6 @@ description: "Setting Up the Morphik server"
         ```
       </Tab>
     </Tabs>
-
     After activation, your command prompt should be prefixed with `(.venv)`, indicating that the virtual environment is active. Once your virtual environment is activated, you can install the required dependencies.
 
     ```bash
@@ -265,15 +256,15 @@ description: "Setting Up the Morphik server"
     ```bash
     # If using Python 3.12+, you might need a specific version of unstructured
     pip install unstructured==0.16.10
-
+    
     # Download required NLTK resources
     python -m nltk.downloader averaged_perceptron_tagger punkt
     ```
 
     #### Setting up the Server Parameters
 
-    At this point, you may want to customize the server - such as use a different model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file. 
-    
+    At this point, you may want to customize the server - such as use a different model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file.
+
     Morphik now uses a registered models approach, which allows you to define hundreds of different models in one place and reference them throughout your configuration. This makes it easy to mix and match models based on your needs (e.g., smaller models for simpler tasks). You can find more details about configuration [here](/configuration).
 
     Morphik uses environment variables to manage secrets and API keys. In order to ensure that any pre-set keys are available to the server, copy the `.env.example` file to `.env`:
@@ -282,7 +273,7 @@ description: "Setting Up the Morphik server"
     cp .env.example .env
     ```
 
-    In case you're using external models like OpenAI or Anthropic Claude, you'll need to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store. 
+    In case you're using external models like OpenAI or Anthropic Claude, you'll need to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store.
 
     ```bash
     python quick_setup.py
@@ -290,7 +281,7 @@ description: "Setting Up the Morphik server"
 
     ### Launching the Server
 
-    You are now ready to launch the Morphik server! Just run the following command to start the server.
+    You are now ready to launch the Morphik server\! Just run the following command to start the server.
 
     ```bash
     python start_server.py
@@ -316,45 +307,51 @@ description: "Setting Up the Morphik server"
 
     - Docker and Docker Compose installed on your system
     - At least 10GB of free disk space (for models and data)
-    - 8GB+ RAM recommended
+    - 8GB\+ RAM recommended
 
     ### Quick Start
 
     1. Clone the repository and navigate to the project directory:
+
     ```bash
     git clone https://github.com/morphik-org/morphik-core.git
     cd morphik-core
     ```
 
-    2. First-time setup:
-    
+    1. First-time setup:
+
     If you want to use Ollama for AI capabilities (recommended for local development):
+
     ```bash
     docker compose --profile ollama up --build -d
     ```
 
     Or if you're using OpenAI API (configure API key in .env):
+
     ```bash
     docker compose up --build
     ```
 
     These commands will:
+
     - Build all required containers
     - Download necessary AI models (nomic-embed-text and llama3.2 if using Ollama)
     - Initialize the PostgreSQL database with pgvector
     - Start all services
 
     The initial setup may take 5-10 minutes depending on your internet speed, as it needs to download the AI models.
-    
-    > **Note**: When using Ollama, ensure your system has sufficient memory. The llama3.2 model requires at least 4GB of available RAM. If you encounter memory issues, you can increase Docker's memory allocation in Docker Desktop settings (Resources > Advanced > Memory), modify the `databridge.toml` file to use a smaller model, or switch to using OpenAI API.
 
-    3. For subsequent runs:
+    > **Note**: When using Ollama, ensure your system has sufficient memory. The llama3.2 model requires at least 4GB of available RAM. If you encounter memory issues, you can increase Docker's memory allocation in Docker Desktop settings (Resources \> Advanced \> Memory), modify the `databridge.toml` file to use a smaller model, or switch to using OpenAI API.
+
+    1. For subsequent runs:
+
     ```bash
     docker compose up    # Start all services
     docker compose down  # Stop all services
     ```
 
-    4. To completely reset (will delete all data and models):
+    1. To completely reset (will delete all data and models):
+
     ```bash
     docker compose down -v
     ```
@@ -362,6 +359,7 @@ description: "Setting Up the Morphik server"
     ### Configuration
 
     The default configuration works out of the box and includes:
+
     - PostgreSQL with pgvector for document storage
     - Ollama for AI models (embeddings and completions)
     - Local file storage
@@ -385,6 +383,7 @@ description: "Setting Up the Morphik server"
     ### Troubleshooting
 
     1. **Service Won't Start**
+
        ```bash
        # View all logs
        docker compose logs
@@ -394,16 +393,13 @@ description: "Setting Up the Morphik server"
        docker compose logs postgres
        docker compose logs ollama
        ```
-
     2. **Database Issues**
        - Check PostgreSQL is healthy: `docker compose ps`
        - Verify database connection: `docker compose exec postgres psql -U databridge -d databridge`
-
     3. **Model Download Issues**
        - Check Ollama logs: `docker compose logs ollama`
        - Ensure enough disk space for models
        - Try restarting Ollama: `docker compose restart ollama`
-
     4. **Ollama Memory Issues**
        - If you see errors like "model requires more system memory than is available" in the logs:
          - Increase Docker memory allocation in Docker Desktop:
@@ -415,6 +411,7 @@ description: "Setting Up the Morphik server"
          - Alternatively, modify `databridge.toml` to use a smaller model
          - Or switch to OpenAI API by uncommenting the OpenAI sections in `databridge.toml`
        - For knowledge graph creation specifically, you can switch from Ollama to OpenAI:
+
          ```toml
          # Change this section in databridge.toml
          [graph]
@@ -422,10 +419,9 @@ description: "Setting Up the Morphik server"
          model_name = "gpt-4o-mini"
          enable_entity_resolution = true
          ```
-
     5. **Performance Issues**
        - Monitor resources: `docker stats`
-       - Ensure sufficient RAM (8GB+ recommended)
+       - Ensure sufficient RAM (8GB\+ recommended)
        - Check disk space: `df -h`
   </Tab>
 </Tabs>
@@ -434,17 +430,17 @@ description: "Setting Up the Morphik server"
 
 Now that you have the server running, you can explore the different ways to interact with the server.
 
-<CardGroup cols={2}>
-<Card icon="gear" title="Configure Morphik" href="/configuration">
-  Configure Morphik using the `databridge.toml` file.
-</Card>
-<Card icon="code" title="API" href="/api-reference/ingest-text">
-  Use the API to interact with the server.
-</Card>
-<Card icon="python" title="Python SDK" href="/python-sdk/introduction">
-  Use the Python SDK to interact with the server.
-</Card>
-<Card icon="react"title="Morphik UI and CLI" href="/web-interface/introduction">
-  Use the Morphik UI or CLI to interact with the server.
-</Card>
+<CardGroup cols="2">
+  <Card title="Configure Morphik" icon="gear" href="/configuration">
+    Configure Morphik using the `databridge.toml` file.
+  </Card>
+  <Card title="API" icon="code" href="/api-reference/ingest-text">
+    Use the API to interact with the server.
+  </Card>
+  <Card title="Python SDK" icon="python" href="/python-sdk/introduction">
+    Use the Python SDK to interact with the server.
+  </Card>
+  <Card title="Morphik UI and CLI" icon="react" href="/web-interface/introduction">
+    Use the Morphik UI or CLI to interact with the server.
+  </Card>
 </CardGroup>
