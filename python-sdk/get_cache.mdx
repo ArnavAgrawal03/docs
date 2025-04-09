@@ -36,9 +36,9 @@ description: "Get a cache by name"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     cache = db.get_cache("programming_cache")
     
@@ -59,9 +59,9 @@ description: "Get a cache by name"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         cache = await db.get_cache("programming_cache")
         
         # Update the cache with new documents

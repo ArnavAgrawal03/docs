@@ -69,9 +69,9 @@ Generate completion using relevant chunks as context.
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     response = db.query(
         "What are the key findings about customer satisfaction?",
@@ -88,9 +88,9 @@ Generate completion using relevant chunks as context.
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         response = await db.query(
             "What are the key findings about customer satisfaction?",
             filters={"department": "research"},
@@ -111,9 +111,9 @@ Generate completion using relevant chunks as context.
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Use a knowledge graph to enhance the query
     response = db.query(
@@ -133,9 +133,9 @@ Generate completion using relevant chunks as context.
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Knowledge graph enhanced query
         kg_response = await db.query(
             "How does product X relate to customer segment Y?",
@@ -159,10 +159,10 @@ Generate completion using relevant chunks as context.
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
-    from databridge.models import QueryPromptOverride, QueryPromptOverrides
+    from morphik import Morphik
+    from morphik.models import QueryPromptOverride, QueryPromptOverrides
     
-    db = DataBridge()
+    db = Morphik()
     
     # Using the QueryPromptOverrides object
     response = db.query(
@@ -191,10 +191,10 @@ Generate completion using relevant chunks as context.
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
-    from databridge.models import QueryPromptOverride, EntityExtractionPromptOverride, QueryPromptOverrides
+    from morphik import AsyncMorphik
+    from morphik.models import QueryPromptOverride, EntityExtractionPromptOverride, QueryPromptOverrides
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Example with both query and entity extraction customization
         response = await db.query(
             "How does the medication affect diabetes?",

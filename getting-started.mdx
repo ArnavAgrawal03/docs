@@ -32,14 +32,14 @@ description: "Setting Up the Morphik server"
           brew services start postgresql@14
           ```
 
-          Create a database and user for DataBridge:
+          Create a database and user for Morphik:
 
           ```bash
-          createdb databridge
+          createdb morphik
           createuser -s postgres
           ```
 
-          These commands create a database named "databridge" and a superuser named "postgres" that the application will use to connect.
+          These commands create a database named "morphik" and a superuser named "postgres" that the application will use to connect.
         </Tab>
         <Tab title="Ubuntu/Debian">
           Install PostgreSQL from the official repositories.**We recommend version 14** . Other versions may work, but haven't been extensively tested\!
@@ -62,10 +62,10 @@ description: "Setting Up the Morphik server"
           sudo systemctl enable postgresql
           ```
 
-          Create a database and user for DataBridge:
+          Create a database and user for Morphik:
 
           ```bash
-          sudo -u postgres createdb databridge
+          sudo -u postgres createdb morphik
           sudo -u postgres createuser -s postgres
           ```
         </Tab>
@@ -77,9 +77,9 @@ description: "Setting Up the Morphik server"
              - Connect to your PostgreSQL server
              - Right-click on "Extensions" and select "Create \> Extension"
              - Select "pgvector" from the dropdown and click "Save"
-          4. Create a database for DataBridge:
+          4. Create a database for Morphik:
              - Right-click on "Databases" and select "Create \> Database"
-             - Name it "databridge" and click "Save"
+             - Name it "morphik" and click "Save"
         </Tab>
       </Tabs>
       After installation, verify that PostgreSQL is running correctly:
@@ -124,7 +124,7 @@ description: "Setting Up the Morphik server"
       If you encounter database initialization issues within Docker, you may need to manually initialize the schema:
 
       ```bash
-      psql -U postgres -d databridge -a -f init.sql
+      psql -U postgres -d morphik -a -f init.sql
       ```
     </Accordion>
     <Accordion title="Installing Ollama">
@@ -263,8 +263,8 @@ description: "Setting Up the Morphik server"
 
     #### Setting up the Server Parameters
 
-    At this point, you may want to customize the server - such as use a different model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file.
-
+    At this point, you may want to customize the server - such as use a different model, enable or disable certain features, etc. - you can do so by editing the `morphik.toml` file. 
+    
     Morphik now uses a registered models approach, which allows you to define hundreds of different models in one place and reference them throughout your configuration. This makes it easy to mix and match models based on your needs (e.g., smaller models for simpler tasks). You can find more details about configuration [here](/configuration).
 
     Morphik uses environment variables to manage secrets and API keys. In order to ensure that any pre-set keys are available to the server, copy the `.env.example` file to `.env`:
@@ -340,10 +340,8 @@ description: "Setting Up the Morphik server"
     - Start all services
 
     The initial setup may take 5-10 minutes depending on your internet speed, as it needs to download the AI models.
-
-    > **Note**: When using Ollama, ensure your system has sufficient memory. The llama3.2 model requires at least 4GB of available RAM. If you encounter memory issues, you can increase Docker's memory allocation in Docker Desktop settings (Resources \> Advanced \> Memory), modify the `databridge.toml` file to use a smaller model, or switch to using OpenAI API.
-
-    1. For subsequent runs:
+    
+    > **Note**: When using Ollama, ensure your system has sufficient memory. The llama3.2 model requires at least 4GB of available RAM. If you encounter memory issues, you can increase Docker's memory allocation in Docker Desktop settings (Resources > Advanced > Memory), modify the `morphik.toml` file to use a smaller model, or switch to using OpenAI API.
 
     ```bash
     docker compose up    # Start all services
@@ -389,13 +387,14 @@ description: "Setting Up the Morphik server"
        docker compose logs
        
        # View specific service logs
-       docker compose logs databridge
+       docker compose logs morphik
        docker compose logs postgres
        docker compose logs ollama
        ```
     2. **Database Issues**
        - Check PostgreSQL is healthy: `docker compose ps`
-       - Verify database connection: `docker compose exec postgres psql -U databridge -d databridge`
+       - Verify database connection: `docker compose exec postgres psql -U morphik -d morphik`
+
     3. **Model Download Issues**
        - Check Ollama logs: `docker compose logs ollama`
        - Ensure enough disk space for models
@@ -408,12 +407,12 @@ description: "Setting Up the Morphik server"
            3. Go to "Resources" section
            4. Increase memory allocation to at least 6GB (8GB recommended)
            5. Click "Apply & Restart"
-         - Alternatively, modify `databridge.toml` to use a smaller model
-         - Or switch to OpenAI API by uncommenting the OpenAI sections in `databridge.toml`
+         - Alternatively, modify `morphik.toml` to use a smaller model
+         - Or switch to OpenAI API by uncommenting the OpenAI sections in `morphik.toml`
        - For knowledge graph creation specifically, you can switch from Ollama to OpenAI:
 
          ```toml
-         # Change this section in databridge.toml
+         # Change this section in morphik.toml
          [graph]
          provider = "openai"
          model_name = "gpt-4o-mini"
@@ -426,21 +425,29 @@ description: "Setting Up the Morphik server"
   </Tab>
 </Tabs>
 
+## Community Support
+
+We have an open community with lots of discussion where you can get help, report bugs, and share your experiences with Morphik. If you need assistance or want to contribute, please join our community!
+
+<Card icon="discord" title="Join our Discord" href="https://discord.gg/BwMtv3Zaju">
+  Get help, report bugs, and connect with other Morphik users.
+</Card>
+
 ## Next Steps
 
 Now that you have the server running, you can explore the different ways to interact with the server.
 
-<CardGroup cols="2">
-  <Card title="Configure Morphik" icon="gear" href="/configuration">
-    Configure Morphik using the `databridge.toml` file.
-  </Card>
-  <Card title="API" icon="code" href="/api-reference/ingest-text">
-    Use the API to interact with the server.
-  </Card>
-  <Card title="Python SDK" icon="python" href="/python-sdk/introduction">
-    Use the Python SDK to interact with the server.
-  </Card>
-  <Card title="Morphik UI and CLI" icon="react" href="/web-interface/introduction">
-    Use the Morphik UI or CLI to interact with the server.
-  </Card>
+<CardGroup cols={2}>
+<Card icon="gear" title="Configure Morphik" href="/configuration">
+  Configure Morphik using the `morphik.toml` file.
+</Card>
+<Card icon="code" title="API" href="/api-reference/ingest-text">
+  Use the API to interact with the server.
+</Card>
+<Card icon="python" title="Python SDK" href="/python-sdk/introduction">
+  Use the Python SDK to interact with the server.
+</Card>
+<Card icon="react"title="Morphik UI and CLI" href="/web-interface/introduction">
+  Use the Morphik UI or CLI to interact with the server.
+</Card>
 </CardGroup>

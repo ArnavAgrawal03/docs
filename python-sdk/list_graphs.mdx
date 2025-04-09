@@ -29,9 +29,9 @@ None
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # List all accessible graphs
     graphs = db.list_graphs()
@@ -46,9 +46,9 @@ None
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # List all accessible graphs
         graphs = await db.list_graphs()
         

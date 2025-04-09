@@ -1,10 +1,10 @@
 ---
-title: 'Setting Up the DataBridge Server'
-description: 'API Reference to get started with DataBridge'
+title: 'Setting Up the Morphik Server'
+description: 'API Reference to get started with Morphik'
 ---
 
 <Note>
-If you're using Python, you can directly use the DataBridge SDK to interact with the API. Installation instruction can be found on the [Python SDK](/python-sdk/introduction) tab.
+If you're using Python, you can directly use the Morphik SDK to interact with the API. Installation instruction can be found on the [Python SDK](/python-sdk/introduction) tab.
 </Note>
 
 ## Prerequisites
@@ -13,32 +13,32 @@ Please ensure that you have Python 3.12 installed on your machine. Guides for in
 
 ## Installing and Running the Server
 
-To get started with DataBridge, we need to first setup the server. This involves cloning the [repository](https://github.com/databridge-org/databridge-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data!
+To get started with Morphik, we need to first setup the server. This involves cloning the [repository](https://github.com/morphik-org/morphik-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data!
 
 First, let's clone the repository from GitHub.
 
 ```bash
-git clone https://github.com/databridge-org/databridge-core.git
+git clone https://github.com/morphik-org/morphik-core.git
 ```
 
-After cloning the repository, you will notice a `databridge-core` folder in your current directory.
+After cloning the repository, you will notice a `morphik-core` folder in your current directory.
 
 ```bash
-ls databridge-core
+ls morphik-core
 ```
 
-If you see an error like `ls: databridge-core: No such file or directory`, it means that the repository is not cloned properly. Please try again.
+If you see an error like `ls: morphik-core: No such file or directory`, it means that the repository is not cloned properly. Please try again.
 
-Once you have cloned the repository, navigate into the `databridge-core` folder.
+Once you have cloned the repository, navigate into the `morphik-core` folder.
 
 ```bash
-cd databridge-core
+cd morphik-core
 ```
 
 Next, you need to set up a virtual environment called `.venv`.
 
 <Note>
-While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with DataBridge. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
+While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
 </Note>
 
 ```bash
@@ -77,7 +77,7 @@ After activation, your command prompt should be prefixed with `(.venv)`, indicat
 pip install -r requirements.txt
 ```
 
-You can now launch the DataBridge server. In case you want to customize the server - such as use a different embedding model, enable or disable certain features, etc. - you can do so by editing the `databridge.toml` file. You can find more details about configuration [here](/api-reference/configuration).
+You can now launch the Morphik server. In case you want to customize the server - such as use a different embedding model, enable or disable certain features, etc. - you can do so by editing the `morphik.toml` file. You can find more details about configuration [here](/api-reference/configuration).
 
 Finally! We are now ready to run the server. Just run the following command to start the server.
 

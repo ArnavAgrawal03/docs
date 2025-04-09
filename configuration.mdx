@@ -5,11 +5,11 @@ description: 'Get the most out of Morphik by customizing it to your needs'
 
 # Morphik Configuration Guide
 
-Morphik's behavior can be fully customized through the `databridge.toml` configuration file. This file is the central place to configure all aspects of the system, from API settings to model providers, database connections, and processing options.
+Morphik's behavior can be fully customized through the `morphik.toml` configuration file. This file is the central place to configure all aspects of the system, from API settings to model providers, database connections, and processing options.
 
 ## Configuration Basics
 
-The `databridge.toml` file uses the TOML format (Tom's Obvious Minimal Language) to organize settings into logical sections. Each section controls a specific component of the Morphik system:
+The `morphik.toml` file uses the TOML format (Tom's Obvious Minimal Language) to organize settings into logical sections. Each section controls a specific component of the Morphik system:
 
 ```toml
 [section_name]
@@ -19,7 +19,7 @@ setting2 = 123
 
 When you first set up Morphik, you can:
 - Run `python quick_setup.py` for an interactive setup process
-- Copy and modify the example `databridge.toml` file
+- Copy and modify the example `morphik.toml` file
 - Create your own configuration file manually
 
 ## Registered Models Approach
@@ -136,7 +136,7 @@ provider = "postgres"
 # Or for MongoDB
 [database]
 provider = "mongodb"
-database_name = "databridge"
+database_name = "morphik"
 collection_name = "documents"
 ```
 
@@ -208,7 +208,7 @@ storage_path = "./storage"
 [storage]
 provider = "aws-s3"
 region = "us-east-2"
-bucket_name = "databridge-storage"
+bucket_name = "morphik-storage"
 ```
 
 ### Vector Database
@@ -223,7 +223,7 @@ provider = "pgvector"
 # MongoDB Atlas
 [vector_store]
 provider = "mongodb"
-database_name = "databridge"
+database_name = "morphik"
 collection_name = "document_chunks"
 ```
 
@@ -247,12 +247,12 @@ model = "claude_sonnet"  # Reference to a key in registered_models
 enable_entity_resolution = true
 ```
 
-### General DataBridge Settings
+### General Morphik Settings
 
 Control core platform features:
 
 ```toml
-[databridge]
+[morphik]
 enable_colpali = true    # Enable advanced retrieval
 mode = "self_hosted"     # "cloud" or "self_hosted"
 ```
@@ -267,7 +267,7 @@ enabled = true
 honeycomb_enabled = true
 honeycomb_endpoint = "https://api.honeycomb.io"
 honeycomb_proxy_endpoint = "https://otel-proxy.onrender.com"
-service_name = "databridge-core"
+service_name = "morphik-core"
 otlp_timeout = 10
 otlp_max_retries = 3
 otlp_retry_delay = 1
@@ -292,7 +292,7 @@ Morphik uses environment variables for sensitive credentials and configuration t
 
 ## Complete Configuration Example
 
-Here's a complete example showing the structure of a databridge.toml file with registered models:
+Here's a complete example showing the structure of a morphik.toml file with registered models:
 
 ```toml
 [api]
@@ -372,7 +372,7 @@ provider = "pgvector"  # or "mongodb"
 model = "ollama_llama"
 batch_size = 4096
 
-[databridge]
+[morphik]
 enable_colpali = true
 mode = "self_hosted"  # "cloud" or "self_hosted"
 
@@ -385,7 +385,7 @@ enabled = true
 honeycomb_enabled = true
 honeycomb_endpoint = "https://api.honeycomb.io"
 honeycomb_proxy_endpoint = "https://otel-proxy.onrender.com"
-service_name = "databridge-core"
+service_name = "morphik-core"
 ```
 
 ## Mixing and Matching Models

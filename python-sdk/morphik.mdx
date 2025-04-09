@@ -8,25 +8,25 @@ description: "Main client for document operations in Morphik"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
     # Without authentication
-    db = DataBridge()
+    db = Morphik()
     
     # With authentication
-    db = DataBridge("databridge://owner_id:token@api.databridge.ai")
+    db = Morphik("morphik://owner_id:token@api.morphik.ai")
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
     # Without authentication
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         doc = await db.ingest_text("Sample content")
     
     # With authentication
-    async with AsyncDataBridge("databridge://owner_id:token@api.databridge.ai") as db:
+    async with AsyncMorphik("morphik://owner_id:token@api.morphik.ai") as db:
         doc = await db.ingest_text("Sample content")
     ```
   </Tab>
@@ -39,25 +39,25 @@ Both clients share the same constructor parameters:
 <Tabs>
   <Tab title="Sync">
     ```python
-    DataBridge(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
+    Morphik(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    AsyncDataBridge(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
+    AsyncMorphik(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
     ```
   </Tab>
 </Tabs>
 
 ### Parameters
 
-- `uri` (str, optional): DataBridge URI in format "databridge://&lt;owner_id&gt;:&lt;token&gt;@&lt;host&gt;". If not provided, connects to http://localhost:8000 without authentication.
+- `uri` (str, optional): Morphik URI in format "morphik://&lt;owner_id&gt;:&lt;token&gt;@&lt;host&gt;". If not provided, connects to http://localhost:8000 without authentication.
 - `timeout` (int, optional): Request timeout in seconds. Defaults to 30.
 - `is_local` (bool, optional): Whether connecting to local development server. Defaults to False.
 
 ## Methods
 
-DataBridge provides the following methods. Each method page includes both synchronous and asynchronous versions.
+Morphik provides the following methods. Each method page includes both synchronous and asynchronous versions.
 
 ### Document Operations
 - [ingest_text](/python-sdk/ingest_text)
@@ -95,18 +95,18 @@ DataBridge provides the following methods. Each method page includes both synchr
 
 ## Context Manager
 
-Using the DataBridge client as a context manager ensures that resources are properly closed when the context exits.
+Using the Morphik client as a context manager ensures that resources are properly closed when the context exits.
 
 <Tabs>
   <Tab title="Sync">
     ```python
-    with DataBridge() as db:
+    with Morphik() as db:
         doc = db.ingest_text("Sample content")
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         doc = await db.ingest_text("Sample content")
     ```
   </Tab>

@@ -1,6 +1,6 @@
 ---
 title: "retrieve_docs"
-description: "Retrieve relevant documents from DataBridge"
+description: "Retrieve relevant documents from Morphik"
 ---
 
 <Tabs>
@@ -45,9 +45,9 @@ description: "Retrieve relevant documents from DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     docs = db.retrieve_docs(
         "machine learning",
@@ -65,9 +65,9 @@ description: "Retrieve relevant documents from DataBridge"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         docs = await db.retrieve_docs(
             "machine learning",
             k=5,

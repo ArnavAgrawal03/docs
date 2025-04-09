@@ -8,9 +8,9 @@ description: "Delete a document and all its associated data"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Delete a document by its ID
     result = db.delete_document("doc_123456")
@@ -20,9 +20,9 @@ description: "Delete a document and all its associated data"
   
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Delete a document by its ID
         result = await db.delete_document("doc_123456")
         print(result["message"])  # "Document doc_123456 deleted successfully"

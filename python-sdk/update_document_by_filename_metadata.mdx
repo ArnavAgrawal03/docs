@@ -39,9 +39,9 @@ description: "Update a document's metadata using filename to identify the docume
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Update just the metadata of a document identified by filename
     updated_doc = db.update_document_by_filename_metadata(
@@ -54,9 +54,9 @@ description: "Update a document's metadata using filename to identify the docume
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Update just the metadata of a document identified by filename
         updated_doc = await db.update_document_by_filename_metadata(
             filename="report.pdf",

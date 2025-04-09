@@ -1,6 +1,6 @@
 ---
 title: "ingest_file"
-description: "Ingest a file document into DataBridge"
+description: "Ingest a file document into Morphik"
 ---
 
 <Tabs>
@@ -47,8 +47,8 @@ description: "Ingest a file document into DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
-    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from morphik import Morphik
+    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
     from pydantic import BaseModel
     
     class DocumentInfo(BaseModel):
@@ -56,7 +56,7 @@ description: "Ingest a file document into DataBridge"
         author: str
         department: str
     
-    db = DataBridge()
+    db = Morphik()
     
     doc = db.ingest_file(
         "document.pdf",
@@ -71,8 +71,8 @@ description: "Ingest a file document into DataBridge"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
-    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from morphik import AsyncMorphik
+    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
     from pydantic import BaseModel
     
     class DocumentInfo(BaseModel):
@@ -80,7 +80,7 @@ description: "Ingest a file document into DataBridge"
         author: str
         department: str
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         doc = await db.ingest_file(
             "document.pdf",
             filename="document.pdf",

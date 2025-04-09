@@ -51,9 +51,9 @@ description: "Update a document with content from a file"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Add content from a file to an existing document
     updated_doc = db.update_document_with_file(
@@ -67,9 +67,9 @@ description: "Update a document with content from a file"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Add content from a file to an existing document
         updated_doc = await db.update_document_with_file(
             document_id="doc_123",

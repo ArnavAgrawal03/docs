@@ -1,15 +1,15 @@
 ---
 title: 'Rules'
-description: 'An overview of rules based ingestion in DataBridge'
+description: 'An overview of rules based ingestion in Morphik'
 ---
 
-Rules! Rules! Rules! LLMs are exceptionally good at transforming content and extracting relevant information, making them ideal building blocks for robust document processing. However, without clear rules, even the most advanced LLMs can struggle to deliver consistent and precise outcomes. DataBridge leverages the power of LLMs, guided by user-defined rules, eliminating the need for developers to create complex custom pipelines. With rules acting as straightforward instructions, we enable reliable, repeatable document processing to unlock the full potential of your unstructured data.
+Rules! Rules! Rules! LLMs are exceptionally good at transforming content and extracting relevant information, making them ideal building blocks for robust document processing. However, without clear rules, even the most advanced LLMs can struggle to deliver consistent and precise outcomes. Morphik leverages the power of LLMs, guided by user-defined rules, eliminating the need for developers to create complex custom pipelines. With rules acting as straightforward instructions, we enable reliable, repeatable document processing to unlock the full potential of your unstructured data.
 
-This explainer outlines the powerful rules-based document ingestion capabilities in DataBridge, focusing on practical use cases like metadata extraction and content transformation.
+This explainer outlines the powerful rules-based document ingestion capabilities in Morphik, focusing on practical use cases like metadata extraction and content transformation.
 
 ## Core Concepts
 
-DataBridge's rules system currently allows for two key operations during document ingestion:
+Morphik's rules system currently allows for two key operations during document ingestion:
 
 1. **Metadata Extraction**: Pull structured information from documents into searchable metadata.
 2. **Content Transformation**: Modify document content during ingestion (redaction, summarization, etc.).
@@ -48,8 +48,8 @@ The rules engine works by:
 This rule type extracts structured data from document content according to a schema. It's perfect for converting unstructured documents into structured, queryable data.
 
 ```python
-from databridge import DataBridge
-from databridge.rules import MetadataExtractionRule
+from morphik import Morphik
+from morphik.rules import MetadataExtractionRule
 from pydantic import BaseModel
 
 # Define a schema for the metadata you want to extract
@@ -61,8 +61,8 @@ class ResumeInfo(BaseModel):
     education: list[dict]
     experience: list[dict]
 
-# Connect to DataBridge
-db = DataBridge()
+# Connect to Morphik
+db = Morphik()
 
 # Ingest a resume with metadata extraction
 doc = db.ingest_file(
@@ -84,11 +84,11 @@ print(f"Education: {len(doc.metadata['education'])} entries")
 This rule type transforms document content according to natural language instructions. It's perfect for redaction, summarization, formatting changes, etc.
 
 ```python
-from databridge import DataBridge
-from databridge.rules import NaturalLanguageRule
+from morphik import Morphik
+from morphik.rules import NaturalLanguageRule
 
-# Connect to DataBridge
-db = DataBridge()
+# Connect to Morphik
+db = Morphik()
 
 # Ingest a document with PII redaction
 doc = db.ingest_file(
@@ -110,12 +110,12 @@ Under the hood, the rules processing system leverages Language Models (LLMs) to 
 
 ### LLM Integration
 
-DataBridge supports multiple LLM providers:
+Morphik supports multiple LLM providers:
 
 1. **OpenAI**: For high-quality results with cloud-based processing
 2. **Ollama**: For self-hosted, private LLM deployments
 
-The LLM for rules processing is configured in your `databridge.toml` file using the registered models approach:
+The LLM for rules processing is configured in your `morphik.toml` file using the registered models approach:
 
 ```toml
 # First, register your models in the registered_models section
@@ -172,7 +172,7 @@ sequenceDiagram
 
 ### Performance Considerations
 
-For large documents, DataBridge automatically chunks the content and processes rules in batches. This ensures efficient handling of documents of any size. The `batch_size` configuration in `databridge.toml` determines how content is split up before passing on the LLM.
+For large documents, Morphik automatically chunks the content and processes rules in batches. This ensures efficient handling of documents of any size. The `batch_size` configuration in `morphik.toml` determines how content is split up before passing on the LLM.
 
 Larger batch sizes may improve throughput but require more memory, and with a huge batch size, we could run into unreliable results. For complex rules or larger documents, you might need to adjust this setting based on your hardware capabilities and the latency requirements of your application.
 
@@ -183,8 +183,8 @@ Larger batch sizes may improve throughput but require more memory, and with a hu
 Let's explore a complete example for processing resumes.
 
 ```python
-from databridge import DataBridge
-from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+from morphik import Morphik
+from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
 from pydantic import BaseModel
 
 # Define resume schema
@@ -199,8 +199,8 @@ class ResumeInfo(BaseModel):
     work_history: list[dict]
     certifications: list[str] = []
 
-# Create DataBridge client
-db = DataBridge()
+# Create Morphik client
+db = Morphik()
 
 # Process resume with multiple rules
 doc = db.ingest_file(
@@ -237,8 +237,8 @@ for candidate in candidates:
 Medical documents often contain sensitive information that needs redaction while preserving clinical value.
 
 ```python
-from databridge import DataBridge
-from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+from morphik import Morphik
+from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
 from pydantic import BaseModel
 
 # Define medical record schema
@@ -251,8 +251,8 @@ class MedicalRecord(BaseModel):
     lab_results: dict
     doctor_notes: str
 
-# Create DataBridge client
-db = DataBridge()
+# Create Morphik client
+db = Morphik()
 
 # Process medical document
 doc = db.ingest_file(
@@ -331,7 +331,7 @@ Different tasks may benefit from different LLMs:
 
 ## Conclusion
 
-DataBridge's rules-based ingestion provides a powerful, flexible system for extracting structured data from unstructured documents and transforming content during ingestion. This capability can be applied to numerous use cases from resume processing to medical record management to legal document analysis.
+Morphik's rules-based ingestion provides a powerful, flexible system for extracting structured data from unstructured documents and transforming content during ingestion. This capability can be applied to numerous use cases from resume processing to medical record management to legal document analysis.
 
 The system's architecture balances flexibility, performance, and ease of use:
 

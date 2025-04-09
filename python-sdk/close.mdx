@@ -29,9 +29,9 @@ None
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Perform operations
     doc = db.ingest_text("Sample content")
@@ -43,10 +43,10 @@ None
   <Tab title="Async">
     ```python
     import asyncio
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
     async def main():
-        db = AsyncDataBridge()
+        db = AsyncMorphik()
         
         # Perform operations
         doc = await db.ingest_text("Sample content")
@@ -61,23 +61,23 @@ None
 
 ## Context Manager Alternative
 
-Instead of manually calling `close()`, you can use the DataBridge client as a context manager:
+Instead of manually calling `close()`, you can use the Morphik client as a context manager:
 
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    with DataBridge() as db:
+    with Morphik() as db:
         doc = db.ingest_text("Sample content")
         # Session is automatically closed when exiting the with block
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         doc = await db.ingest_text("Sample content")
         # Client is automatically closed when exiting the with block
     ```

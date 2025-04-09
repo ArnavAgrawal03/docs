@@ -84,8 +84,8 @@ This customization allows for more precise knowledge graph creation, ensuring th
 Here's an example of creating a knowledge graph with custom prompts and examples:
 
 ```python
-from databridge import DataBridge
-from databridge.models import (
+from morphik import Morphik
+from morphik.models import (
     EntityExtractionExample, 
     EntityResolutionExample,
     EntityExtractionPromptOverride, 
@@ -94,7 +94,7 @@ from databridge.models import (
 )
 
 # Connect to Morphik
-db = DataBridge()
+db = Morphik()
 
 # Create a knowledge graph with custom entity extraction and resolution
 graph = db.create_graph(
@@ -255,10 +255,10 @@ The `hop_depth` parameter controls how far to traverse the graph from the initia
 You can create a knowledge graph from your documents using the Python SDK or the UI component. I'll show the SDK below, UI should be simpler.
 
 ```python
-from databridge import DataBridge
+from morphik import Morphik
 
 # Connect to Morphik
-db = DataBridge()
+db = Morphik()
 
 # Create a knowledge graph from all documents with category "tech"
 graph = db.create_graph(
@@ -315,10 +315,10 @@ Let's walk through a complete example of using knowledge graphs for a healthcare
 
 ```python
 import os
-from databridge import DataBridge
+from morphik import Morphik
 
 # Connect to Morphik
-db = DataBridge()
+db = Morphik()
 
 # Ingest healthcare documents
 doc1 = db.ingest_file("medical_research.pdf", metadata={"domain": "healthcare", "type": "research"})

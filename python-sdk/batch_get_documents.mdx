@@ -29,9 +29,9 @@ description: "Retrieve multiple documents by their IDs in a single batch operati
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     docs = db.batch_get_documents(["doc_123", "doc_456", "doc_789"])
     for doc in docs:
@@ -40,9 +40,9 @@ description: "Retrieve multiple documents by their IDs in a single batch operati
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         docs = await db.batch_get_documents(["doc_123", "doc_456", "doc_789"])
         for doc in docs:
             print(f"Document {doc.external_id}: {doc.metadata.get('title')}")

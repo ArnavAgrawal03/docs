@@ -64,7 +64,7 @@
           {
             "group": "Client",
             "pages": [
-              "python-sdk/databridge",
+              "python-sdk/morphik",
               "python-sdk/close"
             ]
           },

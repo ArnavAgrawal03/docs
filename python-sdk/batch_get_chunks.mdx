@@ -29,10 +29,10 @@ description: "Retrieve specific chunks by their document ID and chunk number"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
-    from databridge.models import ChunkSource
+    from morphik import Morphik
+    from morphik.models import ChunkSource
     
-    db = DataBridge()
+    db = Morphik()
     
     # Using dictionaries
     sources = [
@@ -53,10 +53,10 @@ description: "Retrieve specific chunks by their document ID and chunk number"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
-    from databridge.models import ChunkSource
+    from morphik import AsyncMorphik
+    from morphik.models import ChunkSource
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Using dictionaries
         sources = [
             {"document_id": "doc_123", "chunk_number": 0},

@@ -1,6 +1,6 @@
 ---
 title: "ingest_files"
-description: "Batch ingest multiple files into DataBridge"
+description: "Batch ingest multiple files into Morphik"
 ---
 
 ## Usage
@@ -8,9 +8,9 @@ description: "Batch ingest multiple files into DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Batch ingest files with shared metadata
     result = db.ingest_files(
@@ -32,9 +32,9 @@ description: "Batch ingest multiple files into DataBridge"
   
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Batch ingest files with shared metadata
         result = await db.ingest_files(
             files=["document1.pdf", "document2.docx", "image.png"], 
@@ -121,7 +121,7 @@ An object containing:
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
     from pydantic import BaseModel
     
     class ReportMetadata(BaseModel):
@@ -151,7 +151,7 @@ An object containing:
   
   <Tab title="Async">
     ```python
-    from databridge.rules import MetadataExtractionRule, NaturalLanguageRule
+    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
     from pydantic import BaseModel
     
     class ReportMetadata(BaseModel):

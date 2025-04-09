@@ -29,9 +29,9 @@ description: "Get document metadata by ID"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     doc = db.get_document("doc_123")
     print(f"Title: {doc.metadata.get('title')}")
@@ -41,9 +41,9 @@ description: "Get document metadata by ID"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         doc = await db.get_document("doc_123")
         print(f"Title: {doc.metadata.get('title')}")
         print(f"Content Type: {doc.content_type}")

@@ -42,9 +42,9 @@ description: "Create a graph from documents"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Create a graph from documents with category="research"
     graph = db.create_graph(
@@ -59,7 +59,7 @@ description: "Create a graph from documents"
     )
     
     # With custom entity extraction examples
-    from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+    from morphik.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
     
     # Example with only entity extraction examples
     graph = db.create_graph(
@@ -104,9 +104,9 @@ description: "Create a graph from documents"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Create a graph from documents with category="research"
         graph = await db.create_graph(
             name="research_graph",
@@ -120,7 +120,7 @@ description: "Create a graph from documents"
         )
         
         # With custom entity extraction examples
-        from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+        from morphik.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
         
         # Example with only entity extraction examples
         graph = await db.create_graph(

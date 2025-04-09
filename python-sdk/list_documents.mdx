@@ -1,6 +1,6 @@
 ---
 title: "list_documents"
-description: "List accessible documents in DataBridge"
+description: "List accessible documents in Morphik"
 ---
 
 <Tabs>
@@ -39,9 +39,9 @@ description: "List accessible documents in DataBridge"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Get first page
     docs = db.list_documents(limit=10)
@@ -57,9 +57,9 @@ description: "List accessible documents in DataBridge"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Get first page
         docs = await db.list_documents(limit=10)
         for doc in docs:

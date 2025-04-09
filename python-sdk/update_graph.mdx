@@ -8,9 +8,9 @@ description: "Update an existing knowledge graph with new documents"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # Update a graph with additional documents
     updated_graph = db.update_graph(
@@ -26,9 +26,9 @@ description: "Update an existing knowledge graph with new documents"
   
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # Update a graph with additional documents
         updated_graph = await db.update_graph(
             name="research_graph",
@@ -70,7 +70,7 @@ The graph update operation:
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.models import EntityResolutionPromptOverride, EntityResolutionExample, GraphPromptOverrides
+    from morphik.models import EntityResolutionPromptOverride, EntityResolutionExample, GraphPromptOverrides
     
     # Update with custom entity resolution examples
     updated_graph = db.update_graph(
@@ -124,7 +124,7 @@ Return your resolution in JSON format with the canonical form and all its varian
   
   <Tab title="Async">
     ```python
-    from databridge.models import EntityResolutionPromptOverride, EntityResolutionExample, GraphPromptOverrides
+    from morphik.models import EntityResolutionPromptOverride, EntityResolutionExample, GraphPromptOverrides
     
     # Update with custom entity resolution examples
     updated_graph = await db.update_graph(
@@ -182,7 +182,7 @@ Return your resolution in JSON format with the canonical form and all its varian
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+    from morphik.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
     
     # Update with custom entity extraction examples
     updated_graph = db.update_graph(
@@ -242,7 +242,7 @@ Return the extracted entities in JSON format with the following structure:
   
   <Tab title="Async">
     ```python
-    from databridge.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
+    from morphik.models import EntityExtractionPromptOverride, EntityExtractionExample, GraphPromptOverrides
     
     # Update with custom entity extraction examples
     updated_graph = await db.update_graph(

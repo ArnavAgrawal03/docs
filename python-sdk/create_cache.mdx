@@ -45,9 +45,9 @@ description: "Create a new cache with specified configuration"
 <Tabs>
   <Tab title="Sync">
     ```python
-    from databridge import DataBridge
+    from morphik import Morphik
     
-    db = DataBridge()
+    db = Morphik()
     
     # This will include both:
     # 1. Any documents with category="programming"
@@ -63,9 +63,9 @@ description: "Create a new cache with specified configuration"
   </Tab>
   <Tab title="Async">
     ```python
-    from databridge import AsyncDataBridge
+    from morphik import AsyncMorphik
     
-    async with AsyncDataBridge() as db:
+    async with AsyncMorphik() as db:
         # This will include both:
         # 1. Any documents with category="programming"
         # 2. The specific documents "doc1" and "doc2" (regardless of their category)
