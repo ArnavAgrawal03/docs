@@ -28,7 +28,74 @@ In case you don't see this, and have followed all the steps in the [Getting Star
 
 ### Node and NPM
 
-In order to launch the UI, ensure that you have `node` and `npm` installed. A good way to check this is just by running `node -v` and `npm -v` in your terminal. If you don't have `node` installed, you can view installation instructions [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+In order to launch the UI, ensure that you have `node` and `npm` installed. A good way to check this is just by running `node -v` and `npm -v` in your terminal. If you don't have them installed, you can install them using the following instructions:
+
+<Tabs>
+  <Tab title="macOS">
+    **Install Node.js on macOS**
+    
+    Using Homebrew:
+    ```bash
+    # Install Homebrew if you don't have it
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Install Node.js
+    brew install node
+    ```
+  </Tab>
+  
+  <Tab title="Windows">
+    **Install Node.js on Windows**
+    
+    1. **Using the official installer**:
+       - Visit [nodejs.org](https://nodejs.org/)
+       - Download the Windows installer (.msi)
+       - Run the installer and follow the prompts
+    
+    2. **Using Chocolatey**:
+       ```powershell
+       # Install Chocolatey if you don't have it (run in PowerShell as Admin)
+       Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+       
+       # Install Node.js
+       choco install nodejs
+       ```
+  </Tab>
+  
+  <Tab title="Linux">
+    **Install Node.js on Linux**
+    
+    Using NVM (Node Version Manager):
+    ```bash
+    # Install NVM
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+    
+    # Set up NVM environment (add these to your .bashrc or .zshrc)
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    
+    # Restart your terminal or source your profile
+    source ~/.bashrc  # or ~/.zshrc
+    
+    # Update npm to the latest version
+    npm install -g npm
+    
+    # Install the latest LTS version of Node.js
+    nvm install --lts
+    
+    # Use the installed version
+    nvm use --lts
+    ```
+  </Tab>
+</Tabs>
+
+After installation, verify that Node.js and npm are installed correctly:
+
+```bash
+node -v
+npm -v
+```
 
 ## Running the UI
 You're ready to launch the UI once you have the server running and `npm` installed. In a new terminal (ensure that the server is running and not stopped), navigate to the root of the `morphik-core` repository that you launched the server from. From here change directory into the `ui-component` folder:
