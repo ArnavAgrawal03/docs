@@ -55,6 +55,17 @@
         ]
       },
       {
+        "tab": "Blogs",
+        "groups": [
+          {
+            "group": "Implementation Stories",
+            "pages": [
+              "blogs/memory-vibe-coding"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "openapi": "api-reference/openapi.json"
       },
