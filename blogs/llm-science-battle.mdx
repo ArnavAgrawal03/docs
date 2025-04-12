@@ -1,0 +1,187 @@
+---
+title: "LLM Science Battle"
+description: "Drowning in Discoveries? How LLMs (and Morphik) Are Learning to Read Science"
+---
+
+The world of science is moving at lightning speed. Every day, a tsunami of papers, articles, and reports crashes onto the digital shore, carrying vital discoveries: groundbreaking methods, critical experimental results, newly unveiled datasets, and the grand challenges they tackle. But this wealth of information is largely trapped in unstructured text. How can we possibly sift through it all, connect the dots, and *accelerate* the next big breakthrough?
+
+Enter the AI heavyweights: Large Language Models (LLMs). We've seen them write code like seasoned developers, craft poetry that stirs the soul, and even ace tough exams. But can these powerful models navigate the dense, jargon-filled, and incredibly precise landscape of scientific literature? Can they learn to not just *read* science, but *understand* the relationships within it to build structured knowledge?
+
+That's the million-dollar question we set out to answer, using the [**Morphik**](https://github.com/morphik-org/morphik-core) platform to orchestrate a head-to-head challenge.
+
+We pitted three of today's most talked-about LLMs against the complex task of extracting knowledge from scientific text:
+
+*   **OpenAI's GPT-4o:** The latest flagship, renowned for its multimodal prowess and sophisticated reasoning.
+*   **Google's Gemini 2 Flash:** A nimble powerhouse balancing speed and intelligence, built for real-world applications.
+*   **Meta's Llama 3.2 (3B):** A smaller but capable iteration of Meta's hugely popular open-weight model family, pushing the boundaries of open-source AI.
+
+Our mission: Evaluate their ability to perform **Entity and Relation Extraction** on scientific abstracts, leveraging **Morphik** to manage the entire workflow – from wrangling data and prompting the models to structuring their outputs and evaluating the results against a tough benchmark. Let's see who comes out on top!
+
+### The Gauntlet: Turning Scientific Jargon into Actionable Knowledge Graphs
+
+Imagine you're reading a research paper abstract. Your expert eye quickly spots key terms: "ImageNet" (a Dataset), "Convolutional Neural Network" or "BERT" (Methods), "Image Classification" or "Named Entity Recognition" (Tasks).
+
+*   **Spotting the Actors (Entity Extraction - NER):** This is about identifying these key terms and correctly labelling them – Is this a Method, a Task, or a Dataset?
+*   **Mapping the Connections (Relation Extraction - RE):** This is the trickier part. How do these actors relate? Is "BERT" *Used-For* "Named Entity Recognition"? Is "Method A" being *Compared* to "Method B"? Is "Method C" *Evaluated-On* "ImageNet"?
+
+Doing this accurately, especially at scale, is a monumental challenge. Scientific language is a beast – precise, complex, and loaded with domain-specific terminology. But cracking this code allows us to build [**Knowledge Graphs (KGs)**](/concepts/knowledge-graphs). Think of KGs as structured maps of scientific knowledge, revealing connections and pathways hidden within mountains of text. These maps can power sophisticated search engines, uncover unexpected research synergies, and ultimately accelerate discovery in ways raw text simply cannot.
+
+Orchestrating this intricate extraction process across different LLMs, handling their unique APIs, structuring their potentially varied outputs, and comparing them fairly – that’s precisely where a platform like **Morphik** becomes indispensable.
+
+### The Proving Ground: Why SciER?
+
+To conduct a fair fight, we needed a high-quality arena. We chose **SciER** ([paper](https://arxiv.org/pdf/2410.21155), [GitHub](https://github.com/edzq/SciER)), a well-respected benchmark dataset specifically designed for this kind of challenge in the scientific domain.
+
+Why SciER?
+*   **Gold Standard:** It's meticulously annotated by humans, providing a reliable "ground truth" to measure against.
+*   **Real-World Complexity:** It uses actual scientific abstracts, forcing the models to grapple with authentic complexity and jargon.
+*   **Community Trust:** It's an established benchmark used by researchers to evaluate NER and RE systems.
+
+Using SciER ensures we're not just testing the models on trivial examples, but pushing them against a challenging, relevant, and credible standard.
+
+### Our Playbook: Prompting, Extracting, and Scoring with Morphik
+
+Simply throwing raw text at these powerful LLMs and hoping for the best isn't a strategy. We needed precision and consistency. Here’s how **Morphik** helped us structure the experiment:
+
+1.  **Data Wrangling Made Easy:** We took the SciER records, cleverly grouped sentences by document (abstract), and ingested them smoothly into Morphik. Crucially, we stored the human-annotated "ground truth" entities and relations alongside the text as metadata – essential for evaluation later. *(Illustrative code snippet below shows the logic)*
+
+```python
+# Example: Preparing SciER data for Morphik ingestion
+def prepare_text_for_ingestion(records: List[Dict]) -> List[Dict]:
+    documents = []
+    doc_groups = defaultdict(list)
+    for record in records: doc_groups[record["doc_id"]].append(record) # Group by document
+
+    for doc_id, recs in doc_groups.items():
+        text = "\n".join([r["sentence"] for r in recs]) # Combine sentences
+        gt_entities = [ner for r in recs for ner in r["ner"]] # Aggregate ground truth
+        gt_relations = [rel for r in recs for rel in r["rel"]]
+        documents.append({
+            "text": text,
+            "metadata": { "doc_id": doc_id, "ground_truth_entities": gt_entities, "ground_truth_relations": gt_relations }
+        })
+    return documents
+# The evaluation code is available in the main Morphik repository: https://github.com/morphiklabs/morphik/tree/main/evaluations
+```
+
+2.  **Consistent Prompting is Key:** We engineered a detailed prompt, guiding the LLMs on *exactly* what entities (Dataset, Method, Task) and relationships (Used-For, Compare, Evaluate-On, etc.) to extract, and crucially, how to format the output as JSON. Morphik allowed us to define this prompt *once*, complete with few-shot examples (`EntityExtractionExample`), and apply it *identically* to GPT-4o, Gemini 2 Flash, and Llama 3.2 (`GraphPromptOverrides`). This consistency is vital for a fair comparison. *(Illustrative prompt setup below)*
+
+```python
+# Example: Setting up the prompt structure in Morphik
+def create_graph_extraction_override(entity_types: List[str]) -> EntityExtractionPromptOverride:
+    # ... (Define examples like EntityExtractionExample(label="BERT", type="Method"))
+    prompt_template = """
+    Your task is to read scientific text and extract Entities (Datasets, Methods, Tasks) and their Relationships (Used-For, Compare, etc.).
+    **Entity Examples (brief list):** {examples}
+    **Relationship Types:** Used-For, Feature-Of, Hyponym-Of, Part-Of, Compare, Evaluate-For, Conjunction, Evaluate-On, Synonym-Of.
+    **Instructions:** Extract entities, then relationships between ONLY those entities. Stick to the text. Output a single JSON: {{"entities": [...], "relationships": [...]}}.
+    **Text to analyze:** {content}
+    """
+    # ... (Return EntityExtractionPromptOverride)
+# The evaluation code is available in the main Morphik repository: https://github.com/morphiklabs/morphik/tree/main/evaluations
+```
+
+3.  **Orchestrated Extraction:** For every abstract and each LLM, Morphik handled the behind-the-scenes dance: sending the text chunk (we used a 600-token chunk size with 300-token overlap – parameters ripe for future tuning!), applying the consistent prompt, calling the correct model API, retrieving the response, and parsing the LLM's JSON output into a structured graph format using `db.create_graph`. This streamlined the generation of comparable knowledge graph snippets from each model.
+
+```python
+# Example: Morphik orchestrating graph creation for a specific model
+graph = db.create_graph(
+    name=f"scier_{model_name}_{run_id}",
+    documents=doc_ids, # List of ingested document IDs
+    prompt_overrides=graph_overrides # The consistent prompt defined earlier
+)
+# The evaluation code is available in the main Morphik repository: https://github.com/morphiklabs/morphik/tree/main/evaluations
+```
+
+4.  **Smarter Evaluation (Semantic Similarity):** Exact text matching is too brittle for this task. Does "Convolutional Neural Network" not match "CNN"? To get a more realistic score, we implemented semantic similarity using OpenAI's fast `text-embedding-3-small` model. We compared the *meaning* of extracted entities and relations against the ground truth, considering a match if the cosine similarity score was **0.80** or higher. This acknowledges variations in wording while focusing on conceptual accuracy. Morphik's structured output made it straightforward to feed data into our evaluation script.
+
+```python
+# Example: Using semantic similarity for evaluation
+similarity_calculator = OpenAIEmbedding(threshold=0.80)
+entity_metrics = evaluate_entity_extraction(
+    all_gt_entities, extracted_entities, similarity_calculator, ...
+)
+relation_metrics = evaluate_relation_extraction(
+    all_gt_relations, extracted_relationships, entity_match_map, similarity_calculator, ...
+)
+# The evaluation code is available in the main Morphik repository: https://github.com/morphiklabs/morphik/tree/main/evaluations
+```
+
+5.  **Visualizing the Verdict:** We calculated standard Precision, Recall, and F1-Score for both entity and relation extraction. Morphik's structured data allowed us to easily generate comparison charts.
+
+This end-to-end workflow, managed by Morphik, allowed us to rigorously and efficiently compare these powerful LLMs on a level playing field.
+
+### The Results: Ding, Ding, Ding!
+
+Alright, the moment of truth. How did our contenders fare in this scientific knowledge extraction showdown, orchestrated via Morphik?
+
+**(Results Section 1: F1 Score - The Overall Performance)**
+
+The F1 score balances precision (accuracy of extracted items) and recall (completeness of extracted items). Higher is better.
+
+![GPT-4o Metrics](/assets/gpt40_metrics.png)
+*GPT-4o F1 Scores: Strong Entity Extraction (0.870 F1), but Relation Extraction proves much tougher (0.278 F1), highlighting the challenge of connecting entities.*
+
+![Gemini Flash Metrics](/assets/gemini_metrics.png)
+*Gemini 2 Flash F1 Scores: Impressive Entity Extraction (0.841 F1) and surprisingly leads the pack in Relation Extraction (0.362 F1).*
+
+![Llama 3.2 Metrics](/assets/llama3_2_metrics.png)
+*Llama 3.2 (3B) F1 Scores: Solid Entity Extraction (0.807 F1), but struggles more with Relation Extraction (0.211 F1), typical for this harder task.*
+
+**(Results Section 2: How Many Did They Find? (Counts Comparison))**
+
+Did the models extract roughly the *right number* of entities and relations compared to the human-annotated ground truth?
+
+![GPT-4o Count Comparison](/assets/gpt40_counts.png)
+*GPT-4o Counts: Extracted more entities (265 vs 213 GT), aligning with high recall but hinting at some over-extraction. Extracted fewer relations (90 vs 148 GT).*
+
+![Gemini Flash Count Comparison](/assets/gemini_counts.png)
+*Gemini 2 Flash Counts: Also extracted more entities (265 vs 213 GT). Notably extracted the most relations (105 vs 148 GT), aligning with its higher RE F1 score.*
+
+![Llama 3.2 Count Comparison](/assets/llama3_2_counts.png)
+*Llama 3.2 (3B) Counts: Extracted entities closer to the ground truth count (216 vs 213 GT). Extracted the fewest relations (61 vs 148 GT).*
+
+**(Results Section 3: The Nitty-Gritty (Detailed Metrics Table))**
+
+For the data lovers, here's the breakdown of Precision, Recall, and F1:
+
+| Model                 | Task                | Precision | Recall | F1 Score |
+| :-------------------- | :------------------ | :-------- | :----- | :------- |
+| GPT-4o                | Entity Extraction   | 0.797     | 0.958  | **0.870**|
+| GPT-4o                | Relation Extraction | 0.337     | 0.236  | 0.278    |
+| Gemini 2 Flash        | Entity Extraction   | 0.758     | 0.944  | 0.841    |
+| Gemini 2 Flash        | Relation Extraction | **0.398** | 0.331  | **0.362**|
+| Llama 3.2 (3B)        | Entity Extraction   | **0.801** | 0.812  | 0.807    |
+| Llama 3.2 (3B)        | Relation Extraction | 0.300     | 0.162  | 0.211    |
+
+### Unpacking the Results: Insights and Caveats
+
+Morphik's framework made it easy to compare apples-to-apples. Here’s what stood out:
+
+*   **Entities Easier Than Relations (Big Surprise!):** All models found identifying entities (NER) significantly easier than figuring out their relationships (RE). F1 scores dropped drastically (around 50-70%) for RE across the board. This isn't shocking – understanding the nuanced connections *between* terms is inherently harder than just spotting the terms themselves.
+*   **GPT-4o: The Recall Champion (NER):** GPT-4o excelled at *finding* most of the entities, boasting the highest recall (95.8%) and the top NER F1 score (0.870). However, its higher extracted entity count suggests it might sometimes be slightly over-eager.
+*   **Gemini 2 Flash: The Relation Whisperer?** The surprise standout was Gemini 2 Flash in Relation Extraction. It achieved the best RE F1 score (0.362) and the highest RE precision (0.398), suggesting it was more accurate (though still far from perfect) in identifying valid relationships compared to the others in this specific setup.
+*   **Llama 3.2 (3B): Solid Open-Source Contender:** Llama 3.2 (3B) delivered respectable NER performance, showing a good balance between precision and recall (and extracting a number of entities very close to the ground truth). Its RE performance lagged, but it remains a strong open-weight option.
+*   **The Claude Conundrum:** We initially wanted to include Anthropic's Claude in this comparison. However, we encountered difficulties getting Claude to consistently adhere to the strict JSON output format required for our automated evaluation pipeline, especially for the complex relationship structures. This wasn't necessarily a reflection on Claude's *reasoning* ability, but it highlighted a practical challenge: for automated KG building workflows like those Morphik enables, reliable, structured output from the LLM is non-negotiable.
+*   **Room for Improvement (Prompts, Chunking):** These results reflect *our* specific experimental setup. We used one detailed prompt and a specific text chunking strategy (600 tokens, 300 overlap). More sophisticated prompt engineering (e.g., chain-of-thought, different examples) or experimenting with chunk sizes could potentially boost performance for *all* models. This is an iterative game!
+
+### Conclusion: LLMs Need Orchestration to Truly Shine in Science
+
+So, can LLMs conquer scientific literature? Our experiment suggests they are becoming incredibly powerful tools for *assisting* in this conquest, but they're not quite autonomous conquerors... yet.
+
+Key Takeaways:
+*   **NER is Getting Good:** State-of-the-art LLMs are becoming adept at identifying key entities in scientific text.
+*   **RE is the Next Frontier:** Accurately extracting the complex web of relationships remains a major challenge, though models like Gemini 2 Flash show encouraging progress.
+*   **Model Choice Matters:** Different LLMs exhibit different strengths. GPT-4o excels at broad identification, while Gemini 2 Flash showed an edge here in relational understanding. Llama 3.2 (3B) offers a strong open alternative.
+
+Critically, unlocking the potential of these LLMs for building real-world, large-scale scientific knowledge graphs isn't just about the models themselves. It requires robust platforms like **Morphik** that can seamlessly:
+
+*   **Ingest and Prepare** diverse data sources.
+*   **Manage and Apply** complex, consistent prompts across different models.
+*   **Orchestrate** API calls and handle model-specific quirks.
+*   **Structure** the often unpredictable LLM outputs into usable formats (like graphs!).
+*   **Integrate** smoothly with sophisticated evaluation techniques (like semantic similarity).
+
+Without an orchestration layer like Morphik, running such a comparison reliably, managing the complexities of different APIs and outputs, and ensuring consistent evaluation would be exponentially harder and more error-prone.
+
+The journey to automatically unlock the knowledge buried in scientific text is well underway. While Gemini 2 Flash might have won this particular round of relation extraction, the real winner is the combination of increasingly capable LLMs and intelligent platforms like Morphik. Together, they are paving the way to transform the overwhelming flood of scientific literature into structured, actionable knowledge, accelerating the pace of discovery for everyone.

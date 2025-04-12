@@ -60,7 +60,8 @@
           {
             "group": "Implementation Stories",
             "pages": [
-              "blogs/memory-vibe-coding"
+              "blogs/memory-vibe-coding",
+              "blogs/llm-science-battle"
             ]
           }
         ]
