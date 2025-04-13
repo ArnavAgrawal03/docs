@@ -32,6 +32,49 @@ description: "Main client for document operations in Morphik"
   </Tab>
 </Tabs>
 
+## User and Folder Scoping
+
+Morphik supports organizing and isolating data by user and folder. This provides a way to build multi-tenant applications and organize documents across projects.
+
+### Quick Overview
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    # Folder scoping - organize by project or category
+    folder = db.create_folder("project_x")
+    doc = folder.ingest_text("This document belongs to Project X")
+    
+    # User scoping - isolate data by end user
+    user_scope = db.signin("user123")
+    doc = user_scope.ingest_text("This belongs to user123 only")
+    
+    # Combined scoping - organize by both user and folder
+    user_folder_scope = folder.signin("user123")
+    doc = user_folder_scope.ingest_text("This belongs to user123 in project_x")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    # Folder scoping - organize by project or category
+    folder = db.create_folder("project_x")
+    doc = await folder.ingest_text("This document belongs to Project X")
+    
+    # User scoping - isolate data by end user
+    user_scope = db.signin("user123")
+    doc = await user_scope.ingest_text("This belongs to user123 only")
+    
+    # Combined scoping - organize by both user and folder
+    user_folder_scope = folder.signin("user123")
+    doc = await user_folder_scope.ingest_text("This belongs to user123 in project_x")
+    ```
+  </Tab>
+</Tabs>
+
+For detailed documentation and examples:
+- [Folder Management](/python-sdk/folders) - Organizing documents by logical groups
+- [User Management](/python-sdk/users) - Multi-tenant isolation and user-level data management
+
 ## Constructor
 
 Both clients share the same constructor parameters:

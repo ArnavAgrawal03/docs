@@ -32,6 +32,7 @@
             "group": "Concepts",
             "pages": [
               "concepts/naive-rag",
+              "concepts/user-folder-scoping",
               "concepts/rules-processing",
               "concepts/colpali",
               "concepts/knowledge-graphs"
@@ -96,6 +97,13 @@
               "python-sdk/list_documents",
               "python-sdk/get_document",
               "python-sdk/get_document_by_filename"
+            ]
+          },
+          {
+            "group": "Data Organization",
+            "pages": [
+              "python-sdk/folders",
+              "python-sdk/users"
             ]
           },
           {

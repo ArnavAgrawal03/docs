@@ -4,16 +4,6 @@
     "title": "Morphik API",
     "version": "0.1.0"
   },
-  "servers": [
-    {
-      "url": "http://localhost:8000",
-      "description": "Local Development"
-    },
-    {
-      "url": "https://api.morphik.ai",
-      "description": "Production"
-    }
-  ],
   "paths": {
     "/health": {
       "get": {
@@ -56,7 +46,7 @@
     "/ingest/text": {
       "post": {
         "summary": "Ingest Text",
-        "description": "Ingest a text document.\n\nArgs:\n    request: IngestTextRequest containing:\n        - content: Text content to ingest\n        - filename: Optional filename to help determine content type\n        - metadata: Optional metadata dictionary\n        - rules: Optional list of rules. Each rule should be either:\n               - MetadataExtractionRule: {\"type\": \"metadata_extraction\", \"schema\": {...}}\n               - NaturalLanguageRule: {\"type\": \"natural_language\", \"prompt\": \"...\"}\n    auth: Authentication context\n\nReturns:\n    Document: Metadata of ingested document",
+        "description": "Ingest a text document.\n\nArgs:\n    request: IngestTextRequest containing:\n        - content: Text content to ingest\n        - filename: Optional filename to help determine content type\n        - metadata: Optional metadata dictionary\n        - rules: Optional list of rules. Each rule should be either:\n               - MetadataExtractionRule: {\"type\": \"metadata_extraction\", \"schema\": {...}}\n               - NaturalLanguageRule: {\"type\": \"natural_language\", \"prompt\": \"...\"}\n        - folder_name: Optional folder to scope the document to\n        - end_user_id: Optional end-user ID to scope the document to\n    auth: Authentication context\n\nReturns:\n    Document: Metadata of ingested document",
         "operationId": "ingest_text_ingest_text_post",
         "parameters": [
           {
@@ -106,7 +96,7 @@
     "/ingest/file": {
       "post": {
         "summary": "Ingest File",
-        "description": "Ingest a file document.\n\nArgs:\n    file: File to ingest\n    metadata: JSON string of metadata\n    rules: JSON string of rules list. Each rule should be either:\n           - MetadataExtractionRule: {\"type\": \"metadata_extraction\", \"schema\": {...}}\n           - NaturalLanguageRule: {\"type\": \"natural_language\", \"prompt\": \"...\"}\n    auth: Authentication context\n\nReturns:\n    Document: Metadata of ingested document",
+        "description": "Ingest a file document.\n\nArgs:\n    file: File to ingest\n    metadata: JSON string of metadata\n    rules: JSON string of rules list. Each rule should be either:\n           - MetadataExtractionRule: {\"type\": \"metadata_extraction\", \"schema\": {...}}\n           - NaturalLanguageRule: {\"type\": \"natural_language\", \"prompt\": \"...\"}\n    auth: Authentication context\n    use_colpali: Whether to use ColPali embedding model\n    folder_name: Optional folder to scope the document to\n    end_user_id: Optional end-user ID to scope the document to\n\nReturns:\n    Document: Metadata of ingested document",
         "operationId": "ingest_file_ingest_file_post",
         "parameters": [
           {
@@ -172,7 +162,7 @@
     "/ingest/files": {
       "post": {
         "summary": "Batch Ingest Files",
-        "description": "Batch ingest multiple files.\n\nArgs:\n    files: List of files to ingest\n    metadata: JSON string of metadata (either a single dict or list of dicts)\n    rules: JSON string of rules list. Can be either:\n           - A single list of rules to apply to all files\n           - A list of rule lists, one per file\n    use_colpali: Whether to use ColPali-style embedding\n    parallel: Whether to process files in parallel\n    auth: Authentication context\n\nReturns:\n    BatchIngestResponse containing:\n        - documents: List of successfully ingested documents\n        - errors: List of errors encountered during ingestion",
+        "description": "Batch ingest multiple files.\n\nArgs:\n    files: List of files to ingest\n    metadata: JSON string of metadata (either a single dict or list of dicts)\n    rules: JSON string of rules list. Can be either:\n           - A single list of rules to apply to all files\n           - A list of rule lists, one per file\n    use_colpali: Whether to use ColPali-style embedding\n    parallel: Whether to process files in parallel\n    folder_name: Optional folder to scope the documents to\n    end_user_id: Optional end-user ID to scope the documents to\n    auth: Authentication context\n\nReturns:\n    BatchIngestResponse containing:\n        - documents: List of successfully ingested documents\n        - errors: List of errors encountered during ingestion",
         "operationId": "batch_ingest_files_ingest_files_post",
         "parameters": [
           {
@@ -222,7 +212,7 @@
     "/retrieve/chunks": {
       "post": {
         "summary": "Retrieve Chunks",
-        "description": "Retrieve relevant chunks.",
+        "description": "Retrieve relevant chunks.\n\nArgs:\n    request: RetrieveRequest containing:\n        - query: Search query text\n        - filters: Optional metadata filters\n        - k: Number of results (default: 4)\n        - min_score: Minimum similarity threshold (default: 0.0)\n        - use_reranking: Whether to use reranking\n        - use_colpali: Whether to use ColPali-style embedding model\n        - folder_name: Optional folder to scope the search to\n        - end_user_id: Optional end-user ID to scope the search to\n    auth: Authentication context\n    \nReturns:\n    List[ChunkResult]: List of relevant chunks",
         "operationId": "retrieve_chunks_retrieve_chunks_post",
         "parameters": [
           {
@@ -276,7 +266,7 @@
     "/retrieve/docs": {
       "post": {
         "summary": "Retrieve Documents",
-        "description": "Retrieve relevant documents.",
+        "description": "Retrieve relevant documents.\n\nArgs:\n    request: RetrieveRequest containing:\n        - query: Search query text\n        - filters: Optional metadata filters\n        - k: Number of results (default: 4)\n        - min_score: Minimum similarity threshold (default: 0.0)\n        - use_reranking: Whether to use reranking\n        - use_colpali: Whether to use ColPali-style embedding model\n        - folder_name: Optional folder to scope the search to\n        - end_user_id: Optional end-user ID to scope the search to\n    auth: Authentication context\n    \nReturns:\n    List[DocumentResult]: List of relevant documents",
         "operationId": "retrieve_documents_retrieve_docs_post",
         "parameters": [
           {
@@ -330,7 +320,7 @@
     "/batch/documents": {
       "post": {
         "summary": "Batch Get Documents",
-        "description": "Retrieve multiple documents by their IDs in a single batch operation.",
+        "description": "Retrieve multiple documents by their IDs in a single batch operation.\n\nArgs:\n    request: Dictionary containing:\n        - document_ids: List of document IDs to retrieve\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n    \nReturns:\n    List[Document]: List of documents matching the IDs",
         "operationId": "batch_get_documents_batch_documents_post",
         "parameters": [
           {
@@ -348,11 +338,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                },
-                "title": "Document Ids"
+                "type": "object",
+                "title": "Request"
               }
             }
           }
@@ -388,7 +375,7 @@
     "/batch/chunks": {
       "post": {
         "summary": "Batch Get Chunks",
-        "description": "Retrieve specific chunks by their document ID and chunk number in a single batch operation.",
+        "description": "Retrieve specific chunks by their document ID and chunk number in a single batch operation.\n\nArgs:\n    request: Dictionary containing:\n        - sources: List of ChunkSource objects (with document_id and chunk_number)\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n    \nReturns:\n    List[ChunkResult]: List of chunk results",
         "operationId": "batch_get_chunks_batch_chunks_post",
         "parameters": [
           {
@@ -406,11 +393,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ChunkSource"
-                },
-                "title": "Chunk Ids"
+                "type": "object",
+                "title": "Request"
               }
             }
           }
@@ -446,7 +430,7 @@
     "/query": {
       "post": {
         "summary": "Query Completion",
-        "description": "Generate completion using relevant chunks as context.\n\nWhen graph_name is provided, the query will leverage the knowledge graph \nto enhance retrieval by finding relevant entities and their connected documents.",
+        "description": "Generate completion using relevant chunks as context.\n\nWhen graph_name is provided, the query will leverage the knowledge graph \nto enhance retrieval by finding relevant entities and their connected documents.\n\nArgs:\n    request: CompletionQueryRequest containing:\n        - query: Query text\n        - filters: Optional metadata filters\n        - k: Number of chunks to use as context (default: 4)\n        - min_score: Minimum similarity threshold (default: 0.0)\n        - max_tokens: Maximum tokens in completion\n        - temperature: Model temperature\n        - use_reranking: Whether to use reranking\n        - use_colpali: Whether to use ColPali-style embedding model\n        - graph_name: Optional name of the graph to use for knowledge graph-enhanced retrieval\n        - hop_depth: Number of relationship hops to traverse in the graph (1-3)\n        - include_paths: Whether to include relationship paths in the response\n        - prompt_overrides: Optional customizations for entity extraction, resolution, and query prompts\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n    \nReturns:\n    CompletionResponse: Generated completion",
         "operationId": "query_completion_query_post",
         "parameters": [
           {
@@ -494,10 +478,10 @@
       }
     },
     "/documents": {
-      "get": {
+      "post": {
         "summary": "List Documents",
-        "description": "List accessible documents.",
-        "operationId": "list_documents_documents_get",
+        "description": "List accessible documents.\n\nArgs:\n    auth: Authentication context\n    skip: Number of documents to skip\n    limit: Maximum number of documents to return\n    filters: Optional metadata filters\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n    \nReturns:\n    List[Document]: List of accessible documents",
+        "operationId": "list_documents_documents_post",
         "parameters": [
           {
             "name": "skip",
@@ -517,6 +501,38 @@
               "type": "integer",
               "default": 10000,
               "title": "Limit"
+            }
+          },
+          {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
+            "name": "end_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End User Id"
             }
           },
           {
@@ -556,7 +572,7 @@
                   "items": {
                     "$ref": "#/components/schemas/Document"
                   },
-                  "title": "Response List Documents Documents Get"
+                  "title": "Response List Documents Documents Post"
                 }
               }
             }
@@ -673,7 +689,7 @@
     "/documents/filename/{filename}": {
       "get": {
         "summary": "Get Document By Filename",
-        "description": "Get document by filename.",
+        "description": "Get document by filename.\n\nArgs:\n    filename: Filename of the document to retrieve\n    auth: Authentication context\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n    \nReturns:\n    Document: Document metadata if found and accessible",
         "operationId": "get_document_by_filename_documents_filename__filename__get",
         "parameters": [
           {
@@ -683,6 +699,38 @@
             "schema": {
               "type": "string",
               "title": "Filename"
+            }
+          },
+          {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
+            "name": "end_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End User Id"
             }
           },
           {
@@ -1400,7 +1448,7 @@
     "/graph/create": {
       "post": {
         "summary": "Create Graph",
-        "description": "Create a graph from documents. \n This endpoint extracts entities and relationships from documents matching the specified filters or document IDs and creates a graph. Args:    request: CreateGraphRequest containing:\n        - name: Name of the graph to create\n        - filters: Optional metadata filters to determine which documents to include - documents: Optional list of specific document IDs to include\n    auth: Authentication context\n\nReturns:\n    Graph: The created graph object",
+        "description": "Create a graph from documents.\n\nThis endpoint extracts entities and relationships from documents\nmatching the specified filters or document IDs and creates a graph.\n\nArgs:\n    request: CreateGraphRequest containing:\n        - name: Name of the graph to create\n        - filters: Optional metadata filters to determine which documents to include\n        - documents: Optional list of specific document IDs to include\n        - prompt_overrides: Optional customizations for entity extraction and resolution prompts\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n\nReturns:\n    Graph: The created graph object",
         "operationId": "create_graph_graph_create_post",
         "parameters": [
           {
@@ -1450,7 +1498,7 @@
     "/graph/{name}": {
       "get": {
         "summary": "Get Graph",
-        "description": "Get a graph by name.\n\nThis endpoint retrieves a graph by its name if the user has access to it.\n\nArgs:\n    name: Name of the graph to retrieve\n    auth: Authentication context\n\nReturns:\n    Graph: The requested graph object",
+        "description": "Get a graph by name.\n\nThis endpoint retrieves a graph by its name if the user has access to it.\n\nArgs:\n    name: Name of the graph to retrieve\n    auth: Authentication context\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n\nReturns:\n    Graph: The requested graph object",
         "operationId": "get_graph_graph__name__get",
         "parameters": [
           {
@@ -1460,6 +1508,38 @@
             "schema": {
               "type": "string",
               "title": "Name"
+            }
+          },
+          {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
+            "name": "end_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End User Id"
             }
           },
           {
@@ -1499,9 +1579,41 @@
     "/graphs": {
       "get": {
         "summary": "List Graphs",
-        "description": "List all graphs the user has access to.\n\nThis endpoint retrieves all graphs the user has access to.\n\nArgs:\n    auth: Authentication context\n\nReturns:\n    List[Graph]: List of graph objects",
+        "description": "List all graphs the user has access to.\n\nThis endpoint retrieves all graphs the user has access to.\n\nArgs:\n    auth: Authentication context\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n\nReturns:\n    List[Graph]: List of graph objects",
         "operationId": "list_graphs_graphs_get",
         "parameters": [
+          {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
+            "name": "end_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End User Id"
+            }
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -1543,7 +1655,7 @@
     "/graph/{name}/update": {
       "post": {
         "summary": "Update Graph",
-        "description": "Update an existing graph with new documents.\n\nThis endpoint processes additional documents based on the original graph filters \nand/or new filters/document IDs, extracts entities and relationships, and \nupdates the graph with new information.\n\nArgs:\n    name: Name of the graph to update\n    request: UpdateGraphRequest containing:\n        - additional_filters: Optional additional metadata filters to determine which new documents to include\n        - additional_documents: Optional list of additional document IDs to include\n    auth: Authentication context\n\nReturns:\n    Graph: The updated graph object",
+        "description": "Update an existing graph with new documents.\n\nThis endpoint processes additional documents based on the original graph filters \nand/or new filters/document IDs, extracts entities and relationships, and \nupdates the graph with new information.\n\nArgs:\n    name: Name of the graph to update\n    request: UpdateGraphRequest containing:\n        - additional_filters: Optional additional metadata filters to determine which new documents to include\n        - additional_documents: Optional list of additional document IDs to include\n        - prompt_overrides: Optional customizations for entity extraction and resolution prompts\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n\nReturns:\n    Graph: The updated graph object",
         "operationId": "update_graph_graph__name__update_post",
         "parameters": [
           {
@@ -1694,82 +1806,6 @@
           }
         }
       }
-    },
-    "/user/upgrade": {
-      "post": {
-        "summary": "Upgrade User Tier",
-        "description": "Upgrade a user to a higher tier.",
-        "operationId": "upgrade_user_tier_user_upgrade_post",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "User Id"
-            }
-          },
-          {
-            "name": "tier",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Tier"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "title": "Authorization"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Custom Limits"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "title": "Response Upgrade User Tier User Upgrade Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -1837,6 +1873,28 @@
             "type": "boolean",
             "title": "Parallel",
             "default": true
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id"
           }
         },
         "type": "object",
@@ -1908,6 +1966,28 @@
             "type": "string",
             "title": "Rules",
             "default": "[]"
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id"
           }
         },
         "type": "object",
@@ -2127,6 +2207,30 @@
             "description": "Whether to include relationship paths in the response",
             "default": false
           },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name",
+            "description": "Optional folder scope for the operation"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id",
+            "description": "Optional end-user scope for the operation"
+          },
           "max_tokens": {
             "anyOf": [
               {
@@ -2275,6 +2379,30 @@
                 "prompt_template": "Extract entities from the following text: {content}\n{examples}"
               }
             }
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name",
+            "description": "Optional folder scope for the operation"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id",
+            "description": "Optional end-user scope for the operation"
           }
         },
         "type": "object",
@@ -2362,7 +2490,7 @@
           "content_type"
         ],
         "title": "Document",
-        "description": "Represents a document stored in MongoDB documents collection"
+        "description": "Represents a document stored in the database documents collection"
       },
       "DocumentContent": {
         "properties": {
@@ -2662,6 +2790,10 @@
             "type": "object",
             "title": "Metadata"
           },
+          "system_metadata": {
+            "type": "object",
+            "title": "System Metadata"
+          },
           "document_ids": {
             "items": {
               "type": "string"
@@ -2796,6 +2928,30 @@
               }
             ],
             "title": "Use Colpali"
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name",
+            "description": "Optional folder scope for the operation"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id",
+            "description": "Optional end-user scope for the operation"
           }
         },
         "type": "object",
@@ -3000,6 +3156,30 @@
             "title": "Include Paths",
             "description": "Whether to include relationship paths in the response",
             "default": false
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name",
+            "description": "Optional folder scope for the operation"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id",
+            "description": "Optional end-user scope for the operation"
           }
         },
         "type": "object",
@@ -3099,6 +3279,30 @@
               }
             ],
             "description": "Optional customizations for entity extraction and resolution prompts"
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name",
+            "description": "Optional folder scope for the operation"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id",
+            "description": "Optional end-user scope for the operation"
           }
         },
         "type": "object",
