@@ -5,11 +5,11 @@ description: "A technical exploration of why even natively multimodal LLMs strug
 
 ## Here's the sequence for o4-mini-high:
 
-You hand o4‑mini‑high a PDF with an IRR vs Frequency graph and ask:
+You hand o4‑mini‑high a technical patent with an embedded IRR vs Frequency graph and ask:
 
 "At what frequency does IRR peak?"
 
-Instead of just reading the chart, it hits you with:
+It thinks for 30 seconds and instead of just reading the chart, it hits you with:
 
 "Which page is that on?"
 
@@ -17,7 +17,7 @@ Cue dramatic facepalm. 🤦
 
 ![GPT-4o mini-high failing to answer a question about a graph](/assets/gpt-vs-morphik/gpt-fail-1.png)
 
-Even after I grumbled "Page 6," it confidently proclaimed the peak was "the highest point on the line." Technically wrong and hilariously sure of itself.
+Even after I grumbled "Page 6," it pulled out the Python tool use gun (my favorite as well) proclaimed the peak was "the highest point on the line." Technically wrong and hilariously sure of itself.
 
 ![Additional context doesn't resolve the limitation](/assets/gpt-vs-morphik/gpt-fail-2.png)
 
