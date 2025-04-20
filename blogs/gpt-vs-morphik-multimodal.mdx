@@ -1,0 +1,41 @@
+---
+title: "When Multimodal Models Go Blind"
+description: "A technical exploration of why even natively multimodal LLMs struggle with diagram interpretation in documents"
+---
+
+## Here's the sequence for o4-mini-high:
+
+You hand o4‑mini‑high a PDF with an IRR vs Frequency graph and ask:
+
+"At what frequency does IRR peak?"
+
+Instead of just reading the chart, it hits you with:
+
+"Which page is that on?"
+
+Cue dramatic facepalm. 🤦
+
+![GPT-4o mini-high failing to answer a question about a graph](/assets/gpt-vs-morphik/gpt-fail-1.png)
+
+Even after I grumbled "Page 6," it confidently proclaimed the peak was "the highest point on the line." Technically wrong and hilariously sure of itself.
+
+![Additional context doesn't resolve the limitation](/assets/gpt-vs-morphik/gpt-fail-2.png)
+
+![Model's unsuccessful self-analysis attempt](/assets/gpt-vs-morphik/gpt-fail-3.png)
+
+## Here's the sequence for Morphik:
+
+We treat each page like one giant image+text puzzle:
+
+1. Snap the whole page as an image (diagrams, tables, doodles included)
+2. Extract text blocks with their exact positions (headings, captions, footnotes) 
+3. Blend vision & text embeddings into a multi-vector cocktail 🍹
+4. Retrieve the full region (text+diagram) as a unit—no more orphaned charts
+
+Result? The same question returns:
+
+"IRR peaks at 0 MHz." Boom. 🎯
+
+![Morphik's technical approach correctly processes the query](/assets/gpt-vs-morphik/morphik-success-1.png)
+
+![Context visualization showing the complete retrieved section](/assets/gpt-vs-morphik/morphik-success-2.png)

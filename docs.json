@@ -62,7 +62,8 @@
             "group": "Implementation Stories",
             "pages": [
               "blogs/memory-vibe-coding",
-              "blogs/llm-science-battle"
+              "blogs/llm-science-battle",
+              "blogs/gpt-vs-morphik-multimodal"
             ]
           }
         ]
