@@ -318,19 +318,62 @@ description: "Setting Up the Morphik server"
     cd morphik-core
     ```
 
-    1. First-time setup:
+    2. Before first-time setup, check the configuration:
+
+    Ensure your `morphik.toml` file has the correct settings for running in Docker:
+    
+    ```toml
+    # For Redis configuration when using Docker
+    [redis]
+    host = "redis"  # use "redis" when running in Docker (not "localhost")
+    port = 6379
+    ```
+    
+    (If using local models with Ollama) Also ensure the Ollama configuration matches your deployment setup:
+    
+    - If running both Morphik and Ollama as Docker containers:
+    ```toml
+    # If you are running on docker and ollama is also running on docker use the following
+    ollama_llama_docker_docker = { model_name = "ollama_chat/llama3.2", api_base = "http://ollama:11434" }
+    ollama_llama_vision_docker_docker = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://ollama:11434", vision = true }
+    
+    # For embedding models
+    ollama_embedding_docker_docker = { model_name = "ollama/nomic-embed-text", api_base = "http://ollama:11434" }
+    ```
+    
+    - If running Morphik in Docker but Ollama locally:
+    ```toml
+    # If you are running on docker, but running ollama locally use the following
+    ollama_llama_docker = { model_name = "ollama_chat/llama3.2", api_base = "http://host.docker.internal:11434" }
+    ollama_llama_vision_docker = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://host.docker.internal:11434", vision = true }
+    
+    # For embedding models
+    ollama_embedding_docker = { model_name = "ollama/nomic-embed-text", api_base = "http://host.docker.internal:11434" }
+    ```
+    
+    And update the active model references to use the appropriate Docker configurations:
+    
+    ```toml
+    [completion]
+    model = "ollama_llama_vision_docker_docker"  # If both in Docker
+    
+    [embedding]
+    model = "ollama_embedding_docker_docker"  # If both in Docker
+    ```
 
     If you want to use Ollama for AI capabilities (recommended for local development):
 
     ```bash
     docker compose --profile ollama up --build -d
     ```
+    This will build docker with an Ollama container.
 
-    Or if you're using OpenAI API (configure API key in .env):
+    Or if you're using OpenAI, Anthropic, or other models (configure the API key in .env):
 
     ```bash
     docker compose up --build
     ```
+    This will build docker without the Ollama container.
 
     These commands will:
 
@@ -399,6 +442,10 @@ description: "Setting Up the Morphik server"
        - Check Ollama logs: `docker compose logs ollama`
        - Ensure enough disk space for models
        - Try restarting Ollama: `docker compose restart ollama`
+       - Verify that your Redis and Ollama configuration in `morphik.toml` matches your deployment:
+         - For Redis in Docker, use `host = "redis"` (not "localhost")
+         - If running Ollama in Docker, use `http://ollama:11434` endpoint
+         - If running Ollama locally but Morphik in Docker, use `http://host.docker.internal:11434`
     4. **Ollama Memory Issues**
        - If you see errors like "model requires more system memory than is available" in the logs:
          - Increase Docker memory allocation in Docker Desktop:
