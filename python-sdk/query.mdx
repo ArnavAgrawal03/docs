@@ -22,6 +22,7 @@ Generate completion using relevant chunks as context.
         hop_depth: int = 1,
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
+        schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -39,6 +40,7 @@ Generate completion using relevant chunks as context.
         hop_depth: int = 1,
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
+        schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -57,10 +59,11 @@ Generate completion using relevant chunks as context.
 - `hop_depth` (int, optional): Number of relationship hops to traverse in the graph (1-3). Defaults to 1.
 - `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
 - `prompt_overrides` (QueryPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction, resolution, and query prompts
+- `schema` (Type[BaseModel] | Dict[str, Any], optional): Optional schema for structured output, can be a Pydantic model or a JSON schema dict
 
 ## Returns
 
-- `CompletionResponse`: Response containing the completion and source information
+- `CompletionResponse`: Response containing the completion, source information, and potentially structured output.
 
 ## Examples
 
@@ -223,10 +226,11 @@ Generate completion using relevant chunks as context.
 
 The `CompletionResponse` object returned by this method has the following properties:
 
-- `completion` (str): The generated completion text
+- `completion` (str | Dict[str, Any] | None): The generated completion text or the structured output dictionary.
 - `usage` (Dict[str, int]): Token usage information
 - `sources` (List[ChunkSource]): Sources of chunks used in the completion
 - `metadata` (Dict[str, Any], optional): Additional metadata about the completion. When using a knowledge graph with `include_paths=True`, this contains graph traversal information.
+- `finish_reason` (Optional[str]): Reason the generation finished (e.g., 'stop', 'length')
 
 ### ChunkSource Properties
 
@@ -235,3 +239,91 @@ Each `ChunkSource` object in the `sources` list has the following properties:
 - `document_id` (str): ID of the source document
 - `chunk_number` (int): Chunk number within the document
 - `score` (Optional[float]): Relevance score (if available)
+
+### Using Structured Output
+
+Use the `schema` parameter to get the completion response in a structured format according to a Pydantic model or a JSON schema dictionary.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    from pydantic import BaseModel
+    from typing import List
+
+    # Define the desired output structure
+    class ResearchFindings(BaseModel):
+        main_finding: str
+        supporting_evidence: List[str]
+        limitations: List[str]
+
+    db = Morphik()
+
+    response = db.query(
+        "Summarize the key research findings from these documents",
+        filters={"department": "research"},
+        schema=ResearchFindings
+    )
+
+    # Check if the completion is a dictionary (structured output)
+    if isinstance(response.completion, dict):
+        try:
+            # Parse the dictionary into the Pydantic model
+            findings = ResearchFindings(**response.completion)
+            print(f"Main finding: {findings.main_finding}")
+            print("Supporting evidence:")
+            for evidence in findings.supporting_evidence:
+                print(f"- {evidence}")
+            print("Limitations:")
+            for limitation in findings.limitations:
+                print(f"- {limitation}")
+        except Exception as e:
+            print(f"Error parsing structured output: {e}")
+            # Fallback: print the raw dictionary
+            print(response.completion)
+    elif isinstance(response.completion, str):
+        # Fallback to text completion
+        print(response.completion)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    from pydantic import BaseModel
+    from typing import List
+
+    # Define the desired output structure
+    class ResearchFindings(BaseModel):
+        main_finding: str
+        supporting_evidence: List[str]
+        limitations: List[str]
+
+    async with AsyncMorphik() as db:
+        response = await db.query(
+            "Summarize the key research findings from these documents",
+            filters={"department": "research"},
+            schema=ResearchFindings
+        )
+
+        # Check if the completion is a dictionary (structured output)
+        if isinstance(response.completion, dict):
+            try:
+                # Parse the dictionary into the Pydantic model
+                findings = ResearchFindings(**response.completion)
+                print(f"Main finding: {findings.main_finding}")
+                print("Supporting evidence:")
+                for evidence in findings.supporting_evidence:
+                    print(f"- {evidence}")
+                print("Limitations:")
+                for limitation in findings.limitations:
+                    print(f"- {limitation}")
+            except Exception as e:
+                print(f"Error parsing structured output: {e}")
+                # Fallback: print the raw dictionary
+                print(response.completion)
+        elif isinstance(response.completion, str):
+            # Fallback to text completion
+            print(response.completion)
+    ```
+  </Tab>
+</Tabs>
