@@ -1,304 +1,320 @@
 ---
 title: "Getting Started"
-description: "Setting Up the Morphik server"
+description: "Get up and running with Morphik"
 ---
 
 # Installation Options
 
 <Tabs>
-  <Tab title="Direct Installation">
+  <Tab title="Morphik Cloud (recommended)">
+    <Steps>
+      <Step title="Sign Up">
+        On a new tab, navigate to the [Morphik website](https://morphik.ai) and click the sign up button on the top right.
+      </Step>
+      <Step title="Create a Project">
+        Once you have signed up, you will be redirected to the Morphik Cloud dashboard. Click the "Create Application" button to create a new application. Enter your app name and click "Create Application". You should now see that application in your dashboard.
+      </Step>
+      <Step title="Obtain your URI">
+        Click on the "Copy" icon on the top right of the application card to copy your application URI. 
+      </Step>
+    </Steps>
+
+    That's it! You're ready to use Morphik now :)
+  </Tab>
+  <Tab title="Self Host - Direct Installation (Advanced)">
     ## Direct Installation
 
-    ### Prerequisites
+    <Steps>
+      <Step title="Prerequisites">
+        <Accordion title="Python">
+          Please ensure that you have Python 3.12 installed on your machine. Guides for installing Python can be found on the [Python website](https://www.python.org/downloads/release/python-3129/).
+        </Accordion>
+        <Accordion title="PostgreSQL">
+          Morphik requires PostgreSQL with the pgvector extension for vector storage and similarity search capabilities. Follow the installation instructions for your operating system:
 
-    <Accordion title="Python">
-      Please ensure that you have Python 3.12 installed on your machine. Guides for installing Python can be found on the [Python website](https://www.python.org/downloads/release/python-3129/).
-    </Accordion>
-    <Accordion title="PostgreSQL">
-      Morphik requires PostgreSQL with the pgvector extension for vector storage and similarity search capabilities. Follow the installation instructions for your operating system:
+          <Tabs>
+            <Tab title="macOS">
+              On macOS, you can use Homebrew to install PostgreSQL and pgvector:
 
-      <Tabs>
-        <Tab title="macOS">
-          On macOS, you can use Homebrew to install PostgreSQL and pgvector:
+              ```bash
+              brew install postgresql@14
+              brew install pgvector
+              ```
 
-          ```bash
-          brew install postgresql@14
-          brew install pgvector
-          ```
+              Start the PostgreSQL service:
 
-          Start the PostgreSQL service:
+              ```bash
+              brew services start postgresql@14
+              ```
 
-          ```bash
-          brew services start postgresql@14
-          ```
+              Create a database and user for Morphik:
 
-          Create a database and user for Morphik:
+              ```bash
+              createdb morphik
+              createuser -s postgres
+              ```
 
-          ```bash
-          createdb morphik
-          createuser -s postgres
-          ```
+              These commands create a database named "morphik" and a superuser named "postgres" that the application will use to connect.
+            </Tab>
+            <Tab title="Ubuntu/Debian">
+              Install PostgreSQL from the official repositories.**We recommend version 14** . Other versions may work, but haven't been extensively tested\!
 
-          These commands create a database named "morphik" and a superuser named "postgres" that the application will use to connect.
-        </Tab>
-        <Tab title="Ubuntu/Debian">
-          Install PostgreSQL from the official repositories.**We recommend version 14** . Other versions may work, but haven't been extensively tested\!
+              ```bash
+              sudo apt update
+              sudo apt install postgresql postgresql-contrib
+              ```
 
-          ```bash
-          sudo apt update
-          sudo apt install postgresql postgresql-contrib
-          ```
+              Install pgvector:
 
-          Install pgvector:
+              ```bash
+              sudo apt install postgresql-14-pgvector
+              ```
 
-          ```bash
-          sudo apt install postgresql-14-pgvector
-          ```
+              Start and enable the PostgreSQL service:
 
-          Start and enable the PostgreSQL service:
+              ```bash
+              sudo systemctl start postgresql
+              sudo systemctl enable postgresql
+              ```
 
-          ```bash
-          sudo systemctl start postgresql
-          sudo systemctl enable postgresql
-          ```
+              Create a database and user for Morphik:
 
-          Create a database and user for Morphik:
-
-          ```bash
-          sudo -u postgres createdb morphik
-          sudo -u postgres createuser -s postgres
-          ```
-        </Tab>
-        <Tab title="Windows">
-          1. Download and install PostgreSQL from the [official website](https://www.postgresql.org/download/windows/).
-          2. During installation, make note of the password you set for the postgres user.
-          3. Install pgvector:
-             - Open pgAdmin (installed with PostgreSQL)
-             - Connect to your PostgreSQL server
-             - Right-click on "Extensions" and select "Create \> Extension"
-             - Select "pgvector" from the dropdown and click "Save"
-          4. Create a database for Morphik:
-             - Right-click on "Databases" and select "Create \> Database"
-             - Name it "morphik" and click "Save"
-        </Tab>
-      </Tabs>
-      After installation, verify that PostgreSQL is running correctly:
-
-      ```bash
-      psql -U postgres -c "SELECT version();"
-      ```
-
-      You should see the following output:
-
-      ```
-       version                                                            
-      ------------------------------------------------------------------------------------------------------------------------------
-      <Your postgres version and some compilation details>
-      ```
-    </Accordion>
-    <Accordion title="Additional Dependencies">
-      Some system-level dependencies might be required for processing various document types:
-
-      <Tabs>
-        <Tab title="macOS">
-          ```bash
-          # Install via Homebrew
-          brew install poppler tesseract libmagic
-          ```
-        </Tab>
-        <Tab title="Ubuntu/Debian">
-          ```bash
-          # Install via apt
-          sudo apt-get update
-          sudo apt-get install -y poppler-utils tesseract-ocr libmagic-dev
-          ```
-        </Tab>
-        <Tab title="Windows">
-          For Windows, you may need to install these dependencies manually:
-
-          1. **Poppler**: Download from [poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/)
-          2. **Tesseract**: Download the installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
-          3. **libmagic**: This is included in the python-magic-bin package which will be installed with pip
-        </Tab>
-      </Tabs>
-      If you encounter database initialization issues within Docker, you may need to manually initialize the schema:
-
-      ```bash
-      psql -U postgres -d morphik -a -f init.sql
-      ```
-    </Accordion>
-    <Accordion title="Installing Ollama">
-      <Tabs>
-        <Tab title="macOS">
-          Install Ollama using Homebrew:
+              ```bash
+              sudo -u postgres createdb morphik
+              sudo -u postgres createuser -s postgres
+              ```
+            </Tab>
+            <Tab title="Windows">
+              1. Download and install PostgreSQL from the [official website](https://www.postgresql.org/download/windows/).
+              2. During installation, make note of the password you set for the postgres user.
+              3. Install pgvector:
+                 - Open pgAdmin (installed with PostgreSQL)
+                 - Connect to your PostgreSQL server
+                 - Right-click on "Extensions" and select "Create \> Extension"
+                 - Select "pgvector" from the dropdown and click "Save"
+              4. Create a database for Morphik:
+                 - Right-click on "Databases" and select "Create \> Database"
+                 - Name it "morphik" and click "Save"
+            </Tab>
+          </Tabs>
+          After installation, verify that PostgreSQL is running correctly:
 
           ```bash
-          brew install ollama
+          psql -U postgres -c "SELECT version();"
           ```
 
-          Start Ollama:
+          You should see the following output:
+
+          ```
+           version                                                            
+          ------------------------------------------------------------------------------------------------------------------------------
+          <Your postgres version and some compilation details>
+          ```
+        </Accordion>
+        <Accordion title="Additional Dependencies">
+          Some system-level dependencies might be required for processing various document types:
+
+          <Tabs>
+            <Tab title="macOS">
+              ```bash
+              # Install via Homebrew
+              brew install poppler tesseract libmagic
+              ```
+            </Tab>
+            <Tab title="Ubuntu/Debian">
+              ```bash
+              # Install via apt
+              sudo apt-get update
+              sudo apt-get install -y poppler-utils tesseract-ocr libmagic-dev
+              ```
+            </Tab>
+            <Tab title="Windows">
+              For Windows, you may need to install these dependencies manually:
+
+              1. **Poppler**: Download from [poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/)
+              2. **Tesseract**: Download the installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
+              3. **libmagic**: This is included in the python-magic-bin package which will be installed with pip
+            </Tab>
+          </Tabs>
+          If you encounter database initialization issues within Docker, you may need to manually initialize the schema:
 
           ```bash
-          ollama serve
+          psql -U postgres -d morphik -a -f init.sql
           ```
+        </Accordion>
+        <Accordion title="Installing Ollama">
+          <Tabs>
+            <Tab title="macOS">
+              Install Ollama using Homebrew:
 
-          Pull a model to use with Morphik (in a new terminal):
+              ```bash
+              brew install ollama
+              ```
 
-          ```bash
-          ollama pull llama3.2
-          ```
-        </Tab>
-        <Tab title="Linux">
-          Install Ollama using the official installation script:
+              Start Ollama:
 
-          ```bash
-          curl -fsSL https://ollama.com/install.sh | sh
-          ```
+              ```bash
+              ollama serve
+              ```
 
-          Start Ollama:
+              Pull a model to use with Morphik (in a new terminal):
 
-          ```bash
-          ollama serve
-          ```
+              ```bash
+              ollama pull llama3.2
+              ```
+            </Tab>
+            <Tab title="Linux">
+              Install Ollama using the official installation script:
 
-          Pull a model to use with Morphik (in a new terminal):
+              ```bash
+              curl -fsSL https://ollama.com/install.sh | sh
+              ```
 
-          ```bash
-          ollama pull llama3.2
-          ```
-        </Tab>
-        <Tab title="Windows">
-          1. Download the Ollama installer from the [official website](https://ollama.com/download/windows).
-          2. Run the installer and follow the on-screen instructions.
-          3. After installation, Ollama will start automatically.
-          4. Open Command Prompt or PowerShell and pull a model:
+              Start Ollama:
 
-             ```bash
-             ollama pull llama3.2
-             ```
-        </Tab>
-      </Tabs>
-    </Accordion>
-    ### Cloning the Repository
+              ```bash
+              ollama serve
+              ```
 
-    To get started with Morphik, we need to first setup the server. This involves cloning the [repository](https://github.com/morphik-org/morphik-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data\!
+              Pull a model to use with Morphik (in a new terminal):
 
-    First, let's clone the repository from GitHub.
+              ```bash
+              ollama pull llama3.2
+              ```
+            </Tab>
+            <Tab title="Windows">
+              1. Download the Ollama installer from the [official website](https://ollama.com/download/windows).
+              2. Run the installer and follow the on-screen instructions.
+              3. After installation, Ollama will start automatically.
+              4. Open Command Prompt or PowerShell and pull a model:
 
-    ```bash
-    git clone https://github.com/morphik-org/morphik-core.git
-    ```
+                 ```bash
+                 ollama pull llama3.2
+                 ```
+            </Tab>
+          </Tabs>
+        </Accordion>
+      </Step>
 
-    After cloning the repository, you will notice a `morphik-core` folder in your current directory.
+      <Step title="Cloning the Repository">
+        To get started with Morphik, we need to first setup the server. This involves cloning the [repository](https://github.com/morphik-org/morphik-core/), installing the dependencies, and the running the server. You are just a few steps away from accurate, agentic RAG over your multi-modal data\!
 
-    ```bash
-    ls morphik-core
-    ```
-
-    If you see an error like `ls: morphik-core: No such file or directory`, it means that the repository is not cloned properly. Please try again.
-
-    Once you have cloned the repository, navigate into the `morphik-core` folder.
-
-    ```bash
-    cd morphik-core
-    ```
-
-    Next, you need to set up a virtual environment called `.venv`.
-
-    ### Setting Up the Environment
-
-    #### Installing Python Dependencies
-
-    <Note>
-      While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
-
-      Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
-    </Note>
-    ```bash
-    python3.12 -m venv .venv
-    ```
-
-    Now, you need to activate the virtual environment. The activation command differs based on your operating system.
-
-    <Tabs>
-      <Tab title="Linux/macOS">
-        ```bash
-        source .venv/bin/activate
-        ```
-      </Tab>
-      <Tab title="Windows (Command Prompt)">
-        ```bash
-        .venv\Scripts\activate.bat
-        ```
-      </Tab>
-      <Tab title="Windows (PowerShell)">
-        ```bash
-        .venv\Scripts\Activate.ps1
-        ```
-
-        If you encounter execution policy errors in PowerShell, you may need to run:
+        First, let's clone the repository from GitHub.
 
         ```bash
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+        git clone https://github.com/morphik-org/morphik-core.git
         ```
-      </Tab>
-    </Tabs>
-    After activation, your command prompt should be prefixed with `(.venv)`, indicating that the virtual environment is active. Once your virtual environment is activated, you can install the required dependencies.
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+        After cloning the repository, you will notice a `morphik-core` folder in your current directory.
 
-    #### Python Dependencies for Document Processing
+        ```bash
+        ls morphik-core
+        ```
 
-    You may also need additional Python packages or NLTK resources for processing various document types:
+        If you see an error like `ls: morphik-core: No such file or directory`, it means that the repository is not cloned properly. Please try again.
 
-    ```bash
-    # If using Python 3.12+, you might need a specific version of unstructured
-    pip install unstructured==0.16.10
-    
-    # Download required NLTK resources
-    python -m nltk.downloader averaged_perceptron_tagger punkt
-    ```
+        Once you have cloned the repository, navigate into the `morphik-core` folder.
 
-    #### Setting up the Server Parameters
+        ```bash
+        cd morphik-core
+        ```
+      </Step>
 
-    At this point, you may want to customize the server - such as use a different model, enable or disable certain features, etc. - you can do so by editing the `morphik.toml` file. 
-    
-    Morphik now uses a registered models approach, which allows you to define hundreds of different models in one place and reference them throughout your configuration. This makes it easy to mix and match models based on your needs (e.g., smaller models for simpler tasks). You can find more details about configuration [here](/configuration).
+      <Step title="Setting Up the Environment">
+        <h4>Installing Python Dependencies</h4>
 
-    Morphik uses environment variables to manage secrets and API keys. In order to ensure that any pre-set keys are available to the server, copy the `.env.example` file to `.env`:
+        <Note>
+          While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
 
-    ```bash
-    cp .env.example .env
-    ```
+          Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
+        </Note>
+        ```bash
+        python3.12 -m venv .venv
+        ```
 
-    In case you're using external models like OpenAI or Anthropic Claude, you'll need to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store.
+        Now, you need to activate the virtual environment. The activation command differs based on your operating system.
 
-    ```bash
-    python quick_setup.py
-    ```
+        <Tabs>
+          <Tab title="Linux/macOS">
+            ```bash
+            source .venv/bin/activate
+            ```
+          </Tab>
+          <Tab title="Windows (Command Prompt)">
+            ```bash
+            .venv\Scripts\activate.bat
+            ```
+          </Tab>
+          <Tab title="Windows (PowerShell)">
+            ```bash
+            .venv\Scripts\Activate.ps1
+            ```
 
-    ### Launching the Server
+            If you encounter execution policy errors in PowerShell, you may need to run:
 
-    You are now ready to launch the Morphik server\! Just run the following command to start the server.
+            ```bash
+            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+            ```
+          </Tab>
+        </Tabs>
+        After activation, your command prompt should be prefixed with `(.venv)`, indicating that the virtual environment is active. Once your virtual environment is activated, you can install the required dependencies.
 
-    ```bash
-    python start_server.py
-    ```
+        ```bash
+        pip install -r requirements.txt
+        ```
 
-    You should see the following output:
+        <h4>Python Dependencies for Document Processing</h4>
 
-    ```
-    INFO:     Started server process [15169]
-    INFO:     Waiting for application startup.
-    INFO:     Application startup complete.
-    INFO:     Uvicorn running on http://localhost:8000 (Press CTRL+C to quit)
-    ```
+        You may also need additional Python packages or NLTK resources for processing various document types:
 
-    This means that the server is running on `http://localhost:8000`. You can now interact with the server using the API or the Python SDK.
+        ```bash
+        # If using Python 3.12+, you might need a specific version of unstructured
+        pip install unstructured==0.16.10
+        
+        # Download required NLTK resources
+        python -m nltk.downloader averaged_perceptron_tagger punkt
+        ```
+      </Step>
+
+      <Step title="Setting up the Server Parameters">
+        At this point, you may want to customize the server - such as use a different model, enable or disable certain features, etc. - you can do so by editing the `morphik.toml` file. 
+        
+        Morphik now uses a registered models approach, which allows you to define hundreds of different models in one place and reference them throughout your configuration. This makes it easy to mix and match models based on your needs (e.g., smaller models for simpler tasks). You can find more details about configuration [here](/configuration).
+
+        Morphik uses environment variables to manage secrets and API keys. In order to ensure that any pre-set keys are available to the server, copy the `.env.example` file to `.env`:
+
+        ```bash
+        cp .env.example .env
+        ```
+
+        In case you're using external models like OpenAI or Anthropic Claude, you'll need to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store.
+
+        ```bash
+        python quick_setup.py
+        ```
+      </Step>
+
+      <Step title="Launching the Server">
+        You are now ready to launch the Morphik server\! Just run the following command to start the server.
+
+        ```bash
+        python start_server.py
+        ```
+
+        You should see the following output:
+
+        ```
+        INFO:     Started server process [15169]
+        INFO:     Waiting for application startup.
+        INFO:     Application startup complete.
+        INFO:     Uvicorn running on http://localhost:8000 (Press CTRL+C to quit)
+        ```
+
+        This means that the server is running on `http://localhost:8000`. You can now interact with the server using the API or the Python SDK.
+      </Step>
+    </Steps>
   </Tab>
-  <Tab title="Docker">
+  <Tab title="Self Host - Docker (Advanced)">
     ## Using Docker
 
     Morphik provides a streamlined Docker-based setup that includes all necessary components: the core API, PostgreSQL with pgvector, and Ollama for AI models.
@@ -471,6 +487,90 @@ description: "Setting Up the Morphik server"
        - Check disk space: `df -h`
   </Tab>
 </Tabs>
+
+
+## Using Morphik
+
+You can use Morphik via our Python SDK, our Rest API, via Morphik Console, or via MCP.
+
+<Tabs>
+  <Tab title="Python SDK">
+    <Steps>
+      <Step title="Create a virtual environment">
+        ```bash
+        python3.12 -m venv .venv
+        ```
+      </Step>
+      <Step title="Activate the virtual environment">
+        ```bash
+        source .venv/bin/activate
+        ```
+      </Step>
+      <Step title="Install the SDK">
+        ```bash
+        pip install morphik
+        ```
+      </Step>
+      <Step title="Ingest and Query your first file">
+      ```python
+      from morphik import Morphik
+
+      # Initialize the Morphik client
+      morphik = Morphik(uri="your-morphik-uri")
+      # Ingest a file
+      doc = morphik.ingest_file(file_path="super/complex/file.pdf")
+      doc.wait_for_completion()
+
+      # Query the file
+      response = morphik.query(query="What percentage of Morphik users are building something cool?")
+      print(response) # Responds with 100% :)
+      ```
+      </Step>
+    </Steps>
+    You can find our entire SDK documentation [here](/python-sdk/morphik).
+  </Tab>
+  <Tab title="Rest API">
+  <Steps>
+    <Step title="Extract your bearer token">
+      The bearer token can be extracted directly from your Morphik URI. The URI has the following format:
+      
+      `morphik://<app_name>:<bearer_token>@<host>`
+      
+      The middle part between the colon and the @ symbol is your bearer token.
+    </Step>
+    <Step title="Make API requests">
+      When making requests to the Morphik API, include your bearer token in the `Authorization` header:
+      
+      ```bash        
+        curl -X 'POST' 'https://api.morphik.ai/documents?skip=0&limit=10000' \
+        -H "Authorization: Bearer <your_bearer_token>"
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{}'
+      ```
+      
+      You can find our complete API reference [here](/api-reference/health-check).
+    </Step>
+  </Steps>
+  </Tab>
+  <Tab title="Morphik Console">
+    <Steps>
+      <Step title="Open Morphik Console for your App">
+      Click on the card with your app name on it. This should open the Morphik Console for your app.
+      </Step>
+      <Step title="Ingest a file">
+        To ingest a file, click the "Upload Document" button and select the file you want to ingest. You can choose to batch ingest files or also ingest text if you prefer. Once ingested, you can see the status of your document ingestion in the console. (If you didn't not put in a folder, you'll find it in the "All Documents" section.)
+      </Step>
+      <Step title="Using Morphk Agent">
+      Once your documents are ingested, you can navigate to the "Agent" tab in the sidebar, and start asking questions about your documents! The agent will show you the tool calls that it makes, alongside the results and a final response. You can use for long-lived tasks, or for more complex queries that require multiple steps to complete.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="MCP">
+  You can find more information about MCP [here](/using-morphik/mcp).
+  </Tab>
+</Tabs>
+
 
 ## Community Support
 
