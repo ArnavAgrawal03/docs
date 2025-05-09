@@ -1,0 +1,80 @@
+---
+title: 'Morphik Management API'
+description: 'Learn how to provision and manage isolated Morphik application environments.'
+---
+
+The Morphik Management API provides endpoints for administering your Morphik instance, particularly for provisioning and managing isolated application environments. These features are typically available for Enterprise and Teams plan customers.
+
+## Application Provisioning
+
+Morphik allows you to create dedicated, isolated environments for different projects or tenants. Each "app" consists of its own Postgres database and separate storage, ensuring data segregation and independent resource management.
+
+### Create a New Application
+
+You can provision a new application environment using the following endpoint. This is an enterprise feature and requires appropriate authentication and plan eligibility.
+
+<Note>
+This endpoint is available for users on the **Teams** or **Enterprise** plans. Teams plan users are subject to an application limit.
+</Note>
+
+**POST** `/ee/apps`
+
+This endpoint provisions a brand-new Postgres database and separate storage, configuring it as a Morphik application. The authenticated user making the request becomes the owner of the provisioned app.
+
+#### Authentication
+
+Requires a valid JWT Bearer token in the `Authorization` header. You can use a token obtained by authenticating against any Morphik API URI.
+
+#### Request Body
+
+<Properties>
+  <Property name="app_name" type="string" required={true}>
+    A human-friendly name for the application you want to create.
+  </Property>
+  <Property name="region" type="string">
+    Optional. The geographical region identifier where the database should be provisioned (e.g., `aws-us-east-1`). Defaults to the primary configured region if not specified.
+  </Property>
+</Properties>
+
+**Example Request (cURL):**
+
+```bash
+curl -X POST \
+  http://your-company.morphik.ai/ee/apps \
+  -H 'Authorization: Bearer YOUR_JWT_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "app_name": "My New Marketing App",
+    "region": "aws-us-west-2"
+  }'
+```
+
+#### Response Body (201 Created)
+
+<Properties>
+  <Property name="app_id" type="string">
+    The unique identifier for the newly provisioned application.
+  </Property>
+  <Property name="app_name" type="string">
+    The name of the application, as provided in the request.
+  </Property>
+  <Property name="morphik_uri" type="string">
+    The direct connection URI for the application's dedicated PostgreSQL data backend. This URI includes the `app_id` and is primarily for internal use by Morphik services or for direct database diagnostics. It is **not** the endpoint for making standard Morphik API calls to your application.
+  </Property>
+  <Property name="status" type="string">
+    The provisioning status of the application (e.g., "Provisioned", "Pending").
+  </Property>
+</Properties>
+
+**Example Response:**
+
+```json
+{
+  "app_id": "app_abc123xyz789",
+  "app_name": "My New Marketing App",
+  "morphik_uri": "morphik://{name}:{token}@your-company.morphik.ai",
+  "status": "Provisioned"
+}
+```
+
+That's it! After receiving this response, you can interact with your newly provisioned and isolated application. To make API requests, just use the returned uri.

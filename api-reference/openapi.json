@@ -43,6 +43,116 @@
         }
       }
     },
+    "/ee/create_app": {
+      "post": {
+        "tags": [
+          "Enterprise"
+        ],
+        "summary": "Create App",
+        "description": "Generate a cloud URI for *request.app_id* owned by the calling user.\n\nThe *user_id* is derived from the bearer token.  The caller can therefore\nnot create applications for *other* users unless their token carries the\n``admin`` permission (mirroring the community behaviour).",
+        "operationId": "create_app_ee_create_app_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateUriEERequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Create App Ee Create App Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/apps": {
+      "post": {
+        "tags": [
+          "Enterprise"
+        ],
+        "summary": "Create App Route",
+        "description": "Provision a **brand-new** Neon database for *request.app_name*.\n\nThe caller must be authenticated to the dedicated Morphik instance.  The\nauthenticated user (represented by the JWT's *user_id*) becomes the owner\nof the provisioned app.",
+        "operationId": "create_app_route_ee_apps_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAppResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ingest/text": {
       "post": {
         "summary": "Ingest Text",
@@ -212,7 +322,7 @@
     "/retrieve/chunks": {
       "post": {
         "summary": "Retrieve Chunks",
-        "description": "Retrieve relevant chunks.\n\nArgs:\n    request: RetrieveRequest containing:\n        - query: Search query text\n        - filters: Optional metadata filters\n        - k: Number of results (default: 4)\n        - min_score: Minimum similarity threshold (default: 0.0)\n        - use_reranking: Whether to use reranking\n        - use_colpali: Whether to use ColPali-style embedding model\n        - folder_name: Optional folder to scope the search to\n        - end_user_id: Optional end-user ID to scope the search to\n    auth: Authentication context\n\nReturns:\n    List[ChunkResult]: List of relevant chunks",
+        "description": "Retrieve relevant chunks using either a text query or an image query.\nExpects multipart/form-data.\n\nArgs (sent as multipart/form-data):\n    auth: Authentication context.\n    query_text: Search query text.\n    filters: Optional metadata filters.\n    k: Number of results (default: 4).\n    min_score: Minimum similarity threshold (default: 0.0).\n    use_reranking: Whether to use reranking.\n    use_colpali: Whether to use ColPali-style embedding model.\n    folder_name: Optional folder to scope the search to.\n    end_user_id: Optional end-user ID to scope the search to.\n    show_heatmaps: Whether to generate and include similarity heatmaps.\n    query_image: Image file (JPG/PNG) to be used as a query.\n\nReturns:\n    List[ChunkResult]: List of relevant chunks.",
         "operationId": "retrieve_chunks_retrieve_chunks_post",
         "parameters": [
           {
@@ -226,11 +336,10 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/RetrieveRequest"
+                "$ref": "#/components/schemas/Body_retrieve_chunks_retrieve_chunks_post"
               }
             }
           }
@@ -477,6 +586,57 @@
         }
       }
     },
+    "/agent": {
+      "post": {
+        "summary": "Agent Query",
+        "description": "Process a natural language query using the MorphikAgent and return the response.",
+        "operationId": "agent_query_agent_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentQueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Agent Query Agent Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/documents": {
       "post": {
         "summary": "List Documents",
@@ -501,22 +661,6 @@
               "type": "integer",
               "default": 10000,
               "title": "Limit"
-            }
-          },
-          {
-            "name": "folder_name",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Folder Name"
             }
           },
           {
@@ -549,15 +693,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "anyOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Filters"
+                "$ref": "#/components/schemas/Body_list_documents_documents_post"
               }
             }
           }
@@ -752,22 +888,6 @@
             }
           },
           {
-            "name": "folder_name",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Folder Name"
-            }
-          },
-          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -793,6 +913,29 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Folder Name"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1816,22 +1959,6 @@
             }
           },
           {
-            "name": "folder_name",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Folder Name"
-            }
-          },
-          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -1857,6 +1984,29 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Folder Name"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1888,22 +2038,6 @@
         "operationId": "list_graphs_graphs_get",
         "parameters": [
           {
-            "name": "folder_name",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Folder Name"
-            }
-          },
-          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -1929,6 +2063,29 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Folder Name"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2184,6 +2341,21 @@
   },
   "components": {
     "schemas": {
+      "AgentQueryRequest": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query",
+            "description": "Natural language query for the Morphik agent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "AgentQueryRequest",
+        "description": "Request model for agent queries"
+      },
       "BaseModel": {
         "properties": {
 
@@ -2384,6 +2556,161 @@
         ],
         "title": "Body_ingest_file_ingest_file_post"
       },
+      "Body_list_documents_documents_post": {
+        "properties": {
+          "filters": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filters"
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name"
+          }
+        },
+        "type": "object",
+        "title": "Body_list_documents_documents_post"
+      },
+      "Body_retrieve_chunks_retrieve_chunks_post": {
+        "properties": {
+          "query_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Text",
+            "description": "Text query for retrieval"
+          },
+          "filters": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filters",
+            "description": "Optional metadata filters (JSON string)"
+          },
+          "k": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "title": "K",
+            "description": "Number of results",
+            "default": 4
+          },
+          "min_score": {
+            "type": "number",
+            "title": "Min Score",
+            "description": "Minimum similarity threshold",
+            "default": 0
+          },
+          "use_reranking": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Use Reranking",
+            "description": "Whether to use reranking (default: from config)"
+          },
+          "use_colpali": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Use Colpali",
+            "description": "Whether to use ColPali-style embedding model"
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name",
+            "description": "Optional folder scope. Can be multiple."
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id",
+            "description": "Optional end-user scope for the operation"
+          },
+          "show_heatmaps": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Show Heatmaps",
+            "description": "If true, generate similarity heatmaps for image chunks",
+            "default": false
+          },
+          "query_image": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Image",
+            "description": "Image query for retrieval (JPG/PNG)"
+          }
+        },
+        "type": "object",
+        "title": "Body_retrieve_chunks_retrieve_chunks_post"
+      },
       "Body_update_document_file_documents__document_id__update_file_post": {
         "properties": {
           "file": {
@@ -2460,6 +2787,20 @@
               }
             ],
             "title": "Download Url"
+          },
+          "heatmaps": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heatmaps"
           }
         },
         "type": "object",
@@ -2506,10 +2847,30 @@
       },
       "CompletionQueryRequest": {
         "properties": {
-          "query": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Query"
+          "query_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Text",
+            "description": "Text query for retrieval"
+          },
+          "query_image": {
+            "anyOf": [
+              {
+
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Image",
+            "description": "Image query for retrieval (e.g., FastAPI UploadFile). Will be processed into PILImage."
           },
           "filters": {
             "anyOf": [
@@ -2601,11 +2962,17 @@
                 "type": "string"
               },
               {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
                 "type": "null"
               }
             ],
             "title": "Folder Name",
-            "description": "Optional folder scope for the operation"
+            "description": "Optional folder scope for the operation. Accepts a single folder name or a list of folder names."
           },
           "end_user_id": {
             "anyOf": [
@@ -2618,6 +2985,19 @@
             ],
             "title": "End User Id",
             "description": "Optional end-user scope for the operation"
+          },
+          "show_heatmaps": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Show Heatmaps",
+            "description": "If true, the server will generate similarity heatmaps for image chunks using ColPali/Qwen models.",
+            "default": false
           },
           "max_tokens": {
             "anyOf": [
@@ -2669,9 +3049,6 @@
           }
         },
         "type": "object",
-        "required": [
-          "query"
-        ],
         "title": "CompletionQueryRequest",
         "description": "Request model for completion generation"
       },
@@ -2733,6 +3110,60 @@
         ],
         "title": "CompletionResponse",
         "description": "Response from completion generation"
+      },
+      "CreateAppRequest": {
+        "properties": {
+          "app_name": {
+            "type": "string",
+            "title": "App Name",
+            "description": "Human-friendly name of the application to create"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region",
+            "description": "Optional Neon region identifier (defaults to `aws-us-east-1`)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "app_name"
+        ],
+        "title": "CreateAppRequest"
+      },
+      "CreateAppResponse": {
+        "properties": {
+          "app_id": {
+            "type": "string",
+            "title": "App Id"
+          },
+          "app_name": {
+            "type": "string",
+            "title": "App Name"
+          },
+          "morphik_uri": {
+            "type": "string",
+            "title": "Morphik Uri"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "app_id",
+          "app_name",
+          "morphik_uri",
+          "status"
+        ],
+        "title": "CreateAppResponse"
       },
       "CreateGraphRequest": {
         "properties": {
@@ -2796,11 +3227,17 @@
                 "type": "string"
               },
               {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
                 "type": "null"
               }
             ],
             "title": "Folder Name",
-            "description": "Optional folder scope for the operation"
+            "description": "Optional folder scope for the operation. Accepts a single folder name or a list of folder names."
           },
           "end_user_id": {
             "anyOf": [
@@ -3229,6 +3666,33 @@
         "title": "FolderCreate",
         "description": "Request model for folder creation"
       },
+      "GenerateUriEERequest": {
+        "properties": {
+          "app_id": {
+            "type": "string",
+            "title": "App Id",
+            "description": "ID of the application"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name of the application"
+          },
+          "expiry_days": {
+            "type": "integer",
+            "title": "Expiry Days",
+            "description": "Token validity in days",
+            "default": 30
+          }
+        },
+        "type": "object",
+        "required": [
+          "app_id",
+          "name"
+        ],
+        "title": "GenerateUriEERequest",
+        "description": "Request body for the EE *generate_uri* endpoint (no ``user_id`` field)."
+      },
       "GenerateUriRequest": {
         "properties": {
           "app_id": {
@@ -3584,10 +4048,30 @@
       },
       "RetrieveRequest": {
         "properties": {
-          "query": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Query"
+          "query_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Text",
+            "description": "Text query for retrieval"
+          },
+          "query_image": {
+            "anyOf": [
+              {
+
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Image",
+            "description": "Image query for retrieval (e.g., FastAPI UploadFile). Will be processed into PILImage."
           },
           "filters": {
             "anyOf": [
@@ -3679,11 +4163,17 @@
                 "type": "string"
               },
               {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
                 "type": "null"
               }
             ],
             "title": "Folder Name",
-            "description": "Optional folder scope for the operation"
+            "description": "Optional folder scope for the operation. Accepts a single folder name or a list of folder names."
           },
           "end_user_id": {
             "anyOf": [
@@ -3696,12 +4186,22 @@
             ],
             "title": "End User Id",
             "description": "Optional end-user scope for the operation"
+          },
+          "show_heatmaps": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Show Heatmaps",
+            "description": "If true, the server will generate similarity heatmaps for image chunks using ColPali/Qwen models.",
+            "default": false
           }
         },
         "type": "object",
-        "required": [
-          "query"
-        ],
         "title": "RetrieveRequest",
         "description": "Base retrieve request model"
       },
@@ -3819,11 +4319,17 @@
                 "type": "string"
               },
               {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
                 "type": "null"
               }
             ],
             "title": "Folder Name",
-            "description": "Optional folder scope for the operation"
+            "description": "Optional folder scope for the operation. Accepts a single folder name or a list of folder names."
           },
           "end_user_id": {
             "anyOf": [

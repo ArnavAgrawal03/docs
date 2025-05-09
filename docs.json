@@ -48,6 +48,12 @@
             ]
           },
           {
+            "group": "Instance Management",
+            "pages": [
+              "api-reference/management-api"
+            ]
+          },
+          {
             "group": "Morphik Community",
             "pages": [
               "special-thanks"
