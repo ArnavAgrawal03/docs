@@ -322,7 +322,7 @@
     "/retrieve/chunks": {
       "post": {
         "summary": "Retrieve Chunks",
-        "description": "Retrieve relevant chunks using either a text query or an image query.\nExpects multipart/form-data.\n\nArgs (sent as multipart/form-data):\n    auth: Authentication context.\n    query_text: Search query text.\n    filters: Optional metadata filters.\n    k: Number of results (default: 4).\n    min_score: Minimum similarity threshold (default: 0.0).\n    use_reranking: Whether to use reranking.\n    use_colpali: Whether to use ColPali-style embedding model.\n    folder_name: Optional folder to scope the search to.\n    end_user_id: Optional end-user ID to scope the search to.\n    show_heatmaps: Whether to generate and include similarity heatmaps.\n    query_image: Image file (JPG/PNG) to be used as a query.\n\nReturns:\n    List[ChunkResult]: List of relevant chunks.",
+        "description": "Retrieve relevant chunks.\n\nArgs:\n    request: RetrieveRequest containing:\n        - query: Search query text\n        - filters: Optional metadata filters\n        - k: Number of results (default: 4)\n        - min_score: Minimum similarity threshold (default: 0.0)\n        - use_reranking: Whether to use reranking\n        - use_colpali: Whether to use ColPali-style embedding model\n        - folder_name: Optional folder to scope the search to\n        - end_user_id: Optional end-user ID to scope the search to\n    auth: Authentication context\n\nReturns:\n    List[ChunkResult]: List of relevant chunks",
         "operationId": "retrieve_chunks_retrieve_chunks_post",
         "parameters": [
           {
@@ -336,10 +336,11 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Body_retrieve_chunks_retrieve_chunks_post"
+                "$ref": "#/components/schemas/RetrieveRequest"
               }
             }
           }
@@ -1641,7 +1642,7 @@
     "/graph/create": {
       "post": {
         "summary": "Create Graph",
-        "description": "Create a graph from documents.\n\nThis endpoint extracts entities and relationships from documents\nmatching the specified filters or document IDs and creates a graph.\n\nArgs:\n    request: CreateGraphRequest containing:\n        - name: Name of the graph to create\n        - filters: Optional metadata filters to determine which documents to include\n        - documents: Optional list of specific document IDs to include\n        - prompt_overrides: Optional customizations for entity extraction and resolution prompts\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n\nReturns:\n    Graph: The created graph object",
+        "description": "Create a graph from documents **asynchronously**.\n\nInstead of blocking on the potentially slow entity/relationship extraction, we immediately\ncreate a placeholder graph with `status = \"processing\"`. A background task then fills in\nentities/relationships and marks the graph as completed.",
         "operationId": "create_graph_graph_create_post",
         "parameters": [
           {
@@ -2590,127 +2591,6 @@
         "type": "object",
         "title": "Body_list_documents_documents_post"
       },
-      "Body_retrieve_chunks_retrieve_chunks_post": {
-        "properties": {
-          "query_text": {
-            "anyOf": [
-              {
-                "type": "string",
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Query Text",
-            "description": "Text query for retrieval"
-          },
-          "filters": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Filters",
-            "description": "Optional metadata filters (JSON string)"
-          },
-          "k": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "title": "K",
-            "description": "Number of results",
-            "default": 4
-          },
-          "min_score": {
-            "type": "number",
-            "title": "Min Score",
-            "description": "Minimum similarity threshold",
-            "default": 0
-          },
-          "use_reranking": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Use Reranking",
-            "description": "Whether to use reranking (default: from config)"
-          },
-          "use_colpali": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Use Colpali",
-            "description": "Whether to use ColPali-style embedding model"
-          },
-          "folder_name": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Folder Name",
-            "description": "Optional folder scope. Can be multiple."
-          },
-          "end_user_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "End User Id",
-            "description": "Optional end-user scope for the operation"
-          },
-          "show_heatmaps": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Show Heatmaps",
-            "description": "If true, generate similarity heatmaps for image chunks",
-            "default": false
-          },
-          "query_image": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "binary"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Query Image",
-            "description": "Image query for retrieval (JPG/PNG)"
-          }
-        },
-        "type": "object",
-        "title": "Body_retrieve_chunks_retrieve_chunks_post"
-      },
       "Body_update_document_file_documents__document_id__update_file_post": {
         "properties": {
           "file": {
@@ -2787,20 +2667,6 @@
               }
             ],
             "title": "Download Url"
-          },
-          "heatmaps": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Heatmaps"
           }
         },
         "type": "object",
@@ -2847,30 +2713,10 @@
       },
       "CompletionQueryRequest": {
         "properties": {
-          "query_text": {
-            "anyOf": [
-              {
-                "type": "string",
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Query Text",
-            "description": "Text query for retrieval"
-          },
-          "query_image": {
-            "anyOf": [
-              {
-
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Query Image",
-            "description": "Image query for retrieval (e.g., FastAPI UploadFile). Will be processed into PILImage."
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Query"
           },
           "filters": {
             "anyOf": [
@@ -2986,19 +2832,6 @@
             "title": "End User Id",
             "description": "Optional end-user scope for the operation"
           },
-          "show_heatmaps": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Show Heatmaps",
-            "description": "If true, the server will generate similarity heatmaps for image chunks using ColPali/Qwen models.",
-            "default": false
-          },
           "max_tokens": {
             "anyOf": [
               {
@@ -3049,6 +2882,9 @@
           }
         },
         "type": "object",
+        "required": [
+          "query"
+        ],
         "title": "CompletionQueryRequest",
         "description": "Request model for completion generation"
       },
@@ -4048,30 +3884,10 @@
       },
       "RetrieveRequest": {
         "properties": {
-          "query_text": {
-            "anyOf": [
-              {
-                "type": "string",
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Query Text",
-            "description": "Text query for retrieval"
-          },
-          "query_image": {
-            "anyOf": [
-              {
-
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Query Image",
-            "description": "Image query for retrieval (e.g., FastAPI UploadFile). Will be processed into PILImage."
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Query"
           },
           "filters": {
             "anyOf": [
@@ -4186,22 +4002,12 @@
             ],
             "title": "End User Id",
             "description": "Optional end-user scope for the operation"
-          },
-          "show_heatmaps": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Show Heatmaps",
-            "description": "If true, the server will generate similarity heatmaps for image chunks using ColPali/Qwen models.",
-            "default": false
           }
         },
         "type": "object",
+        "required": [
+          "query"
+        ],
         "title": "RetrieveRequest",
         "description": "Base retrieve request model"
       },

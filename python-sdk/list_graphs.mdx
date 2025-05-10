@@ -37,7 +37,11 @@ None
     graphs = db.list_graphs()
     
     for graph in graphs:
-        print(f"Graph: {graph.name}, Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}")
+        status = graph.status or "completed"
+        print(
+            f"Graph: {graph.name} (status={status}), "
+            f"Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}",
+        )
         
     # Find the most recent graph
     latest_graph = max(graphs, key=lambda g: g.updated_at)
@@ -53,7 +57,11 @@ None
         graphs = await db.list_graphs()
         
         for graph in graphs:
-            print(f"Graph: {graph.name}, Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}")
+            status = graph.status or "completed"
+            print(
+                f"Graph: {graph.name} (status={status}), "
+                f"Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}",
+            )
         
         # Find the most recent graph
         latest_graph = max(graphs, key=lambda g: g.updated_at)

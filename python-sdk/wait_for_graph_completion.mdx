@@ -1,0 +1,74 @@
+---
+title: "wait_for_graph_completion"
+description: "Block until a graph finishes processing"
+---
+
+When you call `create_graph()` the server immediately returns a **placeholder**
+`Graph` with `system_metadata["status"] = "processing"`.  Use
+`wait_for_graph_completion()` to block until processing is done (or fails).
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def wait_for_graph_completion(
+        graph_name: str,
+        timeout_seconds: int = 300,
+        check_interval_seconds: int = 5,
+    ) -> Graph
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def wait_for_graph_completion(
+        graph_name: str,
+        timeout_seconds: int = 300,
+        check_interval_seconds: int = 5,
+    ) -> Graph
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `graph_name` (str): Name of the graph to monitor.
+- `timeout_seconds` (int, default `300`): Maximum seconds to wait.
+- `check_interval_seconds` (int, default `5`): Seconds between status checks.
+
+## Returns
+
+- `Graph`: The completed graph object.  Raises `TimeoutError` if the graph does
+  not finish within the timeout or `RuntimeError` if processing fails.
+
+## Example (sync)
+
+```python
+from morphik import Morphik
+import time
+
+db = Morphik()
+
+graph = db.create_graph(name="research_graph", filters={"category": "research"})
+print("Submitted graph creation...")
+
+# Block until ready
+completed = db.wait_for_graph_completion("research_graph")
+print("Graph ready!", len(completed.entities), "entities")
+```
+
+## Example (async)
+
+```python
+from morphik import AsyncMorphik
+import asyncio
+
+async def main():
+    async with AsyncMorphik() as db:
+        graph = await db.create_graph(
+            name="research_graph", filters={"category": "research"}
+        )
+        print("Submitted graph creation...")
+        completed = await db.wait_for_graph_completion("research_graph")
+        print("Graph ready!", len(completed.entities), "entities")
+
+asyncio.run(main())
+``` 

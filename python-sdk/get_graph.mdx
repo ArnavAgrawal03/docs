@@ -22,7 +22,10 @@ description: "Get a graph by name"
 
 ## Returns
 
-- `Graph`: The requested graph object
+- `Graph`: The requested graph object.  If the graph is still building it will
+  have `system_metadata["status"] == "processing"`.  Use the convenience
+  helpers `graph.is_processing`, `graph.is_completed`, `graph.error`, or the
+  client-level `wait_for_graph_completion()` to monitor progress.
 
 ## Examples
 
@@ -36,6 +39,11 @@ description: "Get a graph by name"
     # Get a graph by name
     graph = db.get_graph("finance_graph")
     
+    if graph.is_processing:
+        print("Graph still processing, waiting...")
+        graph = db.wait_for_graph_completion("finance_graph")
+    
+    # Now safe to access entities and relationships
     print(f"Graph has {len(graph.entities)} entities and {len(graph.relationships)} relationships")
     
     # Access entities and relationships
@@ -57,6 +65,11 @@ description: "Get a graph by name"
         # Get a graph by name
         graph = await db.get_graph("finance_graph")
         
+        if graph.is_processing:
+            print("Graph still processing, waiting...")
+            graph = await db.wait_for_graph_completion("finance_graph")
+        
+        # Now safe to access entities and relationships
         print(f"Graph has {len(graph.entities)} entities and {len(graph.relationships)} relationships")
         
         # Access entities and relationships

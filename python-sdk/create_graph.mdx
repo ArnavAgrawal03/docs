@@ -35,7 +35,14 @@ description: "Create a graph from documents"
 
 ## Returns
 
-- `graph` (Graph): The created graph object containing entities and relationships
+Calling `create_graph` now returns a *placeholder* `Graph` immediately.
+
+- `graph` (Graph): Graph stub with `system_metadata["status"] = "processing"`.
+  Entities and relationships will be empty until processing completes.
+
+Use `db.wait_for_graph_completion("<name>")` (sync) or
+`await db.wait_for_graph_completion("<name>")` (async) to block until the
+graph is done, or poll `graph.is_processing` / `graph.is_completed`.
 
 ## Examples
 
@@ -46,11 +53,20 @@ description: "Create a graph from documents"
     
     db = Morphik()
     
-    # Create a graph from documents with category="research"
+    # Start graph creation – returns immediately with status "processing"
     graph = db.create_graph(
         name="research_graph",
-        filters={"category": "research"}
+        filters={"category": "research"},
     )
+
+    # Option 1: Block until finished
+    graph = db.wait_for_graph_completion("research_graph")
+
+    # Option 2: Poll periodically
+    while graph.is_processing:
+        time.sleep(10)
+        graph = db.get_graph("research_graph")
+    print("Entities:", len(graph.entities))
     
     # Create a graph from specific documents
     graph = db.create_graph(
@@ -107,6 +123,17 @@ description: "Create a graph from documents"
     from morphik import AsyncMorphik
     
     async with AsyncMorphik() as db:
+        # Start graph creation (returns quickly)
+        graph = await db.create_graph(
+            name="research_graph",
+            filters={"category": "research"},
+        )
+
+        # Wait for completion
+        graph = await db.wait_for_graph_completion("research_graph")
+
+        print("Entities:", len(graph.entities))
+
         # Create a graph from documents with category="research"
         graph = await db.create_graph(
             name="research_graph",
