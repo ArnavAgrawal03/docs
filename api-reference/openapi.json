@@ -1,48 +1,10 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Morphik API",
+    "title": "FastAPI",
     "version": "0.1.0"
   },
   "paths": {
-    "/health": {
-      "get": {
-        "summary": "Health Check",
-        "description": "Basic health check endpoint.",
-        "operationId": "health_check_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/health/ready": {
-      "get": {
-        "summary": "Readiness Check",
-        "description": "Readiness check that verifies the application is initialized.",
-        "operationId": "readiness_check_health_ready_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/ee/create_app": {
       "post": {
         "tags": [
@@ -136,6 +98,463 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateAppResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/connectors/{connector_type}/auth_status": {
+      "get": {
+        "tags": [
+          "EE - Connectors"
+        ],
+        "summary": "Get Auth Status For Connector",
+        "description": "Checks the current authentication status for the given connector type.",
+        "operationId": "get_auth_status_for_connector_ee_connectors__connector_type__auth_status_get",
+        "parameters": [
+          {
+            "name": "connector_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connector Type"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorAuthStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/connectors/{connector_type}/auth/initiate_url": {
+      "get": {
+        "tags": [
+          "EE - Connectors"
+        ],
+        "summary": "Get Initiate Auth Url",
+        "description": "Return the provider's *authorization_url* for the given connector.\n\nThe method mirrors the logic of the `/auth/initiate` endpoint but sends a\nJSON payload instead of a redirect so that browsers can stay on the same\norigin until they intentionally navigate away.",
+        "operationId": "get_initiate_auth_url_ee_connectors__connector_type__auth_initiate_url_get",
+        "parameters": [
+          {
+            "name": "connector_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connector Type"
+            }
+          },
+          {
+            "name": "app_redirect_uri",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "App Redirect Uri"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Get Initiate Auth Url Ee Connectors  Connector Type  Auth Initiate Url Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/connectors/{connector_type}/oauth2callback": {
+      "get": {
+        "tags": [
+          "EE - Connectors"
+        ],
+        "summary": "Connector Oauth Callback",
+        "description": "Handles the OAuth 2.0 callback from the authentication provider.\nValidates state, finalizes authentication, and stores credentials.",
+        "operationId": "connector_oauth_callback_ee_connectors__connector_type__oauth2callback_get",
+        "parameters": [
+          {
+            "name": "connector_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connector Type"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Code"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Error"
+            }
+          },
+          {
+            "name": "error_description",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Error Description"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/connectors/{connector_type}/files": {
+      "get": {
+        "tags": [
+          "EE - Connectors"
+        ],
+        "summary": "List Files For Connector",
+        "description": "Lists files and folders from the specified connector.",
+        "operationId": "list_files_for_connector_ee_connectors__connector_type__files_get",
+        "parameters": [
+          {
+            "name": "connector_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connector Type"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Path"
+            }
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page Token"
+            }
+          },
+          {
+            "name": "q_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q Filter"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/connectors/{connector_type}/ingest": {
+      "post": {
+        "tags": [
+          "EE - Connectors"
+        ],
+        "summary": "Ingest File From Connector",
+        "description": "Downloads a file from the connector and ingests it into Morphik via DocumentService.",
+        "operationId": "ingest_file_from_connector_ee_connectors__connector_type__ingest_post",
+        "parameters": [
+          {
+            "name": "connector_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connector Type"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestFromConnectorRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Ingest File From Connector Ee Connectors  Connector Type  Ingest Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/connectors/{connector_type}/disconnect": {
+      "post": {
+        "tags": [
+          "EE - Connectors"
+        ],
+        "summary": "Disconnect From Connector",
+        "description": "Disconnects the user from the specified connector by removing stored credentials.",
+        "operationId": "disconnect_from_connector_ee_connectors__connector_type__disconnect_post",
+        "parameters": [
+          {
+            "name": "connector_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connector Type"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Disconnect From Connector Ee Connectors  Connector Type  Disconnect Post"
                 }
               }
             }
@@ -1830,6 +2249,55 @@
         }
       }
     },
+    "/folders/{folder_name}": {
+      "delete": {
+        "summary": "Delete Folder",
+        "description": "Delete a folder and all associated documents.\n\nArgs:\n    folder_name: Name of the folder to delete\n    auth: Authentication context (must have write access to the folder)\n\nReturns:\n    Deletion status",
+        "operationId": "delete_folder_folders__folder_name__delete",
+        "parameters": [
+          {
+            "name": "folder_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Folder Name"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/folders/{folder_id}/documents/{document_id}": {
       "post": {
         "summary": "Add Document To Folder",
@@ -2947,6 +3415,97 @@
         "title": "CompletionResponse",
         "description": "Response from completion generation"
       },
+      "ConnectorAuthStatus": {
+        "properties": {
+          "is_authenticated": {
+            "type": "boolean",
+            "title": "Is Authenticated"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "auth_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auth Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_authenticated"
+        ],
+        "title": "ConnectorAuthStatus"
+      },
+      "ConnectorFile": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "is_folder": {
+            "type": "boolean",
+            "title": "Is Folder",
+            "default": false
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "modified_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modified Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ConnectorFile"
+      },
       "CreateAppRequest": {
         "properties": {
           "app_name": {
@@ -3128,9 +3687,6 @@
             "title": "Metadata"
           },
           "storage_info": {
-            "additionalProperties": {
-              "type": "string"
-            },
             "type": "object",
             "title": "Storage Info"
           },
@@ -3412,6 +3968,33 @@
         "title": "EntityResolutionPromptOverride",
         "description": "Configuration for customizing entity resolution prompts.\n\nEntity resolution identifies and groups variant forms of the same entity.\nThis override allows you to customize how this process works by providing\na custom prompt template and/or domain-specific examples.\n\nIf only examples are provided (without a prompt_template), they will be\nincorporated into the default prompt. If only prompt_template is provided,\nit will be used with default examples (if any).\n\nRequired placeholders:\n- {entities_str}: Will be replaced with the extracted entities\n- {examples_json}: Will be replaced with JSON-formatted examples of entity resolution groups\n\nExample prompt template:\n```\nI have extracted the following entities:\n\n{entities_str}\n\nBelow are examples of how different entity references can be grouped together:\n\n{examples_json}\n\nGroup the above entities by resolving which mentions refer to the same entity.\nReturn the results in JSON format.\n```"
       },
+      "FileListResponse": {
+        "properties": {
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorFile"
+            },
+            "type": "array",
+            "title": "Files"
+          },
+          "next_page_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Page Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "files"
+        ],
+        "title": "FileListResponse"
+      },
       "Folder": {
         "properties": {
           "id": {
@@ -3689,6 +4272,66 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "IngestFromConnectorRequest": {
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "title": "File Id"
+          },
+          "morphik_folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Morphik Folder Name"
+          },
+          "morphik_end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Morphik End User Id"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "rules": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "title": "IngestFromConnectorRequest"
       },
       "IngestTextRequest": {
         "properties": {
