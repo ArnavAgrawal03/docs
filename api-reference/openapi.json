@@ -113,6 +113,58 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Enterprise"
+        ],
+        "summary": "Delete App Route",
+        "description": "Destroy the Neon project and metadata associated with *app_name*.\n\nOnly the owner of the application (identified via *auth.user_id*) may\nperform this destructive action.",
+        "operationId": "delete_app_route_ee_apps_delete",
+        "parameters": [
+          {
+            "name": "app_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Name of the application to delete",
+              "title": "App Name"
+            },
+            "description": "Name of the application to delete"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NukeAppResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/ee/connectors/{connector_type}/auth_status": {
@@ -501,6 +553,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Ingest File From Connector Ee Connectors  Connector Type  Ingest Post"
                 }
               }
@@ -554,6 +607,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Disconnect From Connector Ee Connectors  Connector Type  Disconnect Post"
                 }
               }
@@ -868,6 +922,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "additionalProperties": true,
                 "title": "Request"
               }
             }
@@ -923,6 +978,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "additionalProperties": true,
                 "title": "Request"
               }
             }
@@ -1039,6 +1095,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Agent Query Agent Post"
                 }
               }
@@ -1274,6 +1331,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Get Document Status Documents  Document Id  Status Get"
                 }
               }
@@ -1555,6 +1613,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "additionalProperties": true,
                 "title": "Metadata"
               }
             }
@@ -1701,7 +1760,8 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object"
+                    "type": "object",
+                    "additionalProperties": true
                   },
                   "title": "Response Get Recent Usage Usage Recent Get"
                 }
@@ -1780,6 +1840,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Create Cache Cache Create Post"
                 }
               }
@@ -1830,6 +1891,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Get Cache Cache  Name  Get"
                 }
               }
@@ -2806,6 +2868,59 @@
           }
         }
       }
+    },
+    "/cloud/apps": {
+      "delete": {
+        "summary": "Delete Cloud App",
+        "description": "Delete *all* resources associated with *app_name* for the calling user.\n\nThis removes:\n• All documents linked to the application's ``app_id`` (includes chunks & S3\n  via existing delete_document flow).\n• The *apps* table entry.\n• The reference in *user_limits.app_ids*.",
+        "operationId": "delete_cloud_app_cloud_apps_delete",
+        "parameters": [
+          {
+            "name": "app_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Name of the application to delete",
+              "title": "App Name"
+            },
+            "description": "Name of the application to delete"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Delete Cloud App Cloud Apps Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2937,6 +3052,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -3030,6 +3146,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -3107,6 +3224,7 @@
             "title": "Chunk Number"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -3189,6 +3307,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -3339,6 +3458,7 @@
 
               },
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -3398,6 +3518,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -3570,6 +3691,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -3683,10 +3805,12 @@
             "title": "Filename"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "storage_info": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Storage Info"
           },
@@ -3698,10 +3822,12 @@
             "title": "Storage Files"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
           "additional_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Additional Metadata"
           },
@@ -3777,6 +3903,7 @@
             "title": "Document Id"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -3784,6 +3911,7 @@
             "$ref": "#/components/schemas/DocumentContent"
           },
           "additional_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Additional Metadata"
           }
@@ -3814,6 +3942,7 @@
             "title": "Type"
           },
           "properties": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Properties"
           },
@@ -3858,6 +3987,7 @@
           "properties": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4031,6 +4161,7 @@
             "title": "Document Ids"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
@@ -4046,6 +4177,7 @@
           },
           "rules": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -4170,10 +4302,12 @@
             "title": "Relationships"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
@@ -4187,6 +4321,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4304,6 +4439,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4316,6 +4452,7 @@
             "anyOf": [
               {
                 "items": {
+                  "additionalProperties": true,
                   "type": "object"
                 },
                 "type": "array"
@@ -4351,11 +4488,13 @@
             "title": "Filename"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "rules": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -4412,6 +4551,7 @@
             "default": "metadata_extraction"
           },
           "schema": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Schema"
           }
@@ -4419,6 +4559,24 @@
         "type": "object",
         "title": "MetadataExtractionRuleRequest",
         "description": "Request model for metadata extraction rule"
+      },
+      "NukeAppResponse": {
+        "properties": {
+          "app_name": {
+            "type": "string",
+            "title": "App Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "deleted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "app_name"
+        ],
+        "title": "NukeAppResponse"
       },
       "QueryPromptOverride": {
         "properties": {
@@ -4535,6 +4693,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4727,6 +4886,7 @@
           "additional_filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
