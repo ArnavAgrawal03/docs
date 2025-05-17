@@ -5,6 +5,25 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/ping": {
+      "get": {
+        "summary": "Ping Health",
+        "description": "Simple health check endpoint that returns 200 OK.",
+        "operationId": "ping_health_ping_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ee/create_app": {
       "post": {
         "tags": [
@@ -682,22 +701,6 @@
         "description": "Ingest a file document asynchronously.\n\nArgs:\n    file: File to ingest\n    metadata: JSON string of metadata\n    rules: JSON string of rules list. Each rule should be either:\n           - MetadataExtractionRule: {\"type\": \"metadata_extraction\", \"schema\": {...}}\n           - NaturalLanguageRule: {\"type\": \"natural_language\", \"prompt\": \"...\"}\n    auth: Authentication context\n    use_colpali: Whether to use ColPali embedding model\n    folder_name: Optional folder to scope the document to\n    end_user_id: Optional end-user ID to scope the document to\n    redis: Redis connection pool for background tasks\n\nReturns:\n    Document with processing status that can be used to check progress",
         "operationId": "ingest_file_ingest_file_post",
         "parameters": [
-          {
-            "name": "use_colpali",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Use Colpali"
-            }
-          },
           {
             "name": "authorization",
             "in": "header",
@@ -1520,22 +1523,6 @@
             "schema": {
               "type": "string",
               "title": "Document Id"
-            }
-          },
-          {
-            "name": "use_colpali",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Use Colpali"
             }
           },
           {
@@ -3112,6 +3099,17 @@
             "title": "Rules",
             "default": "[]"
           },
+          "use_colpali": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Use Colpali"
+          },
           "folder_name": {
             "anyOf": [
               {
@@ -3197,6 +3195,17 @@
             "type": "string",
             "title": "Update Strategy",
             "default": "add"
+          },
+          "use_colpali": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Use Colpali"
           }
         },
         "type": "object",
