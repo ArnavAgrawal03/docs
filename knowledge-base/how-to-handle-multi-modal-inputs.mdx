@@ -1,0 +1,18 @@
+---
+title: 'How do I handle multi-modal inputs?'
+description: 'Combining text, images, and other data types in a search system'
+---
+
+Modern applications often need to search across different data types like PDFs, images, and transcribed audio. Managing those sources separately can be cumbersome.
+
+Morphik accepts multiple modalities out of the box, storing them in a unified index so you can search across all your data with one query. Simply ingest each item with `ingest_file` or `ingest_text`:
+
+```python
+from morphik import Morphik
+
+db = Morphik()
+db.ingest_file("diagram.png")
+db.ingest_text("README.md")
+
+results = db.retrieve_docs(query="project overview")
+```

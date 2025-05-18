@@ -1,0 +1,16 @@
+---
+title: 'How should I chunk my documents?'
+description: 'Guidance on splitting data for optimal retrieval'
+---
+
+Choosing an effective chunking strategy balances context length with retrieval precision. Overly large chunks may dilute relevance, while tiny chunks can miss important context.
+
+Morphik lets you control chunk sizes in your `morphik.toml` configuration. Tweak `parser.chunk_size` and `parser.chunk_overlap` to balance context and recall:
+
+```toml
+[parser]
+chunk_size = 1000
+chunk_overlap = 200
+```
+
+Re-ingest documents after updating these settings to apply the new rules.

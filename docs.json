@@ -147,6 +147,21 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Knowledge Base",
+        "groups": [
+          {
+            "group": "FAQs",
+            "pages": [
+              "knowledge-base/how-do-i-set-up-rag",
+              "knowledge-base/how-to-perform-search-over-documents",
+              "knowledge-base/how-to-improve-retrieval-accuracy",
+              "knowledge-base/how-to-manage-document-chunking",
+              "knowledge-base/how-to-handle-multi-modal-inputs"
+            ]
+          }
+        ]
       }
     ]
   },
