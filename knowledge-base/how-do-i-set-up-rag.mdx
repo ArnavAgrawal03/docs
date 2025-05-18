@@ -1,0 +1,26 @@
+---
+title: 'How do I set up RAG?'
+description: 'Overview of building a retrieval augmented generation workflow'
+---
+
+Retrieval Augmented Generation (RAG) combines search with language models to provide contextually rich responses. A typical setup involves:
+
+1. Ingesting your documents and generating embeddings.
+2. Storing those embeddings in a vector database.
+3. Retrieving relevant chunks based on user queries.
+4. Passing the retrieved context to your language model for generation.
+
+Morphik streamlines these steps by providing ingestion utilities, vector storage, and easy retrieval APIs so you can focus on building your application.
+
+Here is a minimal example using the Python SDK:
+
+```python
+from morphik import Morphik
+
+client = Morphik()
+client.ingest_text("docs/")
+client.create_cache(name="rag-cache", model="llama2", docs=["docs/"])
+results = client.cached_search("rag-cache", query="What is RAG?")
+```
+
+Refer to [ingest_text](/python-sdk/batch_get_documents) and [create_cache](/python-sdk/create_cache) in the docs for detailed parameters.

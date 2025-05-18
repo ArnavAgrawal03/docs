@@ -1,0 +1,31 @@
+---
+title: 'How do I build a chatbot with my data?'
+description: 'Steps to create a retrieval-based assistant using Morphik'
+---
+
+Morphik makes it easy to expose your content through a conversational interface. A typical workflow is:
+
+1. **Ingest** your documents using the Python SDK:
+
+```python
+from morphik import Morphik
+
+client = Morphik()
+client.ingest_text("docs/")
+```
+
+2. **Create a cache** so retrieval can be fast:
+
+```python
+client.create_cache(name="chatbot-cache", model="llama2", docs=["docs/"])
+```
+
+3. **Query the cache** within your chat application:
+
+```python
+results = client.cached_search("chatbot-cache", query="How do I get started?")
+```
+
+See the [create_cache](/python-sdk/create_cache) and [cached_search](/python-sdk/batch_get_documents) docs for more details on these API calls.
+
+Once you retrieve relevant context, pass it to your favorite LLM to generate a response.

@@ -1,0 +1,20 @@
+---
+title: 'How do I perform search over documents?'
+description: 'Techniques for searching document collections efficiently'
+---
+
+Effective document search relies on representing your data in a way that captures meaning. Common approaches include keyword search, vector similarity search, and semantic graph traversal. 
+
+With Morphik, you can ingest text, images, and other modalities, then leverage its built-in vector search and knowledge graph capabilities to quickly find the most relevant information.
+
+Example search using the Python SDK:
+
+```python
+from morphik import Morphik
+
+client = Morphik()
+client.ingest_text("docs/")
+results = client.search("How do payments work?", filters={"product": "billing"})
+```
+
+You can also use [batch_get_documents](/python-sdk/batch_get_documents) to retrieve multiple results at once.
