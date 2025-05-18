@@ -5,16 +5,17 @@ description: 'Techniques for searching document collections efficiently'
 
 Effective document search relies on representing your data in a way that captures meaning. Common approaches include keyword search, vector similarity search, and semantic graph traversal. 
 
-With Morphik, you can ingest text, images, and other modalities, then leverage its built-in vector search and knowledge graph capabilities to quickly find the most relevant information.
-
-Example search using the Python SDK:
+With Morphik, you can ingest text, images, and other modalities. Use the `retrieve_docs` function for a simple vector similarity search or `query` to combine retrieval with language model generation:
 
 ```python
 from morphik import Morphik
 
-client = Morphik()
-client.ingest_text("docs/")
-results = client.search("How do payments work?", filters={"product": "billing"})
-```
+db = Morphik()
 
-You can also use [batch_get_documents](/python-sdk/batch_get_documents) to retrieve multiple results at once.
+# Retrieve top matching documents
+docs = db.retrieve_docs(query="latest sales figures", k=3)
+
+# Or generate an answer from the documents
+answer = db.query("summarize the trends", k=3)
+print(answer.text)
+```

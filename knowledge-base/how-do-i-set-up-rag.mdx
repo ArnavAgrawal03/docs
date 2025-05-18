@@ -12,15 +12,19 @@ Retrieval Augmented Generation (RAG) combines search with language models to pro
 
 Morphik streamlines these steps by providing ingestion utilities, vector storage, and easy retrieval APIs so you can focus on building your application.
 
-Here is a minimal example using the Python SDK:
-
 ```python
 from morphik import Morphik
 
-client = Morphik()
-client.ingest_text("docs/")
-client.create_cache(name="rag-cache", model="llama2", docs=["docs/"])
-results = client.cached_search("rag-cache", query="What is RAG?")
-```
+# Initialize the client
+db = Morphik("morphik://owner_id:token@api.morphik.ai")
 
-Refer to [ingest_text](/python-sdk/batch_get_documents) and [create_cache](/python-sdk/create_cache) in the docs for detailed parameters.
+# 1. Ingest a document
+doc = db.ingest_file("document.pdf")
+
+# 2. Create a cache for quick retrieval
+db.create_cache(name="docs-cache", model="openai_gpt4o", gguf_file="model.gguf", docs=[doc.id])
+
+# 3 & 4. Retrieve and generate with context
+response = db.query("What topics are covered?", k=4)
+print(response.text)
+```

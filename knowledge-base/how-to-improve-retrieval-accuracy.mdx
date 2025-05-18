@@ -9,15 +9,19 @@ Quality retrieval depends on thoughtful preprocessing and query handling. Consid
 - Choosing the right embedding model for your domain.
 - Applying metadata filters or reranking to refine results.
 
-Morphik supports custom chunk sizes, multiple embedding models, and powerful filtering so you can tune retrieval to your needs.
 
-Here is a snippet demonstrating custom chunking and filtering:
+Morphik supports custom chunk sizes, multiple embedding models, and powerful filtering so you can tune retrieval to your needs. For example:
 
 ```python
 from morphik import Morphik
-client = Morphik()
 
-client.ingest_text("docs/", chunk_size=500)
-client.create_cache(name="filtered-cache", filters={"lang": "en"})
-results = client.cached_search("filtered-cache", query="setup guide")
+db = Morphik()
+
+# Query with filters and reranking
+docs = db.query(
+    "renewable energy projects",
+    filters={"category": "energy"},
+    k=8,
+    use_reranking=True,
+)
 ```

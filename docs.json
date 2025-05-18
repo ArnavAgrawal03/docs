@@ -158,12 +158,7 @@
               "knowledge-base/how-to-perform-search-over-documents",
               "knowledge-base/how-to-improve-retrieval-accuracy",
               "knowledge-base/how-to-manage-document-chunking",
-              "knowledge-base/how-to-handle-multi-modal-inputs",
-              "knowledge-base/how-do-i-build-a-chatbot-with-my-data",
-              "knowledge-base/how-can-i-visualize-relationships",
-              "knowledge-base/how-do-i-scale-search-to-many-documents",
-              "knowledge-base/how-do-i-clean-up-stale-data",
-              "knowledge-base/how-do-i-integrate-morphik-into-my-app"
+              "knowledge-base/how-to-handle-multi-modal-inputs"
             ]
           }
         ]
