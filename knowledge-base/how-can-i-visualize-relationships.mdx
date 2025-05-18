@@ -1,0 +1,17 @@
+---
+title: 'How can I visualize relationships in my knowledge graph?'
+description: 'Ways to explore graph links with Morphik'
+---
+
+After building a knowledge graph, you may want to inspect how documents connect. Use the Python SDK to export graph data for visualization:
+
+```python
+from morphik import Morphik
+
+client = Morphik()
+graph = client.create_graph(name="docs-graph")
+
+edges = client.get_graph_edges(graph.id)
+```
+
+The `edges` variable will contain source and destination node IDs. You can feed this into libraries like `networkx` or visualize directly in a notebook. See [create_graph](/python-sdk/create_graph) and [get_graph_edges](/python-sdk/get_graph) for more info.

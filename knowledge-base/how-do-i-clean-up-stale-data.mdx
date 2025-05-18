@@ -1,0 +1,15 @@
+---
+title: 'How do I clean up stale data?'
+description: 'Removing outdated documents from your index'
+---
+
+Over time you may need to remove outdated files or replace them with new versions. Use the Python SDK's deletion helpers:
+
+```python
+from morphik import Morphik
+client = Morphik()
+
+client.delete_document_by_filename("manual-v1.pdf")
+```
+
+After deleting, consider re-ingesting updated documents. You can automate this process in your deployment pipeline. See [delete_document_by_filename](/python-sdk/delete_document_by_filename) for more options.

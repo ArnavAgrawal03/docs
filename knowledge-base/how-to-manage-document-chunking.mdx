@@ -1,0 +1,17 @@
+---
+title: 'How should I chunk my documents?'
+description: 'Guidance on splitting data for optimal retrieval'
+---
+
+Choosing an effective chunking strategy balances context length with retrieval precision. Overly large chunks may dilute relevance, while tiny chunks can miss important context.
+
+Morphik offers utilities to experiment with chunk sizes and overlap so you can find the sweet spot for your corpus. You can also update existing documents with new chunking rules as your needs evolve.
+
+```python
+from morphik import Morphik
+client = Morphik()
+
+client.ingest_text("docs/", chunk_size=256, chunk_overlap=32)
+```
+
+For large updates you can re-ingest documents with adjusted chunk settings.
