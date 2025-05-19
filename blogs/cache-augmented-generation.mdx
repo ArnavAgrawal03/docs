@@ -12,9 +12,9 @@ Imagine loading a 500-page technical manual into your AI **once** – and then g
 
 ## The Problem with Traditional RAG (Retrieval-Augmented Generation)
 
-<warning>
-  RAG’s chunk-embed-retrieve loop adds latency, context bloat, and complexity – and it can still fail if the right chunk isn’t retrieved.
-</warning>
+<Warning>
+  RAG's chunk-embed-retrieve loop adds latency, context bloat, and complexity – and it can still fail if the right chunk isn't retrieved.
+</Warning>
 
 Retrieval-Augmented Generation has been the go-to method for LLMs to access external knowledge. The recipe: **chunk** your documents into pieces, **embed** each chunk as a vector, store them in a database, and at query time **retrieve** the most relevant chunks to stuff into the LLM’s context along with the question. This approach works, but it comes with baggage:
 
@@ -27,9 +27,9 @@ Don’t get us wrong – RAG is powerful (especially for very large or frequentl
 
 ## Cache-Augmented Generation: Giving Your LLM a Memory Upgrade
 
-<success>
+<Info>
   Preload the full document once, save the transformer’s key-value cache, and reuse it for all future queries.
-</success>
+</Info>
 
 **Cache-Augmented Generation (CAG)** is a radically different philosophy: _what if we preload all the knowledge into the model upfront, so it doesn’t have to retrieve stuff later?_ It leverages the transformer’s internal **key-value cache** (the same `past_key_values` that normally store attention states from previous tokens) to store an entire knowledge base inside the model’s context. Think of it as building a **cache layer for the brain** of your model.
 
@@ -37,7 +37,7 @@ Don’t get us wrong – RAG is powerful (especially for very large or frequentl
 2. **Blazing-Fast Queries from Memory:** When a user query comes in, we don’t stuff the documents into the prompt at all. We simply **reload the cached state** into the model’s transformer stack and feed in the new question tokens.
 3. **Reuse, Updates, and Multi-turn:** The cached knowledge can be reused across any number of queries – your LLM now has the “textbook in mind” permanently for that session. You can append new docs with another one-time evaluation step.
 
-![CAG vs RAG](/cag-diagram.png)
+![CAG vs RAG](/assets/CAG/cag-diagram.png)
 
 _Figure 1 – Traditional RAG (top) vs Cache-Augmented Generation (bottom). In Morphik, the “Knowledge Cache” is the serialized transformer key-value state._
 
@@ -49,9 +49,9 @@ _Figure 1 – Traditional RAG (top) vs Cache-Augmented Generation (bottom). In M
 - **Simpler Infrastructure:** No vector DB or rerankers – just the LLM and a cache.
 - **Multi-turn Consistency:** Because the cache persists, conversations naturally stay in sync.
 
-<info>
+<Info>
   If your knowledge base is huge (millions of docs) or changes every hour, stick with RAG or use a hybrid strategy.
-</info>
+</Info>
 
 ## Cache-Augmented Generation in Action (Morphik Demo)
 
