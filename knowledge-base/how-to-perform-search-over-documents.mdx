@@ -22,6 +22,11 @@ print(answer.text)
 
 ### Related questions
 
-- What is the difference between keyword and vector search?
-- How can I limit search to a specific document category?
-- When should I use `query` instead of `retrieve_docs`?
+- **Q:** What is the difference between keyword and vector search?  
+  **A:** Keyword search matches exact terms via an inverted index, while vector search compares dense embeddings to capture semantic similarity even when different words are used.
+
+- **Q:** How can I limit search to a specific document category?  
+  **A:** Pass a `filters` dictionary when calling `retrieve_docs` or `query`, e.g. `filters={"category": "finance"}`, to restrict results to documents with matching metadata.
+
+- **Q:** When should I use `query` instead of `retrieve_docs`?  
+  **A:** Use `query` when you need the language model to read the retrieved docs and generate a synthesized answer; use `retrieve_docs` when you only need the raw documents.

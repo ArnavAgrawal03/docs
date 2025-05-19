@@ -28,6 +28,11 @@ docs = db.query(
 
 ### Related questions
 
-- What embedding model should I choose for technical documentation?
-- How can metadata filtering improve search precision?
-- When should I enable reranking for better results?
+- **Q:** What embedding model should I choose for technical documentation?  
+  **A:** For technical documentation, choose an embedding model trained on technical or scientific text. The best choice depends on your specific domain, but models like `text-embedding-3-large` or domain-specific variants often perform well for technical content.
+
+- **Q:** How can metadata filtering improve search precision?  
+  **A:** Metadata filtering allows you to narrow down search results by document attributes like creation date, author, or category. This is particularly useful when you know certain metadata about the documents you're looking for, as it helps eliminate irrelevant results before semantic matching.
+
+- **Q:** When should I enable reranking for better results?  
+  **A:** Enable reranking when you need higher precision in your top results. Reranking is especially valuable when the initial vector search returns many similar results, as it uses more sophisticated algorithms to reorder them based on relevance to your query.

@@ -17,6 +17,11 @@ Re-ingest documents after updating these settings to apply the new rules.
 
 ### Related questions
 
-- What chunk size works best for large PDFs?
-- How does chunk overlap affect answer quality?
-- Do I need to re-ingest data after changing chunk settings?
+- **Q:** What chunk size works best for large PDFs?  
+  **A:** For large PDFs, a chunk size of 1000-2000 characters often works well, as it provides enough context while maintaining retrieval precision. However, the ideal size depends on your content and use case - technical documents might benefit from larger chunks, while conversational text might work better with smaller ones.
+
+- **Q:** How does chunk overlap affect answer quality?  
+  **A:** Chunk overlap (typically 10-20% of chunk size) helps maintain context between chunks and prevents important information from being split across chunk boundaries. This is particularly important for questions that might span multiple sections of a document.
+
+- **Q:** Do I need to re-ingest data after changing chunk settings?  
+  **A:** Yes, any changes to chunk size or overlap require re-ingesting your documents, as these settings determine how the text is processed and indexed. The system needs to recreate the document chunks with your new settings to ensure proper retrieval.

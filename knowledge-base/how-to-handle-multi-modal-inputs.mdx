@@ -19,6 +19,11 @@ results = db.retrieve_docs(query="project overview")
 
 ### Related questions
 
-- How do I combine text and images in a single search query?
-- What file formats does Morphik support for multi-modal ingestion?
-- Can I search audio transcripts together with documents?
+- **Q:** How do I combine text and images in a single search query?  
+  **A:** Simply include both text and image files in your ingestion process. Morphik will automatically process and index each file according to its type. You can then search across all modalities with a single query, and the system will return the most relevant results regardless of format.
+
+- **Q:** What file formats does Morphik support for multi-modal ingestion?  
+  **A:** Morphik supports a wide range of formats including PDFs, images (PNG, JPG, etc.), and text files. The system automatically detects and processes each file type appropriately, extracting text from documents and generating embeddings for all content.
+
+- **Q:** Can I search audio transcripts together with documents?  
+  **A:** Yes, once audio files are transcribed to text, you can search them alongside other documents. Use the same `ingest_file` method for both audio transcripts and other document types, and they'll be included in unified search results.

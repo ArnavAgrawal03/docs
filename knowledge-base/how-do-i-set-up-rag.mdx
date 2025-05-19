@@ -31,6 +31,11 @@ print(response.text)
 
 ### Related questions
 
-- What are the steps to set up a RAG pipeline with Morphik?
-- How can I quickly build a retrieval-augmented generation workflow?
-- What is the easiest way to implement RAG in my application?
+- **Q:** What are the steps to set up a RAG pipeline with Morphik?  
+  **A:** The key steps are: (1) Initialize the Morphik client, (2) Ingest your documents using `ingest_file()`, (3) Create a cache with `create_cache()`, and (4) Query using `query()` with your question and desired number of results.
+
+- **Q:** How can I quickly build a retrieval-augmented generation workflow?  
+  **A:** Use Morphik's built-in RAG capabilities by following the code example above. The `query()` method handles both retrieval and generation in one step when you provide a question and set `k` for the number of relevant chunks to retrieve.
+
+- **Q:** What is the easiest way to implement RAG in my application?  
+  **A:** The simplest approach is to use Morphik's unified API which handles document processing, embedding, and querying. Just ingest your documents and call `query()` with natural language questions to get AI-generated answers with source citations.
