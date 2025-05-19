@@ -69,7 +69,8 @@
             "pages": [
               "blogs/memory-vibe-coding",
               "blogs/llm-science-battle",
-              "blogs/gpt-vs-morphik-multimodal"
+              "blogs/gpt-vs-morphik-multimodal",
+              "blogs/cache-augmented-generation"
             ]
           }
         ]
