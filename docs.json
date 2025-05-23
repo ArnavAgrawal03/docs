@@ -51,12 +51,7 @@
           {
             "group": "Cookbooks",
             "pages": [
-              "cookbooks/agent-workflows",
-              "cookbooks/multimodal",
-              "cookbooks/knowledge-graphs",
-              "cookbooks/video-rag",
-              "cookbooks/cache-augmented-generation",
-              "cookbooks/mcp"
+              "cookbooks/agent-workflows"
             ]
           },
           {
