@@ -1,0 +1,313 @@
+---
+title: "Agent Workflows"
+description: "Practical examples of using the Morphik Agent for complex analysis tasks"
+---
+The Morphik Agent enables sophisticated workflows that go far beyond simple document retrieval. This cookbook provides practical examples of how to use the agent for complex analysis tasks.
+
+## Financial Analysis Workflow
+
+This example shows how the agent can autonomously analyze financial documents, perform calculations, and generate insights.
+
+```python
+from morphik import Morphik
+
+db = Morphik()
+
+# Complex financial analysis query
+result = db.agent_query("""
+Analyze our quarterly financial reports for the last two years.
+Calculate key metrics like revenue growth rate, profit margins, and ROI.
+Identify trends and provide actionable recommendations for improving profitability.
+Save the key insights for future reference.
+""")
+
+print("Financial Analysis:")
+print(result["response"])
+
+# Check what the agent did
+print("\nAgent Tool Usage:")
+for i, tool in enumerate(result["tool_history"], 1):
+    print(f"{i}. {tool['tool_name']}")
+    if tool['tool_name'] == 'execute_code':
+        print(f"   Executed: {tool['tool_args']['code'][:100]}...")
+
+# Display structured results
+for obj in result["display_objects"]:
+    if obj["type"] == "text" and "## Key Metrics" in obj["content"]:
+        print("\nKey Financial Metrics:")
+        print(obj["content"])
+```
+
+## Customer Research Pipeline
+
+Demonstrates how the agent can research customer data, analyze sentiment, and identify opportunities.
+
+```python
+# Multi-step customer analysis
+customer_analysis = db.agent_query("""
+Research our customer feedback and support tickets from the last quarter.
+Analyze sentiment trends and identify the top 3 pain points.
+For each pain point, suggest specific product improvements.
+Create a priority matrix based on impact and effort.
+""")
+
+print("Customer Research Results:")
+print(customer_analysis["response"])
+
+# Extract any charts or visualizations the agent created
+for obj in customer_analysis["display_objects"]:
+    if obj["type"] == "image":
+        print(f"Generated visualization: {obj['caption']}")
+        # In a real app, you'd display the image from obj["content"]
+```
+
+## Knowledge Graph Discovery
+
+Shows how to use the agent to explore complex relationships in your data.
+
+```python
+# Knowledge graph exploration
+kg_insights = db.agent_query("""
+Explore our product knowledge graph to find unexpected connections 
+between customer segments and product features.
+Identify potential cross-selling opportunities based on relationship strengths.
+Create a ranked list of opportunities with supporting evidence.
+""")
+
+print("Knowledge Graph Insights:")
+print(kg_insights["response"])
+
+# Check if the agent found any graph relationships
+for tool in kg_insights["tool_history"]:
+    if tool["tool_name"] == "knowledge_graph_query":
+        print(f"Graph query: {tool['tool_args']}")
+        print(f"Results: {str(tool['tool_result'])[:200]}...")
+```
+
+## Document Intelligence Workflow
+
+Demonstrates automated document analysis and summarization.
+
+```python
+# Intelligent document processing
+doc_intelligence = db.agent_query("""
+Analyze all documents in our legal department folder.
+Extract key contract terms, identify renewal dates, and flag any risks.
+Create a summary report with actionable items for the legal team.
+""")
+
+print("Document Intelligence Report:")
+print(doc_intelligence["response"])
+
+# Show how the agent processed different document types
+documents_analyzed = [
+    tool for tool in doc_intelligence["tool_history"] 
+    if tool["tool_name"] == "document_analyzer"
+]
+
+print(f"\nAnalyzed {len(documents_analyzed)} documents:")
+for tool in documents_analyzed:
+    doc_id = tool["tool_args"].get("document_id", "unknown")
+    analysis_type = tool["tool_args"].get("analysis_type", "general")
+    print(f"- Document {doc_id}: {analysis_type} analysis")
+```
+
+## Competitive Analysis
+
+Shows how the agent can combine multiple data sources for strategic insights.
+
+```python
+# Strategic competitive analysis
+competitive_analysis = db.agent_query("""
+Analyze our product documentation and market research reports.
+Compare our features against competitor data in the knowledge graph.
+Identify gaps in our offering and opportunities for differentiation.
+Calculate market share implications and recommend strategic priorities.
+""")
+
+print("Competitive Analysis:")
+print(competitive_analysis["response"])
+
+# Extract strategic recommendations
+for obj in competitive_analysis["display_objects"]:
+    if "recommendation" in obj["content"].lower():
+        print("\nStrategic Recommendations:")
+        print(obj["content"])
+```
+
+## Iterative Analysis with Memory
+
+Demonstrates how the agent's memory enables progressive analysis.
+
+```python
+# Step 1: Initial analysis with memory
+step1 = db.agent_query("""
+Analyze our marketing campaign performance across all channels.
+Calculate ROI for each channel and identify top performers.
+Save the key findings and metrics for future analysis.
+""")
+
+# Step 2: Build on previous analysis
+step2 = db.agent_query("""
+Based on our previous marketing performance analysis,
+develop an optimized budget allocation strategy for next quarter.
+Compare projected ROI with current performance.
+""")
+
+# Step 3: Create action plan
+step3 = db.agent_query("""
+Using our marketing analysis and budget optimization,
+create a detailed implementation plan with timelines and success metrics.
+""")
+
+print("Progressive Analysis Results:")
+print("Step 1 - Performance Analysis:")
+print(step1["response"][:200] + "...\n")
+
+print("Step 2 - Budget Optimization:")
+print(step2["response"][:200] + "...\n")
+
+print("Step 3 - Implementation Plan:")
+print(step3["response"])
+```
+
+## Data Validation and Quality Checks
+
+Shows how the agent can validate data consistency across documents.
+
+```python
+# Data validation workflow
+validation_results = db.agent_query("""
+Check consistency of financial data across our quarterly reports.
+Identify any discrepancies in revenue, costs, or key metrics.
+Calculate data quality scores and flag potential errors.
+Provide recommendations for improving data accuracy.
+""")
+
+print("Data Validation Results:")
+print(validation_results["response"])
+
+# Check for any code the agent wrote to validate data
+code_executions = [
+    tool for tool in validation_results["tool_history"]
+    if tool["tool_name"] == "execute_code"
+]
+
+print(f"\nAgent performed {len(code_executions)} validation calculations")
+for execution in code_executions:
+    if "discrepancy" in str(execution["tool_result"]).lower():
+        print("Found data discrepancy:", execution["tool_result"])
+```
+
+## Best Practices for Agent Workflows
+
+### 1. Be Specific About Deliverables
+
+```python
+# Good: Clear expected outcomes
+query = """
+Analyze customer churn data and:
+1. Calculate monthly churn rate trends
+2. Identify top 3 churn drivers
+3. Estimate revenue impact
+4. Recommend retention strategies
+"""
+
+# Less optimal: Vague request
+query = "Look at customer churn"
+```
+
+### 2. Use Memory for Complex Projects
+
+```python
+# Break complex projects into phases
+phases = [
+    "Analyze current market position and save findings",
+    "Based on market analysis, identify expansion opportunities",
+    "Create detailed business plan for top opportunity",
+    "Calculate financial projections and risk assessment"
+]
+
+results = []
+for phase in phases:
+    result = db.agent_query(phase)
+    results.append(result)
+    print(f"Completed: {phase}")
+```
+
+### 3. Validate Agent Outputs
+
+```python
+def validate_agent_response(result):
+    """Validate and extract key information from agent response"""
+    
+    # Check for errors
+    if "error" in result["response"].lower():
+        return {"valid": False, "error": "Agent reported error"}
+    
+    # Check if calculations were performed
+    calculations = [
+        tool for tool in result["tool_history"]
+        if tool["tool_name"] == "execute_code"
+    ]
+    
+    # Extract key metrics
+    metrics = {}
+    for obj in result["display_objects"]:
+        if obj["type"] == "text" and "%" in obj["content"]:
+            # Extract percentage values
+            import re
+            percentages = re.findall(r'(\d+\.?\d*)%', obj["content"])
+            metrics["percentages"] = percentages
+    
+    return {
+        "valid": True,
+        "calculations_performed": len(calculations),
+        "metrics": metrics,
+        "sources_count": len(result["sources"])
+    }
+
+# Use validation
+result = db.agent_query("Calculate our quarterly growth rate")
+validation = validate_agent_response(result)
+print(f"Validation: {validation}")
+```
+
+## Error Handling and Recovery
+
+```python
+def robust_agent_query(query, max_retries=2):
+    """Agent query with error handling and retries"""
+    
+    for attempt in range(max_retries + 1):
+        try:
+            result = db.agent_query(query)
+            
+            # Check for tool failures
+            failed_tools = [
+                tool for tool in result.get("tool_history", [])
+                if "error" in str(tool.get("tool_result", "")).lower()
+            ]
+            
+            if failed_tools and attempt < max_retries:
+                print(f"Attempt {attempt + 1} had tool failures, retrying...")
+                continue
+                
+            return result
+            
+        except Exception as e:
+            if attempt < max_retries:
+                print(f"Attempt {attempt + 1} failed: {e}, retrying...")
+                continue
+            else:
+                raise e
+    
+    return None
+
+# Use robust querying
+result = robust_agent_query(
+    "Perform complex financial analysis with error checking"
+)
+```
+
+These workflows demonstrate the power of the Morphik Agent for complex, multi-step analysis tasks that would be impossible with traditional retrieval-based systems. The agent's ability to plan, execute tools, and remember context makes it ideal for sophisticated business intelligence and research workflows. 

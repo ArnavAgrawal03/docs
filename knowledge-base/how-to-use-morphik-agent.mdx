@@ -1,0 +1,226 @@
+---
+title: "How to use the Morphik Agent"
+description: "Understanding when and how to use the intelligent Morphik Agent for complex analysis tasks"
+---
+## What is the Morphik Agent?
+
+The Morphik Agent is an intelligent assistant that can autonomously use various tools to answer complex queries. Unlike the regular `query` method which retrieves and generates responses from existing documents, the agent can:
+
+- **Plan and execute**: Decide which tools to use based on your query
+- **Perform calculations**: Write and run Python code for analysis
+- **Explore relationships**: Navigate knowledge graphs to find connections
+- **Remember context**: Save insights for future queries
+- **Generate rich content**: Provide structured responses with text and images
+
+## When should I use `agent_query` vs `query`?
+
+### Use `agent_query` when you need:
+
+✅ **Multi-step analysis**
+```python
+# Agent can break this down into multiple steps automatically
+result = db.agent_query("""
+Analyze our customer data, calculate churn rates, 
+identify key factors, and recommend retention strategies
+""")
+```
+
+✅ **Calculations and data processing**
+```python
+# Agent will write and execute code to perform calculations
+result = db.agent_query("""
+Calculate the ROI for each marketing channel and 
+rank them by effectiveness
+""")
+```
+
+✅ **Knowledge graph exploration**
+```python
+# Agent can navigate complex relationships
+result = db.agent_query("""
+Find connections between our premium customers and 
+specific product features to identify upsell opportunities
+""")
+```
+
+✅ **Research requiring document discovery**
+```python
+# Agent will find relevant documents automatically
+result = db.agent_query("""
+Research our competitive position in the enterprise market
+""")
+```
+
+### Use regular `query` when you need:
+
+✅ **Quick fact-finding**
+```python
+# Simple retrieval-based question
+response = db.query("What was our revenue last quarter?")
+```
+
+✅ **Direct document questions**
+```python
+# Straightforward Q&A about specific content
+response = db.query("What are the main features of Product X?")
+```
+
+✅ **Performance-critical applications**
+```python
+# When speed is more important than analysis depth
+response = db.query("Find documents about topic Y")
+```
+
+## How do I interpret agent responses?
+
+The agent returns a rich dictionary with four components:
+
+### 1. Main Response
+```python
+result = db.agent_query("Analyze sales trends")
+print(result["response"])  # The agent's final answer
+```
+
+### 2. Tool History (understand what the agent did)
+```python
+for tool in result["tool_history"]:
+    print(f"Tool: {tool['tool_name']}")
+    print(f"Args: {tool['tool_args']}")
+    print(f"Result: {tool['tool_result']}")
+```
+
+### 3. Display Objects (structured content)
+```python
+for obj in result["display_objects"]:
+    if obj["type"] == "text":
+        print("Text content:", obj["content"])
+    elif obj["type"] == "image":
+        print("Image caption:", obj["caption"])
+        # obj["content"] contains the actual image data
+```
+
+### 4. Sources (attribution)
+```python
+for source in result["sources"]:
+    print(f"Source: {source['documentName']}")
+    print(f"ID: {source['sourceId']}")
+```
+
+## Best Practices
+
+### 1. Be specific about your goals
+```python
+# Good: Clear, specific request
+query = """
+Analyze customer satisfaction surveys from Q3, 
+calculate NPS scores by region, and identify 
+the top 3 areas for improvement
+"""
+
+# Less optimal: Vague request
+query = "Look at customer feedback"
+```
+
+### 2. Use memory for complex projects
+```python
+# Step 1: Analysis with memory
+step1 = db.agent_query("""
+Analyze our product performance metrics and 
+save key insights for future reference
+""")
+
+# Step 2: Build on previous analysis  
+step2 = db.agent_query("""
+Based on our product performance analysis,
+create a roadmap for improvements
+""")
+```
+
+### 3. Validate important results
+```python
+result = db.agent_query("Calculate financial projections")
+
+# Check if calculations were performed
+calculations = [
+    tool for tool in result["tool_history"] 
+    if tool["tool_name"] == "execute_code"
+]
+
+if calculations:
+    print(f"Agent performed {len(calculations)} calculations")
+    # Review the code and results
+    for calc in calculations:
+        print("Code:", calc["tool_args"]["code"])
+        print("Result:", calc["tool_result"])
+```
+
+## Common Use Cases
+
+### Financial Analysis
+```python
+result = db.agent_query("""
+Analyze our quarterly financial statements,
+calculate key ratios (ROE, ROI, profit margins),
+and compare against industry benchmarks
+""")
+```
+
+### Customer Research
+```python
+result = db.agent_query("""
+Research customer feedback across all channels,
+identify sentiment trends, and prioritize
+product improvements by impact
+""")
+```
+
+### Competitive Intelligence
+```python
+result = db.agent_query("""
+Compare our product features against competitors,
+identify gaps in our offering, and recommend
+strategic priorities for next quarter
+""")
+```
+
+### Document Intelligence
+```python
+result = db.agent_query("""
+Analyze all contracts in our legal folder,
+extract key terms and renewal dates,
+and flag any potential risks
+""")
+```
+
+## Troubleshooting
+
+### Agent is taking too long
+- Break complex queries into smaller steps
+- Be more specific about what you need
+- Check if you're asking for too many calculations
+
+### Results seem incomplete
+- Check the `tool_history` to see what the agent tried
+- Look for error messages in tool results
+- Try rephrasing your query more clearly
+
+### Want to see intermediate steps
+```python
+result = db.agent_query("Complex analysis task")
+
+# Review each step the agent took
+for i, tool in enumerate(result["tool_history"], 1):
+    print(f"Step {i}: {tool['tool_name']}")
+    print(f"Input: {tool['tool_args']}")
+    print(f"Output: {str(tool['tool_result'])[:200]}...")
+    print("-" * 50)
+```
+
+## Limitations
+
+- **Response time**: Agent queries take longer than regular queries (10-60 seconds)
+- **Usage limits**: Cloud deployments may have rate limits for agent calls
+- **Context window**: Very complex queries might exceed the model's context window
+- **Tool availability**: Some tools may not be available in all deployments
+
+The Morphik Agent is designed for sophisticated analysis tasks that require planning, computation, and multi-step reasoning. For simple document retrieval, the regular `query` method will be faster and more cost-effective. 

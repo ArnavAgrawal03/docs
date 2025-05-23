@@ -32,6 +32,7 @@
             "group": "Concepts",
             "pages": [
               "concepts/naive-rag",
+              "concepts/morphik-agent",
               "concepts/user-folder-scoping",
               "concepts/rules-processing",
               "concepts/colpali",
@@ -45,6 +46,17 @@
               "using-morphik/morphik-shell",
               "using-morphik/mcp",
               "using-morphik/code"
+            ]
+          },
+          {
+            "group": "Cookbooks",
+            "pages": [
+              "cookbooks/agent-workflows",
+              "cookbooks/multimodal",
+              "cookbooks/knowledge-graphs",
+              "cookbooks/video-rag",
+              "cookbooks/cache-augmented-generation",
+              "cookbooks/mcp"
             ]
           },
           {
@@ -102,6 +114,7 @@
               "python-sdk/retrieve_chunks",
               "python-sdk/retrieve_docs",
               "python-sdk/query",
+              "python-sdk/agent_query",
               "python-sdk/list_documents",
               "python-sdk/get_document",
               "python-sdk/get_document_by_filename"
@@ -156,6 +169,7 @@
             "group": "FAQs",
             "pages": [
               "knowledge-base/how-do-i-set-up-rag",
+              "knowledge-base/how-to-use-morphik-agent",
               "knowledge-base/how-to-perform-search-over-documents",
               "knowledge-base/how-to-improve-retrieval-accuracy",
               "knowledge-base/how-to-manage-document-chunking",

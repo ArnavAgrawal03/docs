@@ -1,0 +1,394 @@
+---
+title: "agent_query"
+description: "Execute an agentic query with autonomous tool access and conversation handling"
+---
+Execute an agentic query with autonomous tool access and conversation handling.
+
+The Morphik agent is an intelligent assistant that can autonomously use various tools to answer complex queries. Unlike the regular `query` method which retrieves and generates responses from existing documents, the agent can dynamically decide which tools to use based on the query requirements, execute code, analyze documents, create graphs, and more.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def agent_query(query: str) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def agent_query(query: str) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `query` (str): Natural language query for the Morphik agent
+
+## Returns
+
+- `Dict[str, Any]`: A comprehensive response dictionary containing:
+  - `response` (str): The agent's final text response
+  - `tool_history` (List[Dict]): Detailed history of all tool executions
+  - `display_objects` (List[Dict]): Structured content objects for rich display
+  - `sources` (List[Dict]): Source attribution for all referenced content
+
+### Response Structure
+
+The agent response contains four main components:
+
+#### 1. `response` (str)
+The agent's final textual response to your query.
+
+#### 2. `tool_history` (List[Dict])
+A chronological list of all tools the agent executed, where each entry contains:
+- `tool_name` (str): Name of the executed tool
+- `tool_args` (dict): Arguments passed to the tool
+- `tool_result` (str/dict): The result returned by the tool
+
+#### 3. `display_objects` (List[Dict])
+Structured content objects for rich display, where each object contains:
+- `type` (str): Either "text" or "image"
+- `content` (str): For text objects, this is markdown content. For image objects, this is the image data
+- `source` (str): Source ID linking to the original content
+- `caption` (str, for images): Description or caption for image objects
+
+#### 4. `sources` (List[Dict])
+Source attribution information, where each source contains:
+- `sourceId` (str): Unique identifier for the source
+- `documentName` (str): Human-readable document name
+- `documentId` (str): Document identifier
+- `content` (str): Relevant content from the source
+
+## Available Tools
+
+The agent has access to the following tools and will automatically choose which ones to use:
+
+### Document Operations
+- **retrieve_chunks**: Retrieve relevant text and image chunks from the knowledge base
+- **retrieve_document**: Get full document content or metadata
+- **document_analyzer**: Analyze documents for entities, facts, summary, sentiment, or full analysis
+- **list_documents**: List documents accessible to the agent
+
+### Knowledge Graph Operations
+- **knowledge_graph_query**: Query knowledge graphs for entities, paths, subgraphs, or list entities
+- **list_graphs**: List available knowledge graphs
+
+### Computation & Analysis
+- **execute_code**: Run Python code in a safe sandbox environment
+
+### Memory Management
+- **save_to_memory**: Save important information to persistent memory for future queries
+
+## Examples
+
+### Simple Query
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    
+    db = Morphik()
+    
+    # Simple informational query
+    result = db.agent_query("What are the main trends in our Q3 sales data?")
+    
+    print("Agent Response:")
+    print(result["response"])
+    
+    # Check what tools were used
+    print("\nTools Used:")
+    for tool in result["tool_history"]:
+        print(f"- {tool['tool_name']}: {tool['tool_args']}")
+    
+    # Display structured content
+    print("\nDisplay Objects:")
+    for obj in result["display_objects"]:
+        if obj["type"] == "text":
+            print(f"Text from {obj['source']}: {obj['content'][:100]}...")
+        elif obj["type"] == "image":
+            print(f"Image from {obj['source']}: {obj['caption']}")
+    
+    # Check sources
+    print("\nSources:")
+    for source in result["sources"]:
+        print(f"- {source['documentName']} (ID: {source['sourceId']})")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    
+    async with AsyncMorphik() as db:
+        # Simple informational query
+        result = await db.agent_query("What are the main trends in our Q3 sales data?")
+        
+        print("Agent Response:")
+        print(result["response"])
+        
+        # Check what tools were used
+        print("\nTools Used:")
+        for tool in result["tool_history"]:
+            print(f"- {tool['tool_name']}: {tool['tool_args']}")
+        
+        # Display structured content
+        print("\nDisplay Objects:")
+        for obj in result["display_objects"]:
+            if obj["type"] == "text":
+                print(f"Text from {obj['source']}: {obj['content'][:100]}...")
+            elif obj["type"] == "image":
+                print(f"Image from {obj['source']}: {obj['caption']}")
+        
+        # Check sources
+        print("\nSources:")
+        for source in result["sources"]:
+            print(f"- {source['documentName']} (ID: {source['sourceId']})")
+    ```
+  </Tab>
+</Tabs>
+
+### Complex Analysis Request
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    
+    db = Morphik()
+    
+    # Complex multi-step analysis
+    result = db.agent_query(
+        "Analyze all documents from the marketing department, "
+        "identify key performance metrics, calculate the average "
+        "conversion rate, and create a summary with actionable insights"
+    )
+    
+    print("Analysis Results:")
+    print(result["response"])
+    
+    # The agent might have used multiple tools:
+    # 1. list_documents to find marketing documents
+    # 2. retrieve_chunks to get relevant content
+    # 3. document_analyzer to analyze documents
+    # 4. execute_code to perform calculations
+    # 5. save_to_memory to store insights
+    
+    print(f"\nAgent executed {len(result['tool_history'])} tool calls")
+    for i, tool in enumerate(result["tool_history"], 1):
+        print(f"{i}. {tool['tool_name']}")
+        if tool['tool_name'] == 'execute_code':
+            print(f"   Code: {tool['tool_args'].get('code', '')[:100]}...")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    
+    async with AsyncMorphik() as db:
+        # Complex multi-step analysis
+        result = await db.agent_query(
+            "Analyze all documents from the marketing department, "
+            "identify key performance metrics, calculate the average "
+            "conversion rate, and create a summary with actionable insights"
+        )
+        
+        print("Analysis Results:")
+        print(result["response"])
+        
+        print(f"\nAgent executed {len(result['tool_history'])} tool calls")
+        for i, tool in enumerate(result["tool_history"], 1):
+            print(f"{i}. {tool['tool_name']}")
+            if tool['tool_name'] == 'execute_code':
+                print(f"   Code: {tool['tool_args'].get('code', '')[:100]}...")
+    ```
+  </Tab>
+</Tabs>
+
+### Knowledge Graph Exploration
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    
+    db = Morphik()
+    
+    # Knowledge graph query
+    result = db.agent_query(
+        "What relationships exist between our top customers and "
+        "our product categories? Show me the connection paths."
+    )
+    
+    print("Knowledge Graph Analysis:")
+    print(result["response"])
+    
+    # Check if knowledge graph tools were used
+    kg_tools = [tool for tool in result["tool_history"] 
+                if tool['tool_name'] in ['knowledge_graph_query', 'list_graphs']]
+    
+    for tool in kg_tools:
+        print(f"\nKG Tool: {tool['tool_name']}")
+        print(f"Args: {tool['tool_args']}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    
+    async with AsyncMorphik() as db:
+        # Knowledge graph query
+        result = await db.agent_query(
+            "What relationships exist between our top customers and "
+            "our product categories? Show me the connection paths."
+        )
+        
+        print("Knowledge Graph Analysis:")
+        print(result["response"])
+        
+        # Check if knowledge graph tools were used
+        kg_tools = [tool for tool in result["tool_history"] 
+                    if tool['tool_name'] in ['knowledge_graph_query', 'list_graphs']]
+        
+        for tool in kg_tools:
+            print(f"\nKG Tool: {tool['tool_name']}")
+            print(f"Args: {tool['tool_args']}")
+    ```
+  </Tab>
+</Tabs>
+
+### Working with Display Objects
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    
+    db = Morphik()
+    
+    result = db.agent_query("Find charts and graphs related to quarterly performance")
+    
+    # Process different types of display objects
+    for obj in result["display_objects"]:
+        if obj["type"] == "text":
+            print(f"📝 Text Content from {obj['source']}:")
+            print(obj["content"])
+            print("-" * 50)
+        
+        elif obj["type"] == "image":
+            print(f"🖼️ Image from {obj['source']}:")
+            print(f"Caption: {obj['caption']}")
+            # obj["content"] contains the actual image data
+            # You could save it to a file or display it in a UI
+            print("-" * 50)
+    
+    # Map sources to display objects
+    source_usage = {}
+    for obj in result["display_objects"]:
+        source_id = obj["source"]
+        if source_id not in source_usage:
+            source_usage[source_id] = []
+        source_usage[source_id].append(obj["type"])
+    
+    print("Source Usage Summary:")
+    for source_id, types in source_usage.items():
+        source_info = next((s for s in result["sources"] if s["sourceId"] == source_id), None)
+        if source_info:
+            print(f"- {source_info['documentName']}: {', '.join(types)}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    
+    async with AsyncMorphik() as db:
+        result = await db.agent_query("Find charts and graphs related to quarterly performance")
+        
+        # Process different types of display objects
+        for obj in result["display_objects"]:
+            if obj["type"] == "text":
+                print(f"📝 Text Content from {obj['source']}:")
+                print(obj["content"])
+                print("-" * 50)
+            
+            elif obj["type"] == "image":
+                print(f"🖼️ Image from {obj['source']}:")
+                print(f"Caption: {obj['caption']}")
+                print("-" * 50)
+        
+        # Map sources to display objects
+        source_usage = {}
+        for obj in result["display_objects"]:
+            source_id = obj["source"]
+            if source_id not in source_usage:
+                source_usage[source_id] = []
+            source_usage[source_id].append(obj["type"])
+        
+        print("Source Usage Summary:")
+        for source_id, types in source_usage.items():
+            source_info = next((s for s in result["sources"] if s["sourceId"] == source_id), None)
+            if source_info:
+                print(f"- {source_info['documentName']}: {', '.join(types)}")
+    ```
+  </Tab>
+</Tabs>
+
+## Key Differences from `query` Method
+
+| Feature | `query` | `agent_query` |
+|---------|---------|---------------|
+| **Approach** | Retrieval-based: finds relevant chunks and generates response | Agent-based: autonomously decides and uses tools |
+| **Tools** | None (fixed retrieval pipeline) | Full tool access (retrieve, analyze, code, graphs, etc.) |
+| **Response Type** | `CompletionResponse` object | `Dict[str, Any]` with rich structure |
+| **Autonomy** | Fixed workflow | Dynamic decision making |
+| **Capabilities** | Document retrieval and QA | Multi-modal analysis, computation, memory |
+| **Use Case** | Direct questions about documents | Complex research and analysis tasks |
+
+## Best Practices
+
+### 1. **Query Formulation**
+- Be specific about what you want the agent to accomplish
+- Include context about the type of analysis or information needed
+- Mention if you want calculations, comparisons, or visualizations
+
+### 2. **Response Processing**
+- Always check the `tool_history` to understand what the agent did
+- Use `display_objects` for rich content presentation
+- Reference `sources` for attribution and verification
+
+### 3. **Error Handling**
+```python
+try:
+    result = db.agent_query("Complex analysis request")
+    if not result.get("response"):
+        print("Agent couldn't generate a response")
+    elif "error" in result.get("response", "").lower():
+        print("Agent encountered an error:", result["response"])
+    else:
+        # Process successful response
+        print(result["response"])
+except Exception as e:
+    print(f"Agent query failed: {e}")
+```
+
+### 4. **Memory Usage**
+The agent can save important information to memory for future queries:
+```python
+# First query - agent saves insights to memory
+result1 = db.agent_query("Analyze customer satisfaction trends and save key insights")
+
+# Later query - agent can reference saved insights
+result2 = db.agent_query("Based on previous customer satisfaction analysis, what should we focus on next quarter?")
+```
+
+## Limitations
+
+- **Cloud Mode**: Free tier accounts have limits on agent calls
+- **Context Window**: Very complex queries might exceed the model's context window
+- **Tool Availability**: Some tools may not be available depending on your configuration
+- **Processing Time**: Agent queries typically take longer than regular queries due to tool execution
+
+## Related Methods
+
+- [`query`](./query): For simple document-based Q&A
+- [`retrieve_chunks`](./retrieve_chunks): For manual document retrieval
+- [`create_graph`](./create_graph): For knowledge graph creation
+- [`list_documents`](./list_documents): For document discovery 
