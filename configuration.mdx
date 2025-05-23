@@ -38,8 +38,8 @@ First, register your models in the `[registered_models]` section:
 ```toml
 [registered_models]
 # OpenAI models
-openai_gpt4o = { model_name = "gpt-4o" }
-openai_gpt4 = { model_name = "gpt-4" }
+openai_gpt4-1 = { model_name = "gpt-4.1" }
+openai_gpt4-1-mini = { model_name = "gpt-4.1-mini" }
 
 # Azure OpenAI models
 azure_gpt4 = { model_name = "gpt-4", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-4-deployment" }
@@ -47,18 +47,20 @@ azure_gpt35 = { model_name = "gpt-3.5-turbo", api_base = "YOUR_AZURE_URL_HERE", 
 
 # Anthropic models
 claude_opus = { model_name = "claude-3-opus-20240229" }
-claude_sonnet = { model_name = "claude-3-sonnet-20240229" }
+claude_sonnet = { model_name = "claude-3-7-sonnet-latest" }
 
-# Ollama models
-ollama_llama = { model_name = "ollama_chat/llama3.2", api_base = "http://localhost:11434" }
-ollama_llama_docker = { model_name = "ollama_chat/llama3.2", api_base = "http://ollama:11434" }
+# Ollama models (modify api_base based on your deployment)
+# - Local Ollama: "http://localhost:11434" (default)
+# - Morphik in Docker, Ollama local: "http://host.docker.internal:11434"  
+# - Both in Docker: "http://ollama:11434"
+ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
 ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
+ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
 
 # Embedding models
 openai_embedding = { model_name = "text-embedding-3-small" }
 openai_embedding_large = { model_name = "text-embedding-3-large" }
 azure_embedding = { model_name = "text-embedding-ada-002", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "embedding-ada-002" }
-ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
 ```
 
 ### Using Registered Models
@@ -67,7 +69,7 @@ Then reference these models by their key in different sections:
 
 ```toml
 [completion]
-model = "ollama_llama"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 default_max_tokens = "1000"
 default_temperature = 0.5
 
@@ -77,16 +79,45 @@ dimensions = 768
 similarity_metric = "cosine"
 
 [parser.vision]
-model = "ollama_llama_vision"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 
 [rules]
-model = "ollama_llama"
+model = "ollama_qwen_vision"
 
 [graph]
-model = "ollama_llama"
+model = "ollama_qwen_vision"
 ```
 
 This approach gives you maximum flexibility to use different models for different components, and even switch between local and cloud models as needed.
+
+## Ollama Deployment Configurations
+
+When using Ollama models, you need to configure the `api_base` parameter based on your deployment setup:
+
+### Local Development
+If both Morphik and Ollama are running locally:
+```toml
+ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
+ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
+```
+
+### Morphik in Docker, Ollama Local
+If you're running Morphik in Docker but Ollama locally on your machine:
+```toml
+ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://host.docker.internal:11434", vision = true }
+ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://host.docker.internal:11434" }
+```
+
+### Both in Docker
+If both Morphik and Ollama are running in Docker containers:
+```toml
+ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://ollama:11434", vision = true }
+ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://ollama:11434" }
+```
+
+<Tip>
+Simply modify the `api_base` parameter in your existing model definitions rather than creating separate model entries for each deployment scenario.
+</Tip>
 
 ## Core Configuration Sections
 
@@ -120,7 +151,7 @@ Configure the model used for generating text:
 
 ```toml
 [completion]
-model = "claude_sonnet"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 default_max_tokens = "1000"
 default_temperature = 0.5
 ```
@@ -146,8 +177,8 @@ Configure vector embeddings generation:
 
 ```toml
 [embedding]
-model = "openai_embedding"  # Reference to registered model
-dimensions = 1536
+model = "ollama_embedding"  # Reference to registered model
+dimensions = 768
 similarity_metric = "cosine"
 ```
 
@@ -161,7 +192,7 @@ chunk_size = 1000        # Characters per chunk
 chunk_overlap = 200      # Overlap between chunks
 use_unstructured_api = false
 use_contextual_chunking = false
-contextual_chunking_model = "ollama_llama"  # Reference to a key in registered_models
+contextual_chunking_model = "ollama_qwen_vision"  # Reference to a key in registered_models
 ```
 
 ### Vision Processing
@@ -170,7 +201,7 @@ Configure multimodal processing for images and videos:
 
 ```toml
 [parser.vision]
-model = "ollama_llama_vision"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 frame_sample_rate = -1   # Set to -1 to disable frame captioning
 ```
 
@@ -233,7 +264,7 @@ Configure document processing with rules:
 
 ```toml
 [rules]
-model = "openai_gpt4"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 batch_size = 4096
 ```
 
@@ -243,7 +274,7 @@ Configure entity extraction and graph building:
 
 ```toml
 [graph]
-model = "claude_sonnet"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 enable_entity_resolution = true
 ```
 
@@ -309,8 +340,8 @@ dev_permissions = ["read", "write", "admin"]
 
 [registered_models]
 # OpenAI models
-openai_gpt4o = { model_name = "gpt-4o" }
-openai_gpt4 = { model_name = "gpt-4" }
+openai_gpt4-1 = { model_name = "gpt-4.1" }
+openai_gpt4-1-mini = { model_name = "gpt-4.1-mini" }
 
 # Azure OpenAI models
 azure_gpt4 = { model_name = "gpt-4", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-4-deployment" }
@@ -318,18 +349,23 @@ azure_gpt35 = { model_name = "gpt-3.5-turbo", api_base = "YOUR_AZURE_URL_HERE", 
 
 # Anthropic models
 claude_opus = { model_name = "claude-3-opus-20240229" }
-claude_sonnet = { model_name = "claude-3-sonnet-20240229" }
+claude_sonnet = { model_name = "claude-3-7-sonnet-latest" }
 
-# Ollama models
-ollama_llama = { model_name = "ollama_chat/llama3.2", api_base = "http://localhost:11434" }
+# Ollama models (modify api_base based on your deployment)
+# - Local Ollama: "http://localhost:11434" (default)
+# - Morphik in Docker, Ollama local: "http://host.docker.internal:11434"  
+# - Both in Docker: "http://ollama:11434"
+ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
 ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
+ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
 
 # Embedding models
 openai_embedding = { model_name = "text-embedding-3-small" }
-ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
+openai_embedding_large = { model_name = "text-embedding-3-large" }
+azure_embedding = { model_name = "text-embedding-ada-002", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "embedding-ada-002" }
 
 [completion]
-model = "ollama_llama"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 default_max_tokens = "1000"
 default_temperature = 0.5
 
@@ -346,10 +382,10 @@ chunk_size = 1000
 chunk_overlap = 200
 use_unstructured_api = false
 use_contextual_chunking = false
-contextual_chunking_model = "ollama_llama"  # Reference to a key in registered_models
+contextual_chunking_model = "ollama_qwen_vision"  # Reference to a key in registered_models
 
 [parser.vision]
-model = "ollama_llama_vision"  # Reference to a key in registered_models
+model = "ollama_qwen_vision"  # Reference to a key in registered_models
 frame_sample_rate = -1
 
 [reranker]
@@ -369,7 +405,7 @@ storage_path = "./storage"
 provider = "pgvector"  # or "mongodb"
 
 [rules]
-model = "ollama_llama"
+model = "ollama_qwen_vision"
 batch_size = 4096
 
 [morphik]
@@ -377,7 +413,7 @@ enable_colpali = true
 mode = "self_hosted"  # "cloud" or "self_hosted"
 
 [graph]
-model = "ollama_llama"
+model = "ollama_qwen_vision"
 enable_entity_resolution = true
 
 [telemetry]
@@ -401,13 +437,13 @@ For example:
 
 ```toml
 [parser.vision]
-model = "openai_gpt4o"  # Use GPT-4o for image analysis
+model = "ollama_llama_vision"  # Use Llama vision model for image analysis
 
 [rules]
 model = "claude_sonnet"  # Use Claude Sonnet for rules processing
 
 [completion]
-model = "ollama_llama"  # Use Llama local model for general completion
+model = "ollama_qwen_vision"  # Use Qwen vision model for general completion
 ```
 
 ## Docker Configuration Adjustments

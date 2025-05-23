@@ -345,39 +345,23 @@ description: "Get up and running with Morphik"
     port = 6379
     ```
     
-    (If using local models with Ollama) Also ensure the Ollama configuration matches your deployment setup:
-    
-    - If running both Morphik and Ollama as Docker containers:
-    ```toml
-    # If you are running on docker and ollama is also running on docker use the following
-    ollama_llama_docker_docker = { model_name = "ollama_chat/llama3.2", api_base = "http://ollama:11434" }
-    ollama_llama_vision_docker_docker = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://ollama:11434", vision = true }
-    
-    # For embedding models
-    ollama_embedding_docker_docker = { model_name = "ollama/nomic-embed-text", api_base = "http://ollama:11434" }
-    ```
-    
-    - If running Morphik in Docker but Ollama locally:
-    ```toml
-    # If you are running on docker, but running ollama locally use the following
-    ollama_llama_docker = { model_name = "ollama_chat/llama3.2", api_base = "http://host.docker.internal:11434" }
-    ollama_llama_vision_docker = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://host.docker.internal:11434", vision = true }
-    
-    # For embedding models
-    ollama_embedding_docker = { model_name = "ollama/nomic-embed-text", api_base = "http://host.docker.internal:11434" }
-    ```
-    
-    And update the active model references to use the appropriate Docker configurations:
+    (If using local models with Ollama) Also ensure the Ollama configuration matches your deployment setup by modifying the `api_base` in your `morphik.toml`:
     
     ```toml
-    [completion]
-    model = "ollama_llama_vision_docker_docker"  # If both in Docker
+    # Modify the api_base based on your deployment:
+    # - Local Ollama: "http://localhost:11434" (default)
+    # - Morphik in Docker, Ollama local: "http://host.docker.internal:11434"  
+    # - Both in Docker: "http://ollama:11434"
     
-    [embedding]
-    model = "ollama_embedding_docker_docker"  # If both in Docker
+    [registered_models]
+    ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
+    ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
+    ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
     ```
+    
+    For example, if running both Morphik and Ollama in Docker, change all `api_base` values to `"http://ollama:11434"`.
 
-    If you want to use Ollama for AI capabilities (recommended for local development):
+    If you want to use Ollama for AI capabilities:
 
     ```bash
     docker compose --profile ollama up --build -d
@@ -394,13 +378,13 @@ description: "Get up and running with Morphik"
     These commands will:
 
     - Build all required containers
-    - Download necessary AI models (nomic-embed-text and llama3.2 if using Ollama)
+    - Download necessary AI models (nomic-embed-text and qwen2.5vl if using Ollama)
     - Initialize the PostgreSQL database with pgvector
     - Start all services
 
     The initial setup may take 5-10 minutes depending on your internet speed, as it needs to download the AI models.
     
-    > **Note**: When using Ollama, ensure your system has sufficient memory. The llama3.2 model requires at least 4GB of available RAM. If you encounter memory issues, you can increase Docker's memory allocation in Docker Desktop settings (Resources > Advanced > Memory), modify the `morphik.toml` file to use a smaller model, or switch to using OpenAI API.
+    > **Note**: When using Ollama, ensure your system has sufficient memory. The qwen2.5vl model requires at least 4GB of available RAM. If you encounter memory issues, you can increase Docker's memory allocation in Docker Desktop settings (Resources > Advanced > Memory), modify the `morphik.toml` file to use a smaller model, or switch to using OpenAI API.
 
     ```bash
     docker compose up    # Start all services
