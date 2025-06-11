@@ -43,7 +43,6 @@
             "group": "Using Morphik",
             "pages": [
               "using-morphik/morphik-ui",
-              "using-morphik/morphik-shell",
               "using-morphik/mcp",
               "using-morphik/code"
             ]

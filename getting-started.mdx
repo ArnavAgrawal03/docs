@@ -142,10 +142,17 @@ description: "Get up and running with Morphik"
           psql -U postgres -d morphik -a -f init.sql
           ```
         </Accordion>
-        <Accordion title="Installing Ollama">
+        <Accordion title="Docker (required for background services)">
+          Docker is used to spin up auxiliary services automatically (e.g., a
+          local Redis container for Morphik's task queue). Install Docker
+          Desktop (macOS/Windows) or the Docker engine (Linux) and make sure the
+          daemon is running.
+        </Accordion>
+        <Accordion title="Optional: Running Local Models with Ollama">
           <Tabs>
             <Tab title="macOS">
-              Install Ollama using Homebrew:
+              If you want to run models locally instead of using cloud
+              providers, first install Ollama using Homebrew:
 
               ```bash
               brew install ollama
@@ -228,52 +235,56 @@ description: "Get up and running with Morphik"
 
           Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
         </Note>
-        ```bash
-        python3.12 -m venv .venv
-        ```
+        You don't need to create a virtual-env or run `uv sync` yourself—the
+        installer script will handle everything, including installing **uv** if
+        it's missing. If you prefer a manual setup at some point, install uv
+        globally (`pip install --upgrade uv`) and run `uv sync` to recreate the
+        environment, but this is entirely optional.
 
-        Now, you need to activate the virtual environment. The activation command differs based on your operating system.
+        uv reads the `pyproject.toml` / `uv.lock` files, so all dependencies
+        (including optional ones like `unstructured`) are declared in one place.
 
-        <Tabs>
-          <Tab title="Linux/macOS">
-            ```bash
-            source .venv/bin/activate
-            ```
-          </Tab>
-          <Tab title="Windows (Command Prompt)">
-            ```bash
-            .venv\Scripts\activate.bat
-            ```
-          </Tab>
-          <Tab title="Windows (PowerShell)">
-            ```bash
-            .venv\Scripts\Activate.ps1
-            ```
+        <Note>
+          If you need additional NLTK data you can still download it afterwards:
 
-            If you encounter execution policy errors in PowerShell, you may need to run:
+          ```bash
+          python -m nltk.downloader averaged_perceptron_tagger punkt
+          ```
+        </Note>
 
-            ```bash
-            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-            ```
-          </Tab>
-        </Tabs>
-        After activation, your command prompt should be prefixed with `(.venv)`, indicating that the virtual environment is active. Once your virtual environment is activated, you can install the required dependencies.
+        ---
+
+      </Step>
+
+      <Step title="Run the Installer Script">
+        From the project root, run the one-liner below – it auto-detects your
+        platform (macOS or Linux), sets any required build flags, installs
+        dependencies, and starts the server:
 
         ```bash
-        pip install -r requirements.txt
+        # Make the script executable
+        chmod +x install_and_start.sh
+
+        # Run the installer
+        ./install_and_start.sh
         ```
 
-        <h4>Python Dependencies for Document Processing</h4>
+        The script will:
 
-        You may also need additional Python packages or NLTK resources for processing various document types:
+        1. Create & activate a `.venv` with **uv**
+        2. Install `colpali-engine` (knowledge-graph generation)
+        3. Build `llama-cpp-python` (Metal acceleration on Apple Silicon)
+        4. Launch the server via `uv run start_server.py`
 
-        ```bash
-        # If using Python 3.12+, you might need a specific version of unstructured
-        pip install unstructured==0.16.10
-        
-        # Download required NLTK resources
-        python -m nltk.downloader averaged_perceptron_tagger punkt
-        ```
+        <Note>
+          You only need to run `./install_and_start.sh` the first time to set up
+          the environment. For future sessions, activate your project directory
+          and simply start the server with:
+
+          ```bash
+          uv run start_server.py
+          ```
+        </Note>
       </Step>
 
       <Step title="Setting up the Server Parameters">
@@ -281,24 +292,18 @@ description: "Get up and running with Morphik"
         
         Morphik now uses a registered models approach, which allows you to define hundreds of different models in one place and reference them throughout your configuration. This makes it easy to mix and match models based on your needs (e.g., smaller models for simpler tasks). You can find more details about configuration [here](/configuration).
 
-        Morphik uses environment variables to manage secrets and API keys. In order to ensure that any pre-set keys are available to the server, copy the `.env.example` file to `.env`:
-
-        ```bash
-        cp .env.example .env
-        ```
-
-        In case you're using external models like OpenAI or Anthropic Claude, you'll need to edit the `.env` file with the necessary API keys. Finally, you can run the setup script to install dependencies and setup the database and vector store.
-
-        ```bash
-        python quick_setup.py
-        ```
+        The installer copies `.env.example` to `.env` automatically if it's
+        missing. After the script finishes, open `.env` to add any API keys (e.g.
+        `OPENAI_API_KEY`) or secrets you need. You can tweak `morphik.toml`
+        anytime to switch completion/embedding models, adjust chunking, or enable
+        advanced features.
       </Step>
 
       <Step title="Launching the Server">
         You are now ready to launch the Morphik server\! Just run the following command to start the server.
 
         ```bash
-        python start_server.py
+        uv run start_server.py
         ```
 
         You should see the following output:
