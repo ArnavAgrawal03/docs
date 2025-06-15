@@ -330,42 +330,74 @@ description: "Get up and running with Morphik"
 
     **Option&nbsp;A — Run the pre-built image**
 
-    Step-by-step:
+    This is the recommended method for most users. It uses `docker-compose` to run the pre-built Morphik image along with its required Postgres and Redis containers.
 
-    ```bash
-    # 1. Pull the image from GitHub Container Registry
-    docker pull ghcr.io/morphik-org/morphik-core:latest
+    <Steps>
+    <Step title="Download the Compose file">
+      You'll need a `docker-compose.run.yml` file to tell Docker how to run Morphik and its dependencies.
 
-    # 2. Create an env file with your secrets – at minimum OPENAI_API_KEY
-    cat > morphik.env << 'EOF'
-    OPENAI_API_KEY=sk-...
-    # JWT_SECRET_KEY=change-me-in-prod  # optional, defaults internally
-    EOF
+      ```bash
+      # Download the file from the Morphik repository
+      curl -o docker-compose.run.yml https://raw.githubusercontent.com/morphik-org/morphik-core/main/docker-compose.run.yml
+      ```
+    </Step>
 
-    # 3 (optional).  Grab the default config so you can tweak it locally
-    #    The image ships the file at /app/morphik.toml.default
-    #    Copy it once, edit in your editor, then mount it back in step 4.
-    docker run --rm ghcr.io/morphik-org/morphik-core:latest \
-               cat /app/morphik.toml.default > morphik.toml
+    <Step title="Create your Environment file">
+      Create a `.env` file in the same directory. This is where you will put your API keys.
 
-    # 4. Launch the container – mount the config & env file
-    #    If you did not tweak the file, omit the -v flag and the image will
-    #    use its internal defaults (OpenAI models, 1536-d pgvector table).
-    docker run -d --name morphik \
-      --env-file morphik.env \
-      -v $(pwd)/morphik.toml:/app/morphik.toml:ro \
-      -p 8000:8000 ghcr.io/morphik-org/morphik-core:latest
-    ```
+      ```bash
+      cat > .env << 'EOF'
+      # Your OpenAI API key is required
+      OPENAI_API_KEY=sk-...
 
-    The server is now running at [http://localhost:8000](http://localhost:8000).
+      # A secret key for signing JWTs. Change this in a production environment.
+      JWT_SECRET_KEY=your-super-secret-key-that-is-long-and-random
+      EOF
+      ```
+    </Step>
 
-    **Changing models / behaviour later**  
-    Just edit `morphik.toml` and `docker restart morphik`.  Any field you omit keeps the baked-in default.
+    <Step title="Start the application">
+      Now, you can start all the services with a single command.
+
+      ```bash
+      # This command will pull the necessary images and start the containers in the background
+      docker compose -f docker-compose.run.yml up -d
+      ```
+      The first time you run this, it may take a few minutes to download the images. Subsequent starts will be much faster. The server will be available at [http://localhost:8000](http://localhost:8000).
+    </Step>
+    </Steps>
+
+    <Accordion title="How to customize your configuration (Optional)">
+      If you need to change the models, embedding dimensions, or other advanced settings, follow these steps:
+
+      1.  **Extract the default configuration:** Before starting the services, run this command to get a copy of the default `morphik.toml` file.
+
+          ```bash
+          docker run --rm ghcr.io/morphik-org/morphik-core:latest \
+                     cat /app/morphik.toml.default > morphik.toml
+          ```
+
+      2.  **Edit the file:** Open the `morphik.toml` file you just created and make your desired changes.
+
+      3.  **Start the application:** Run the `docker compose up` command as shown above. The `docker-compose.run.yml` file is configured to automatically detect and use your local `morphik.toml`, overriding the internal default.
+    </Accordion>
+
+    <Accordion title="How to use local models with Ollama (Optional)">
+    To use local models instead of OpenAI, start the services with the `ollama` profile enabled:
+
+      ```bash
+      docker compose -f docker-compose.run.yml --profile ollama up -d
+      ```
+
+    Make sure your `morphik.toml` is configured to use Ollama models. The default `api_base` for Ollama in the compose file is `http://ollama:11434`.
+    </Accordion>
 
     ---
 
     **Option&nbsp;B — Develop from source (build locally)**
-
+    <Note>
+    This option uses `docker-compose.yml` to build the image from the source code in this repository. The `start.sh` script simplifies this process.
+    </Note>
     ```bash
     # Clone and enter the repo
     git clone https://github.com/morphik-org/morphik-core.git
@@ -375,13 +407,6 @@ description: "Get up and running with Morphik"
     chmod +x start.sh
     ./start.sh
     ```
-
-    `start.sh` will:
-
-    1. Generate `.env` if missing (includes placeholders for `OPENAI_API_KEY`, etc.)
-    2. Copy **morphik.docker.toml ➜ morphik.toml** (overwriting each run) so the stack
-       always uses the OpenAI config.
-    3. Run `docker compose build && docker compose up -d`.
 
     Once the containers are up visit [http://localhost:8000/docs](http://localhost:8000/docs).
 
