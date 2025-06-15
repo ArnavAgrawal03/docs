@@ -212,15 +212,7 @@ description: "Get up and running with Morphik"
         git clone https://github.com/morphik-org/morphik-core.git
         ```
 
-        After cloning the repository, you will notice a `morphik-core` folder in your current directory.
-
-        ```bash
-        ls morphik-core
-        ```
-
-        If you see an error like `ls: morphik-core: No such file or directory`, it means that the repository is not cloned properly. Please try again.
-
-        Once you have cloned the repository, navigate into the `morphik-core` folder.
+        After cloning the repository, navigate into the `morphik-core` folder.
 
         ```bash
         cd morphik-core
@@ -315,7 +307,7 @@ description: "Get up and running with Morphik"
         INFO:     Uvicorn running on http://localhost:8000 (Press CTRL+C to quit)
         ```
 
-        This means that the server is running on `http://localhost:8000`. You can now interact with the server using the API or the Python SDK.
+        This means that the server is running on [http://localhost:8000](http://localhost:8000). You can now interact with the server using the API or the Python SDK.
       </Step>
     </Steps>
   </Tab>
@@ -336,75 +328,82 @@ description: "Get up and running with Morphik"
 
     ### Quick Start
 
-    1. Clone the repository and navigate to the project directory:
+    **Option&nbsp;A — Run the pre-built image**
+
+    Step-by-step:
 
     ```bash
+    # 1. Pull the image from GitHub Container Registry
+    docker pull ghcr.io/morphik-org/morphik-core:latest
+
+    # 2. Create an env file with your secrets – at minimum OPENAI_API_KEY
+    cat > morphik.env << 'EOF'
+    OPENAI_API_KEY=sk-...
+    # JWT_SECRET_KEY=change-me-in-prod  # optional, defaults internally
+    EOF
+
+    # 3 (optional).  Grab the default config so you can tweak it locally
+    #    The image ships the file at /app/morphik.toml.default
+    #    Copy it once, edit in your editor, then mount it back in step 4.
+    docker run --rm ghcr.io/morphik-org/morphik-core:latest \
+               cat /app/morphik.toml.default > morphik.toml
+
+    # 4. Launch the container – mount the config & env file
+    #    If you did not tweak the file, omit the -v flag and the image will
+    #    use its internal defaults (OpenAI models, 1536-d pgvector table).
+    docker run -d --name morphik \
+      --env-file morphik.env \
+      -v $(pwd)/morphik.toml:/app/morphik.toml:ro \
+      -p 8000:8000 ghcr.io/morphik-org/morphik-core:latest
+    ```
+
+    The server is now running at [http://localhost:8000](http://localhost:8000).
+
+    **Changing models / behaviour later**  
+    Just edit `morphik.toml` and `docker restart morphik`.  Any field you omit keeps the baked-in default.
+
+    ---
+
+    **Option&nbsp;B — Develop from source (build locally)**
+
+    ```bash
+    # Clone and enter the repo
     git clone https://github.com/morphik-org/morphik-core.git
     cd morphik-core
+
+    # Start everything (Postgres, Redis, Morphik) with sane defaults
+    chmod +x start.sh
+    ./start.sh
     ```
 
-    2. Before first-time setup, check the configuration:
+    `start.sh` will:
 
-    Ensure your `morphik.toml` file has the correct settings for running in Docker:
-    
-    ```toml
-    # For Redis configuration when using Docker
-    [redis]
-    host = "redis"  # use "redis" when running in Docker (not "localhost")
-    port = 6379
-    ```
-    
-    (If using local models with Ollama) Also ensure the Ollama configuration matches your deployment setup by modifying the `api_base` in your `morphik.toml`:
-    
-    ```toml
-    # Modify the api_base based on your deployment:
-    # - Local Ollama: "http://localhost:11434" (default)
-    # - Morphik in Docker, Ollama local: "http://host.docker.internal:11434"  
-    # - Both in Docker: "http://ollama:11434"
-    
-    [registered_models]
-    ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
-    ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
-    ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
-    ```
-    
-    For example, if running both Morphik and Ollama in Docker, change all `api_base` values to `"http://ollama:11434"`.
+    1. Generate `.env` if missing (includes placeholders for `OPENAI_API_KEY`, etc.)
+    2. Copy **morphik.docker.toml ➜ morphik.toml** (overwriting each run) so the stack
+       always uses the OpenAI config.
+    3. Run `docker compose build && docker compose up -d`.
 
-    If you want to use Ollama for AI capabilities:
+    Once the containers are up visit [http://localhost:8000/docs](http://localhost:8000/docs).
+
+    Need local models via Ollama?  Skip `start.sh` and run:
 
     ```bash
     docker compose --profile ollama up --build -d
     ```
-    This will build docker with an Ollama container.
 
-    Or if you're using OpenAI, Anthropic, or other models (configure the API key in .env):
+    ---
 
-    ```bash
-    docker compose up --build
-    ```
-    This will build docker without the Ollama container.
+    ### Advanced configuration
 
-    These commands will:
+    • **Change models** – edit `morphik.docker.toml` (for dev) or the file you mounted in Option A.  The most common edits are:
+      - switch `[completion] model` to `openai_gpt4-1` for full GPT-4, or any key in `[registered_models]`.
+      - lower `dimensions` back to 768 if you use a smaller embedding.
 
-    - Build all required containers
-    - Download necessary AI models (nomic-embed-text and qwen2.5vl if using Ollama)
-    - Initialize the PostgreSQL database with pgvector
-    - Start all services
+    • **Change ports / database** – edit `.env` (HOST, PORT, POSTGRES_URI).
 
-    The initial setup may take 5-10 minutes depending on your internet speed, as it needs to download the AI models.
-    
-    > **Note**: When using Ollama, ensure your system has sufficient memory. The qwen2.5vl model requires at least 4GB of available RAM. If you encounter memory issues, you can increase Docker's memory allocation in Docker Desktop settings (Resources > Advanced > Memory), modify the `morphik.toml` file to use a smaller model, or switch to using OpenAI API.
+    • **Persist data** – by default volumes declared in `docker-compose.yml` persist Postgres and storage across restarts.  For the pre-built image add `-v my_pg:/var/lib/postgresql/data` etc.
 
-    ```bash
-    docker compose up    # Start all services
-    docker compose down  # Stop all services
-    ```
-
-    1. To completely reset (will delete all data and models):
-
-    ```bash
-    docker compose down -v
-    ```
+    ---
 
     ### Configuration
 
