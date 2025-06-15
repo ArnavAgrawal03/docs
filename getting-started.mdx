@@ -368,18 +368,31 @@ description: "Get up and running with Morphik"
     </Steps>
 
     <Accordion title="How to customize your configuration (Optional)">
-      If you need to change the models, embedding dimensions, or other advanced settings, follow these steps:
+      The default `docker compose up` command uses the configuration baked into the Morphik image. If you need to change models, embedding dimensions, or other advanced settings, follow these steps:
 
-      1.  **Extract the default configuration:** Before starting the services, run this command to get a copy of the default `morphik.toml` file.
+      1.  **Extract the default configuration:** Run this command to get a local copy of the `morphik.toml` file.
 
           ```bash
           docker run --rm ghcr.io/morphik-org/morphik-core:latest \
                      cat /app/morphik.toml.default > morphik.toml
           ```
 
-      2.  **Edit the file:** Open the `morphik.toml` file you just created and make your desired changes.
+      2.  **Edit the local `morphik.toml` file:** Open the file you just created and make your desired changes.
 
-      3.  **Start the application:** Run the `docker compose up` command as shown above. The `docker-compose.run.yml` file is configured to automatically detect and use your local `morphik.toml`, overriding the internal default.
+      3.  **Enable the custom config in `docker-compose.run.yml`:** Open `docker-compose.run.yml` in a text editor and uncomment the volume mount for both the `morphik` and `worker` services.
+
+          Change this:
+          ```yaml
+          # To use a custom config, create a 'morphik.toml' file locally and uncomment the following line.
+          # - ./morphik.toml:/app/morphik.toml:ro
+          ```
+          To this:
+          ```yaml
+          # To use a custom config, create a 'morphik.toml' file locally and uncomment the following line.
+          - ./morphik.toml:/app/morphik.toml:ro
+          ```
+
+      4.  **Start the application:** Run `docker compose -f docker-compose.run.yml up -d`. It will now use your local `morphik.toml` file.
     </Accordion>
 
     <Accordion title="How to use local models with Ollama (Optional)">
