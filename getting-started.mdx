@@ -324,6 +324,10 @@ description: "Get up and running with Morphik"
 
     Morphik provides a streamlined Docker-based setup that includes all necessary components: the core API, PostgreSQL with pgvector, and Ollama for AI models.
 
+    <Note>
+      If you are using an Apple Silicon (M-series) Mac, we highly recommend using the Direct Installation method instead of Docker. GPU passthrough is not supported via Docker on Apple Silicon, which can significantly impact performance.
+    </Note>
+
     ### Prerequisites
 
     - Docker and Docker Compose installed on your system
