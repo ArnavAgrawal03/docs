@@ -1,0 +1,46 @@
+---
+title: "get_graph_visualization"
+description: "Retrieve nodes and links for visualizing a knowledge graph"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def get_graph_visualization(
+      name: str,
+      folder_name: Optional[Union[str, List[str]]] = None,
+      end_user_id: Optional[str] = None,
+  ) -> Dict[str, Any]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def get_graph_visualization(
+      name: str,
+      folder_name: Optional[Union[str, List[str]]] = None,
+      end_user_id: Optional[str] = None,
+  ) -> Dict[str, Any]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `name` (str): Graph name.
+- `folder_name` (str | List[str], optional): Folder scope filter.
+- `end_user_id` (str, optional): End-user scope filter.
+
+## Returns
+
+- `Dict[str, Any]`: JSON with `nodes` and `links` arrays ready for d3-force or similar libraries.
+
+## Example
+
+```python
+viz = db.get_graph_visualization("research_graph")
+print(len(viz["nodes"]), "nodes", len(viz["links"]), "edges")
+``` 

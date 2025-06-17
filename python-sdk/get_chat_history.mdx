@@ -1,0 +1,59 @@
+---
+title: "get_chat_history"
+description: "Fetch the full message history for a specific chat conversation"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def get_chat_history(chat_id: str) -> List[Dict[str, Any]]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def get_chat_history(chat_id: str) -> List[Dict[str, Any]]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `chat_id` (str): Identifier of the conversation to retrieve.
+
+## Returns
+
+- `List[Dict[str, Any]]`: A list of message dictionaries in chronological order.
+
+Each message dictionary contains:
+
+- `role` – either `"user"` or `"assistant"`
+- `content` – the original text of the message
+- `timestamp` – ISO-8601 timestamp string
+
+## Example
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  db = Morphik()
+  history = db.get_chat_history("chat_123")
+  for msg in history:
+      print(f"[{msg['role']}] {msg['content']}")
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async with AsyncMorphik() as db:
+      history = await db.get_chat_history("chat_123")
+      print(history[-1])
+  ```
+
+  </Tab>
+</Tabs> 

@@ -1,0 +1,49 @@
+---
+title: "get_recent_usage"
+description: "Retrieve a log of recent usage entries with optional filters"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def get_recent_usage(
+      operation_type: Optional[str] = None,
+      since: Optional[datetime] = None,
+      status: Optional[str] = None,
+  ) -> List[Dict[str, Any]]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def get_recent_usage(
+      operation_type: Optional[str] = None,
+      since: Optional[datetime] = None,
+      status: Optional[str] = None,
+  ) -> List[Dict[str, Any]]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `operation_type` (str, optional): Filter by operation (e.g. `"query"`, `"ingest"`).
+- `since` (datetime | str, optional): Only return records newer than this timestamp (ISO string or `datetime`).
+- `status` (str, optional): Filter by `"success"` or `"error"`.
+
+## Returns
+
+- `List[Dict[str, Any]]`: Each record includes `timestamp`, `operation_type`, `tokens_used`, `duration_ms`, and `status`.
+
+## Example
+
+```python
+from datetime import datetime, timedelta
+
+one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+recent = db.get_recent_usage(since=one_hour_ago)
+print(len(recent), "operations in the last hour")
+``` 

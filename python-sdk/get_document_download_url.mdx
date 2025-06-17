@@ -1,0 +1,39 @@
+---
+title: "get_document_download_url"
+description: "Generate a presigned URL to download a document's raw file content"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def get_document_download_url(document_id: str, expires_in: int = 3600) -> Dict[str, Any]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def get_document_download_url(document_id: str, expires_in: int = 3600) -> Dict[str, Any]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `document_id` (str): External ID of the document.
+- `expires_in` (int, optional): URL expiration time in seconds. Default is 3600 (1 hour).
+
+## Returns
+
+- `Dict[str, Any]` containing:
+  - `download_url` – presigned URL usable in a browser or `requests.get`.
+  - `filename`, `content_type`, `expires_in`, `document_id` (echoed back).
+
+## Example
+
+```python
+info = db.get_document_download_url(doc.external_id)
+print(info["download_url"])
+``` 

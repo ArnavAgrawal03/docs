@@ -1,0 +1,56 @@
+---
+title: "list_chat_conversations"
+description: "List recent chat conversations for the authenticated user"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def list_chat_conversations(limit: int = 100) -> List[Dict[str, Any]]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def list_chat_conversations(limit: int = 100) -> List[Dict[str, Any]]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `limit` (int, optional): Maximum number of conversations to return. Valid range is 1-500. Default is 100.
+
+## Returns
+
+- `List[Dict[str, Any]]`: Each dictionary contains:
+  - `chat_id` – conversation identifier
+  - `updated_at` – last activity timestamp
+  - `message_preview` – snippet of the last user/assistant message
+
+## Example
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  db = Morphik()
+  convos = db.list_chat_conversations(limit=20)
+  for convo in convos:
+      print(convo["chat_id"], convo["updated_at"])
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async with AsyncMorphik() as db:
+      convos = await db.list_chat_conversations()
+      print(f"You have {len(convos)} conversations")
+  ```
+
+  </Tab>
+</Tabs> 

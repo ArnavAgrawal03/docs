@@ -1,0 +1,54 @@
+---
+title: "ping"
+description: "Health-check endpoint – verify that your Morphik server is reachable"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def ping() -> Dict[str, Any]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def ping() -> Dict[str, Any]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Returns
+
+- `Dict[str, Any]`: A JSON object with two keys:
+  - `status` – always `"ok"` when the server is running
+  - `message` – human-readable confirmation string
+
+## Example
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  from morphik import Morphik
+
+  db = Morphik()
+  resp = db.ping()
+  assert resp["status"] == "ok"
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  from morphik import AsyncMorphik
+
+  async with AsyncMorphik() as db:
+      resp = await db.ping()
+      print(resp)
+  ```
+
+  </Tab>
+</Tabs> 

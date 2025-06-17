@@ -1,0 +1,32 @@
+---
+title: "get_usage_stats"
+description: "Retrieve cumulative token usage for the current user or application"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def get_usage_stats() -> Dict[str, int]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def get_usage_stats() -> Dict[str, int]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Returns
+
+- `Dict[str, int]`: Mapping of operation types (e.g. `"query"`, `"agent"`) to total tokens used.
+
+## Example
+
+```python
+stats = db.get_usage_stats()
+print(stats["query"], "tokens consumed for queries")
+``` 

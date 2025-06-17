@@ -1,0 +1,37 @@
+---
+title: "check_workflow_status"
+description: "Poll the status of an asynchronous graph build/update workflow"
+---
+
+<Tabs>
+  <Tab title="Sync">
+
+  ```python
+  def check_workflow_status(workflow_id: str, run_id: Optional[str] = None) -> Dict[str, Any]
+  ```
+
+  </Tab>
+  <Tab title="Async">
+
+  ```python
+  async def check_workflow_status(workflow_id: str, run_id: Optional[str] = None) -> Dict[str, Any]
+  ```
+
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `workflow_id` (str): Identifier returned when the graph build/update was started.
+- `run_id` (str, optional): For multi-run workflows, specify a particular run.
+
+## Returns
+
+- `Dict[str, Any]`: At minimum contains `status` (`"running"`, `"completed"` or `"failed"`). Additional keys such as `result` may be included when finished.
+
+## Example
+
+```python
+status = db.check_workflow_status("build-update-research_graph-abc123")
+print(status["status"])
+``` 

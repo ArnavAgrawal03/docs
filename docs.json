@@ -144,7 +144,9 @@
             "pages": [
               "python-sdk/create_graph",
               "python-sdk/get_graph",
-              "python-sdk/list_graphs"
+              "python-sdk/list_graphs",
+              "python-sdk/get_graph_visualization",
+              "python-sdk/check_workflow_status"
             ]
           },
           {
@@ -152,6 +154,27 @@
             "pages": [
               "python-sdk/create_cache",
               "python-sdk/get_cache"
+            ]
+          },
+          {
+            "group": "Chat & Conversation Management",
+            "pages": [
+              "python-sdk/list_chat_conversations",
+              "python-sdk/get_chat_history"
+            ]
+          },
+          {
+            "group": "Document Management",
+            "pages": [
+              "python-sdk/get_document_download_url"
+            ]
+          },
+          {
+            "group": "Usage & Monitoring",
+            "pages": [
+              "python-sdk/get_usage_stats",
+              "python-sdk/get_recent_usage",
+              "python-sdk/ping"
             ]
           }
         ]
