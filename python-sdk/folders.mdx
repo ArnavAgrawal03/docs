@@ -94,13 +94,58 @@ All the core document operations available on the main Morphik client are also a
 - `ingest_directory` - Ingest all files from a directory into this folder
 - `retrieve_chunks` - Retrieve chunks matching a query from this folder
 - `retrieve_docs` - Retrieve documents matching a query from this folder
-- `query` - Generate a completion using context from this folder
+- `query` - Generate a completion using context from this folder (supports `llm_config` parameter for custom LLM configuration)
 - `list_documents` - List all documents in this folder
 - `batch_get_documents` - Get multiple documents by their IDs from this folder
 - `batch_get_chunks` - Get specific chunks by source from this folder
 - `create_graph` - Create a knowledge graph from documents in this folder
 - `update_graph` - Update a knowledge graph with new documents from this folder
 - `delete_document_by_filename` - Delete a document by filename from this folder
+
+## Using Custom LLM Configuration with Folders
+
+You can pass a custom LLM configuration when querying within a folder:
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    
+    db = Morphik()
+    folder = db.get_folder("research")
+    
+    # Use a specific model for this query
+    response = folder.query(
+        "Summarize the latest findings",
+        llm_config={
+            "model": "claude-3-opus-20240229",
+            "temperature": 0.5
+        }
+    )
+    
+    print(response.completion)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    
+    async with AsyncMorphik() as db:
+        folder = db.get_folder("research")
+        
+        # Use a specific model for this query
+        response = await folder.query(
+            "Summarize the latest findings",
+            llm_config={
+                "model": "claude-3-opus-20240229",
+                "temperature": 0.5
+            }
+        )
+        
+        print(response.completion)
+    ```
+  </Tab>
+</Tabs>
 
 ## Example: Project Document Management
 

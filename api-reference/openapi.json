@@ -24,6 +24,97 @@
         }
       }
     },
+    "/models": {
+      "get": {
+        "summary": "Get Available Models",
+        "description": "Get list of available models from configuration.\n\nReturns models grouped by type (chat, embedding, etc.) with their metadata.",
+        "operationId": "get_available_models_models_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "models"
+        ],
+        "summary": "Save Model",
+        "description": "Save a custom model configuration.",
+        "operationId": "save_model_models_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveModelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ingest/text": {
       "post": {
         "tags": [
@@ -166,6 +257,690 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BatchIngestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/document/chat/{chat_id}": {
+      "get": {
+        "tags": [
+          "document"
+        ],
+        "summary": "Get Document Chat History",
+        "description": "Retrieve the message history for a document chat conversation.\n\nArgs:\n    chat_id: Identifier of the document chat conversation.\n    auth: Authentication context used to verify access to the conversation.\n    redis: Redis connection where chat messages are stored.\n\nReturns:\n    A list of message dictionaries or an empty list if no history exists.",
+        "operationId": "get_document_chat_history_document_chat__chat_id__get",
+        "parameters": [
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chat Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/document/chat/{chat_id}/complete": {
+      "post": {
+        "tags": [
+          "document"
+        ],
+        "summary": "Complete Document Chat",
+        "description": "Stream a chat completion response for a document chat conversation.\n\nArgs:\n    chat_id: Identifier of the document chat conversation.\n    request: The chat request containing the user message.\n    auth: Authentication context.\n    redis: Redis connection for chat history storage.\n\nReturns:\n    StreamingResponse with the assistant's response.",
+        "operationId": "complete_document_chat_document_chat__chat_id__complete_post",
+        "parameters": [
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chat Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/model-config/": {
+      "get": {
+        "tags": [
+          "model-config"
+        ],
+        "summary": "List Model Configs",
+        "description": "List all model configurations for the authenticated user and app.",
+        "operationId": "list_model_configs_model_config__get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModelConfigResponse"
+                  },
+                  "title": "Response List Model Configs Model Config  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "model-config"
+        ],
+        "summary": "Create Model Config",
+        "description": "Create a new model configuration.",
+        "operationId": "create_model_config_model_config__post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelConfigCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/model-config/{config_id}": {
+      "get": {
+        "tags": [
+          "model-config"
+        ],
+        "summary": "Get Model Config",
+        "description": "Get a specific model configuration.",
+        "operationId": "get_model_config_model_config__config_id__get",
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Config Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "model-config"
+        ],
+        "summary": "Update Model Config",
+        "description": "Update an existing model configuration.",
+        "operationId": "update_model_config_model_config__config_id__put",
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Config Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelConfigUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "model-config"
+        ],
+        "summary": "Delete Model Config",
+        "description": "Delete a model configuration.",
+        "operationId": "delete_model_config_model_config__config_id__delete",
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Config Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete Model Config Model Config  Config Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/model-config/custom-models/list": {
+      "get": {
+        "tags": [
+          "model-config"
+        ],
+        "summary": "List Custom Models",
+        "description": "List all custom models for the authenticated user.",
+        "operationId": "list_custom_models_model_config_custom_models_list_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomModel"
+                  },
+                  "title": "Response List Custom Models Model Config Custom Models List Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/model-config/custom-models": {
+      "post": {
+        "tags": [
+          "model-config"
+        ],
+        "summary": "Create Custom Model",
+        "description": "Create a new custom model.",
+        "operationId": "create_custom_model_model_config_custom_models_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomModelCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/custom": {
+      "get": {
+        "tags": [
+          "models"
+        ],
+        "summary": "List Custom Models",
+        "description": "List all custom models for the authenticated user.",
+        "operationId": "list_custom_models_models_custom_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModelResponse"
+                  },
+                  "title": "Response List Custom Models Models Custom Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{model_id}": {
+      "delete": {
+        "tags": [
+          "models"
+        ],
+        "summary": "Delete Model",
+        "description": "Delete a custom model.",
+        "operationId": "delete_model_models__model_id__delete",
+        "parameters": [
+          {
+            "name": "model_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Model Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete Model Models  Model Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api-keys": {
+      "post": {
+        "tags": [
+          "models"
+        ],
+        "summary": "Save Api Key",
+        "description": "Save API key for a provider.",
+        "operationId": "save_api_key_api_keys_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveApiKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Save Api Key Api Keys Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "models"
+        ],
+        "summary": "List Api Keys",
+        "description": "List all configured API keys (sanitized).",
+        "operationId": "list_api_keys_api_keys_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response List Api Keys Api Keys Get"
                 }
               }
             }
@@ -403,7 +1178,7 @@
           "EE - Connectors"
         ],
         "summary": "Get Initiate Auth Url",
-        "description": "Return the provider's *authorization_url* for the given connector.\n\nThe method mirrors the logic of the `/auth/initiate` endpoint but sends a\nJSON payload instead of a redirect so that browsers can stay on the same\norigin until they intentionally navigate away.",
+        "description": "Return the provider's *authorization_url* for the given connector.\n\nThe method mirrors the logic of the `/auth/initiate` endpoint but sends a\nJSON payload instead of a redirect so that browsers can stay on the same\norigin until they intentionally navigate away.\n\nFor OAuth-based connectors, this returns authorization_url.\nFor manual credential connectors, this returns the credential form specification.",
         "operationId": "get_initiate_auth_url_ee_connectors__connector_type__auth_initiate_url_get",
         "parameters": [
           {
@@ -447,10 +1222,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ManualCredentialsAuthResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OAuthAuthResponse"
+                    }
+                  ],
                   "title": "Response Get Initiate Auth Url Ee Connectors  Connector Type  Auth Initiate Url Get"
                 }
               }
@@ -559,6 +1338,70 @@
               "application/json": {
                 "schema": {
 
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ee/connectors/{connector_type}/auth/finalize": {
+      "post": {
+        "tags": [
+          "EE - Connectors"
+        ],
+        "summary": "Finalize Manual Auth",
+        "description": "Finalize authentication using manual credentials.\n\nThis endpoint is used for connectors that require manual credential input\n(like Zotero) instead of OAuth flows.",
+        "operationId": "finalize_manual_auth_ee_connectors__connector_type__auth_finalize_post",
+        "parameters": [
+          {
+            "name": "connector_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connector Type"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualCredentialsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Finalize Manual Auth Ee Connectors  Connector Type  Auth Finalize Post"
                 }
               }
             }
@@ -1127,10 +1970,50 @@
         }
       }
     },
+    "/models/available": {
+      "get": {
+        "summary": "Get Available Models For Selection",
+        "description": "Get list of available models for UI selection.\n\nReturns a list of models that can be used for queries. Each model includes:\n- id: Model identifier to use in llm_config\n- name: Display name for the model\n- provider: The LLM provider (e.g., openai, anthropic, ollama)\n- description: Optional description of the model",
+        "operationId": "get_available_models_for_selection_models_available_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/agent": {
       "post": {
         "summary": "Agent Query",
-        "description": "Execute an agent-style query using the :class:`MorphikAgent`.\n\nArgs:\n    request: The query payload containing the natural language question.\n    auth: Authentication context used to enforce limits and access control.\n\nReturns:\n    A dictionary with the agent's full response.",
+        "description": "Execute an agent-style query using the :class:`MorphikAgent`.\n\nArgs:\n    request: The query payload containing the natural language question and optional chat_id.\n    auth: Authentication context used to enforce limits and access control.\n    redis: Redis connection for chat history storage.\n\nReturns:\n    A dictionary with the agent's full response.",
         "operationId": "agent_query_agent_post",
         "parameters": [
           {
@@ -1206,6 +2089,28 @@
             }
           },
           {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -1235,7 +2140,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Body_list_documents_documents_post"
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Filters"
               }
             }
           }
@@ -1486,6 +2400,116 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}/download_url": {
+      "get": {
+        "summary": "Get Document Download Url",
+        "description": "Get a download URL for a specific document.\n\nArgs:\n    document_id: External ID of the document\n    auth: Authentication context\n    expires_in: URL expiration time in seconds (default: 1 hour)\n\nReturns:\n    Dictionary containing the download URL and metadata",
+        "operationId": "get_document_download_url_documents__document_id__download_url_get",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "expires_in",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "URL expiration time in seconds",
+              "default": 3600,
+              "title": "Expires In"
+            },
+            "description": "URL expiration time in seconds"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}/file": {
+      "get": {
+        "summary": "Download Document File",
+        "description": "Download the actual file content for a document.\nThis endpoint is used for local storage when file:// URLs cannot be accessed by browsers.\n\nArgs:\n    document_id: External ID of the document\n    auth: Authentication context\n\nReturns:\n    StreamingResponse with the file content",
+        "operationId": "download_document_file_documents__document_id__file_get",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
                 }
               }
             }
@@ -2311,6 +3335,50 @@
         }
       }
     },
+    "/folders/summary": {
+      "get": {
+        "summary": "List Folder Summaries",
+        "description": "Return compact folder list (id, name, doc_count, updated_at).",
+        "operationId": "list_folder_summaries_folders_summary_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderSummary"
+                  },
+                  "title": "Response List Folder Summaries Folders Summary Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/folders/{folder_id}": {
       "get": {
         "summary": "Get Folder",
@@ -2694,6 +3762,96 @@
         }
       }
     },
+    "/graph/{name}/visualization": {
+      "get": {
+        "summary": "Get Graph Visualization",
+        "description": "Get graph visualization data.\n\nThis endpoint retrieves the nodes and links data needed for graph visualization.\nIt works with both local and API-based graph services.\n\nArgs:\n    name: Name of the graph to visualize\n    auth: Authentication context\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n\nReturns:\n    Dict: Visualization data containing nodes and links arrays",
+        "operationId": "get_graph_visualization_graph__name__visualization_get",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          },
+          {
+            "name": "end_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End User Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Folder Name"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Graph Visualization Graph  Name  Visualization Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/graph/{name}/update": {
       "post": {
         "summary": "Update Graph",
@@ -2736,6 +3894,73 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Graph"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/graph/workflow/{workflow_id}/status": {
+      "get": {
+        "summary": "Check Workflow Status",
+        "description": "Check the status of a graph build/update workflow.\n\nThis endpoint polls the external graph API to check the status of an async operation.\n\nArgs:\n    workflow_id: The workflow ID returned from build/update operations\n    run_id: Optional run ID for the specific workflow run\n    auth: Authentication context\n\nReturns:\n    Dict containing status ('running', 'completed', or 'failed') and optional result",
+        "operationId": "check_workflow_status_graph_workflow__workflow_id__status_get",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Check Workflow Status Graph Workflow  Workflow Id  Status Get"
                 }
               }
             }
@@ -2974,7 +4199,7 @@
     "/chats": {
       "get": {
         "summary": "List Chat Conversations",
-        "description": "List chat conversations available to the current user.\n\nArgs:\n    auth: Authentication context containing user and app identifiers.\n    limit: Maximum number of conversations to return.\n\nReturns:\n    A list of dictionaries describing each conversation, ordered by most\n    recent activity.",
+        "description": "List chat conversations available to the current user.\n\nArgs:\n    auth: Authentication context containing user and app identifiers.\n    limit: Maximum number of conversations to return (1-500)\n\nReturns:\n    A list of dictionaries describing each conversation, ordered by most\n    recent activity.",
         "operationId": "list_chat_conversations_chats_get",
         "parameters": [
           {
@@ -3037,6 +4262,18 @@
             "type": "string",
             "title": "Query",
             "description": "Natural language query for the Morphik agent"
+          },
+          "chat_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chat Id",
+            "description": "Optional chat session ID for persisting conversation history"
           }
         },
         "type": "object",
@@ -3246,41 +4483,6 @@
         ],
         "title": "Body_ingest_file_ingest_file_post"
       },
-      "Body_list_documents_documents_post": {
-        "properties": {
-          "filters": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Filters"
-          },
-          "folder_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Folder Name"
-          }
-        },
-        "type": "object",
-        "title": "Body_list_documents_documents_post"
-      },
       "Body_update_document_file_documents__document_id__update_file_post": {
         "properties": {
           "file": {
@@ -3338,6 +4540,18 @@
           "timestamp": {
             "type": "string",
             "title": "Timestamp"
+          },
+          "agent_data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Data"
           }
         },
         "type": "object",
@@ -3622,6 +4836,32 @@
             ],
             "title": "Chat Id",
             "description": "Optional chat session ID for persisting conversation history"
+          },
+          "stream_response": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stream Response",
+            "description": "Whether to stream the response back in chunks",
+            "default": false
+          },
+          "llm_config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llm Config",
+            "description": "LiteLLM-compatible model configuration (e.g., model name, API key, base URL)"
           }
         },
         "type": "object",
@@ -3931,6 +5171,136 @@
         "title": "CreateGraphRequest",
         "description": "Request model for creating a graph"
       },
+      "CredentialField": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Required"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CredentialFieldOption"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "label",
+          "description",
+          "type",
+          "required"
+        ],
+        "title": "CredentialField"
+      },
+      "CredentialFieldOption": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "CredentialFieldOption"
+      },
+      "CustomModel": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "provider",
+          "model_name",
+          "config"
+        ],
+        "title": "CustomModel",
+        "description": "Custom model definition."
+      },
+      "CustomModelCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "provider",
+          "model_name",
+          "config"
+        ],
+        "title": "CustomModelCreate",
+        "description": "Request model for creating a custom model."
+      },
       "Document": {
         "properties": {
           "external_id": {
@@ -4011,6 +5381,42 @@
         ],
         "title": "Document",
         "description": "Represents a document stored in the database documents collection"
+      },
+      "DocumentChatRequest": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "DocumentChatRequest",
+        "description": "Request model for document chat completion."
       },
       "DocumentContent": {
         "properties": {
@@ -4309,10 +5715,17 @@
             "title": "Owner"
           },
           "document_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Document Ids"
           },
           "system_metadata": {
@@ -4371,6 +5784,51 @@
         ],
         "title": "FolderCreate",
         "description": "Request model for folder creation"
+      },
+      "FolderSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "doc_count": {
+            "type": "integer",
+            "title": "Doc Count",
+            "default": 0
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "FolderSummary"
       },
       "GenerateUriEERequest": {
         "properties": {
@@ -4698,6 +6156,53 @@
         "title": "IngestTextRequest",
         "description": "Request model for ingesting text content"
       },
+      "ManualCredentialsAuthResponse": {
+        "properties": {
+          "auth_type": {
+            "type": "string",
+            "title": "Auth Type"
+          },
+          "required_fields": {
+            "items": {
+              "$ref": "#/components/schemas/CredentialField"
+            },
+            "type": "array",
+            "title": "Required Fields"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "auth_type",
+          "required_fields"
+        ],
+        "title": "ManualCredentialsAuthResponse"
+      },
+      "ManualCredentialsRequest": {
+        "properties": {
+          "credentials": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Credentials"
+          }
+        },
+        "type": "object",
+        "required": [
+          "credentials"
+        ],
+        "title": "ManualCredentialsRequest",
+        "description": "Request model for manual credential submission."
+      },
       "MetadataExtractionRuleRequest": {
         "properties": {
           "type": {
@@ -4714,6 +6219,118 @@
         "type": "object",
         "title": "MetadataExtractionRuleRequest",
         "description": "Request model for metadata extraction rule"
+      },
+      "ModelConfigCreate": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "config_data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider",
+          "config_data"
+        ],
+        "title": "ModelConfigCreate",
+        "description": "Request model for creating a model configuration."
+      },
+      "ModelConfigResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "config_data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config Data"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "provider",
+          "config_data",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ModelConfigResponse",
+        "description": "Response model for model configuration."
+      },
+      "ModelConfigUpdate": {
+        "properties": {
+          "config_data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "config_data"
+        ],
+        "title": "ModelConfigUpdate",
+        "description": "Request model for updating a model configuration."
+      },
+      "ModelResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "provider",
+          "config",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ModelResponse",
+        "description": "Response for a saved model."
       },
       "NukeAppResponse": {
         "properties": {
@@ -4732,6 +6349,19 @@
           "app_name"
         ],
         "title": "NukeAppResponse"
+      },
+      "OAuthAuthResponse": {
+        "properties": {
+          "authorization_url": {
+            "type": "string",
+            "title": "Authorization Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "authorization_url"
+        ],
+        "title": "OAuthAuthResponse"
       },
       "QueryPromptOverride": {
         "properties": {
@@ -4967,6 +6597,61 @@
         ],
         "title": "RetrieveRequest",
         "description": "Base retrieve request model"
+      },
+      "SaveApiKeyRequest": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "api_key": {
+            "type": "string",
+            "title": "Api Key"
+          },
+          "base_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider",
+          "api_key"
+        ],
+        "title": "SaveApiKeyRequest",
+        "description": "Request to save API keys."
+      },
+      "SaveModelRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "provider",
+          "config"
+        ],
+        "title": "SaveModelRequest",
+        "description": "Request to save a custom model."
       },
       "SetFolderRuleRequest": {
         "properties": {

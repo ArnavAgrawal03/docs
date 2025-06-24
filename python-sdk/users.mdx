@@ -92,13 +92,60 @@ The UserScope class provides the same document operations as the main Morphik cl
 - `ingest_directory` - Ingest all files from a directory for this user
 - `retrieve_chunks` - Retrieve chunks matching a query from this user's documents
 - `retrieve_docs` - Retrieve documents matching a query from this user's documents
-- `query` - Generate a completion using context from this user's documents
+- `query` - Generate a completion using context from this user's documents (supports `llm_config` parameter for custom LLM configuration)
 - `list_documents` - List all documents owned by this user
 - `batch_get_documents` - Get multiple documents by their IDs for this user
 - `batch_get_chunks` - Get specific chunks by source for this user
 - `create_graph` - Create a knowledge graph from this user's documents
 - `update_graph` - Update a knowledge graph with new documents from this user
 - `delete_document_by_filename` - Delete a document by filename for this user
+
+## Using Custom LLM Configuration with User Scopes
+
+You can pass a custom LLM configuration when querying within a user scope:
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    
+    db = Morphik()
+    user_scope = db.signin("user123")
+    
+    # Use a specific model for this user's query
+    response = user_scope.query(
+        "What documents have I uploaded recently?",
+        llm_config={
+            "model": "gpt-4-turbo",
+            "temperature": 0.3,
+            "max_tokens": 1000
+        }
+    )
+    
+    print(response.completion)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    
+    async with AsyncMorphik() as db:
+        user_scope = db.signin("user123")
+        
+        # Use a specific model for this user's query
+        response = await user_scope.query(
+            "What documents have I uploaded recently?",
+            llm_config={
+                "model": "gpt-4-turbo",
+                "temperature": 0.3,
+                "max_tokens": 1000
+            }
+        )
+        
+        print(response.completion)
+    ```
+  </Tab>
+</Tabs>
 
 ## Example: Customer Support Application
 

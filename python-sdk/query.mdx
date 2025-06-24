@@ -23,6 +23,7 @@ Generate completion using relevant chunks as context.
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
         schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
+        llm_config: Optional[Dict[str, Any]] = None,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -41,6 +42,7 @@ Generate completion using relevant chunks as context.
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
         schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
+        llm_config: Optional[Dict[str, Any]] = None,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -60,6 +62,7 @@ Generate completion using relevant chunks as context.
 - `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
 - `prompt_overrides` (QueryPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction, resolution, and query prompts
 - `schema` (Type[BaseModel] | Dict[str, Any], optional): Optional schema for structured output, can be a Pydantic model or a JSON schema dict
+- `llm_config` (Dict[str, Any], optional): Optional LiteLLM-compatible model configuration (e.g., model name, API key, base URL). Allows overriding the default LLM configuration on a per-query basis. Defaults to None.
 
 ## Returns
 
@@ -239,6 +242,80 @@ Each `ChunkSource` object in the `sources` list has the following properties:
 - `document_id` (str): ID of the source document
 - `chunk_number` (int): Chunk number within the document
 - `score` (Optional[float]): Relevance score (if available)
+
+### Using Custom LLM Configuration
+
+<Note>
+The `llm_config` parameter is available in SDK version 0.2.5 and later.
+</Note>
+
+Use the `llm_config` parameter to override the default LLM configuration on a per-query basis. This allows you to use different models, API keys, or other LiteLLM-compatible settings for specific queries.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+    
+    db = Morphik()
+    
+    # Use GPT-4 for a specific query
+    response = db.query(
+        "What are the key findings?",
+        llm_config={
+            "model": "gpt-4",
+            "api_key": "sk-...",
+            "base_url": "https://api.openai.com/v1",
+            "temperature": 0.7,
+            "max_tokens": 2000
+        }
+    )
+    
+    print(response.completion)
+    
+    # Use Claude for another query
+    response = db.query(
+        "Summarize the research findings",
+        llm_config={
+            "model": "claude-3-opus-20240229",
+            "api_key": "your-anthropic-key"
+        }
+    )
+    
+    print(response.completion)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    
+    async with AsyncMorphik() as db:
+        # Use GPT-4 for a specific query
+        response = await db.query(
+            "What are the key findings?",
+            llm_config={
+                "model": "gpt-4",
+                "api_key": "sk-...",
+                "base_url": "https://api.openai.com/v1",
+                "temperature": 0.7,
+                "max_tokens": 2000
+            }
+        )
+        
+        print(response.completion)
+        
+        # Use Claude for another query
+        response = await db.query(
+            "Summarize the research findings",
+            llm_config={
+                "model": "claude-3-opus-20240229",
+                "api_key": "your-anthropic-key"
+            }
+        )
+        
+        print(response.completion)
+    ```
+  </Tab>
+</Tabs>
 
 ### Using Structured Output
 
