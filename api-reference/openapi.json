@@ -388,6 +388,490 @@
         }
       }
     },
+    "/workflows": {
+      "post": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Create Workflow",
+        "description": "Create a new workflow.",
+        "operationId": "create_workflow_workflows_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Workflow"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workflow"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "List Workflows",
+        "description": "List workflows visible to the caller.",
+        "operationId": "list_workflows_workflows_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Workflow"
+                  },
+                  "title": "Response List Workflows Workflows Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workflows/{workflow_id}": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Get Workflow",
+        "operationId": "get_workflow_workflows__workflow_id__get",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workflow"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Update Workflow",
+        "operationId": "update_workflow_workflows__workflow_id__put",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Updates"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workflow"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Delete Workflow",
+        "operationId": "delete_workflow_workflows__workflow_id__delete",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete Workflow Workflows  Workflow Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workflows/{workflow_id}/run/{document_id}": {
+      "post": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Run Workflow",
+        "description": "Queue a workflow run and return immediately.\n\nThe heavy execution is scheduled in a *BackgroundTask* so the request\nfinishes quickly, enabling the UI to update the document row to\n\"processing\" without waiting for LLM calls.",
+        "operationId": "run_workflow_workflows__workflow_id__run__document_id__post",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRun"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workflows/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Get Workflow Run",
+        "operationId": "get_workflow_run_workflows_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRun"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Delete Workflow Run",
+        "description": "Delete a workflow run.",
+        "operationId": "delete_workflow_run_workflows_runs__run_id__delete",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete Workflow Run Workflows Runs  Run Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workflows/{workflow_id}/runs": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "summary": "Get Workflow Runs",
+        "description": "Get all runs for a specific workflow.",
+        "operationId": "get_workflow_runs_workflows__workflow_id__runs_get",
+        "parameters": [
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowRun"
+                  },
+                  "title": "Response Get Workflow Runs Workflows  Workflow Id  Runs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/model-config/": {
       "get": {
         "tags": [
@@ -937,10 +1421,117 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "type": "object",
-                    "additionalProperties": true
+                    "type": "object"
                   },
                   "title": "Response List Api Keys Api Keys Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logs/": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get Logs",
+        "description": "Return recent logs for the authenticated user (scoped by user_id).",
+        "operationId": "get_logs_logs__get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "op_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Op Type"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LogResponse"
+                  },
+                  "title": "Response Get Logs Logs  Get"
                 }
               }
             }
@@ -1400,7 +1991,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Finalize Manual Auth Ee Connectors  Connector Type  Auth Finalize Post"
                 }
               }
@@ -1574,7 +2164,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Ingest File From Connector Ee Connectors  Connector Type  Ingest Post"
                 }
               }
@@ -1628,7 +2217,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Disconnect From Connector Ee Connectors  Connector Type  Disconnect Post"
                 }
               }
@@ -1684,6 +2272,56 @@
                     "$ref": "#/components/schemas/ChunkResult"
                   },
                   "title": "Response Retrieve Chunks Retrieve Chunks Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/retrieve/chunks/grouped": {
+      "post": {
+        "summary": "Retrieve Chunks Grouped",
+        "description": "Retrieve relevant chunks with grouped response format.\n\nReturns both flat results (for backward compatibility) and grouped results (for UI).\nWhen padding \u003E 0, groups chunks by main matches and their padding chunks.\n\nArgs:\n    request: RetrieveRequest containing query, filters, padding, etc.\n    auth: Authentication context\n\nReturns:\n    GroupedChunkResponse: Contains both flat chunks and grouped chunks",
+        "operationId": "retrieve_chunks_grouped_retrieve_chunks_grouped_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupedChunkResponse"
                 }
               }
             }
@@ -1777,7 +2415,6 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "additionalProperties": true,
                 "title": "Request"
               }
             }
@@ -1833,7 +2470,6 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "additionalProperties": true,
                 "title": "Request"
               }
             }
@@ -2043,7 +2679,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Agent Query Agent Post"
                 }
               }
@@ -2142,8 +2777,7 @@
               "schema": {
                 "anyOf": [
                   {
-                    "type": "object",
-                    "additionalProperties": true
+                    "type": "object"
                   },
                   {
                     "type": "null"
@@ -2310,7 +2944,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Get Document Status Documents  Document Id  Status Get"
                 }
               }
@@ -2686,7 +3319,6 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "additionalProperties": true,
                 "title": "Metadata"
               }
             }
@@ -2833,8 +3465,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "additionalProperties": true
+                    "type": "object"
                   },
                   "title": "Response Get Recent Usage Usage Recent Get"
                 }
@@ -2913,7 +3544,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Create Cache Cache Create Post"
                 }
               }
@@ -2964,7 +3594,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Get Cache Cache  Name  Get"
                 }
               }
@@ -3677,6 +4306,54 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete Graph",
+        "description": "Delete a graph by name.\n\nArgs:\n    name: Name of the graph to delete\n    auth: Authentication context (must have write access to the graph)\n\nReturns:\n    Deletion status",
+        "operationId": "delete_graph_graph__name__delete",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Delete Graph Graph  Name  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/graphs": {
@@ -3833,7 +4510,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Get Graph Visualization Graph  Name  Visualization Get"
                 }
               }
@@ -3911,6 +4587,95 @@
         }
       }
     },
+    "/graph/{name}/status": {
+      "get": {
+        "summary": "Get Graph Status",
+        "description": "Lightweight endpoint to check graph status with automatic status synchronization.\n\nThis endpoint:\n1. First checks the local database for graph status\n2. If status is 'processing' and has workflow_id, checks the external workflow status\n3. Updates the local database if workflow has completed\n4. Returns the current status and optionally pipeline stage information",
+        "operationId": "get_graph_status_graph__name__status_get",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          },
+          {
+            "name": "end_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End User Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Folder Name"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Get Graph Status Graph  Name  Status Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/graph/workflow/{workflow_id}/status": {
       "get": {
         "summary": "Check Workflow Status",
@@ -3959,7 +4724,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Check Workflow Status Graph Workflow  Workflow Id  Status Get"
                 }
               }
@@ -4143,6 +4907,175 @@
         }
       }
     },
+    "/folders/{folder_id}/workflows/{workflow_id}": {
+      "post": {
+        "summary": "Associate Workflow To Folder",
+        "description": "Associate a workflow with a folder for automatic execution on document ingestion.",
+        "operationId": "associate_workflow_to_folder_folders__folder_id__workflows__workflow_id__post",
+        "parameters": [
+          {
+            "name": "folder_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Folder Id"
+            }
+          },
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Associate Workflow To Folder Folders  Folder Id  Workflows  Workflow Id  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Disassociate Workflow From Folder",
+        "description": "Remove a workflow association from a folder.",
+        "operationId": "disassociate_workflow_from_folder_folders__folder_id__workflows__workflow_id__delete",
+        "parameters": [
+          {
+            "name": "folder_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Folder Id"
+            }
+          },
+          {
+            "name": "workflow_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workflow Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Disassociate Workflow From Folder Folders  Folder Id  Workflows  Workflow Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/folders/{folder_id}/workflows": {
+      "get": {
+        "summary": "List Folder Workflows",
+        "description": "List all workflows associated with a folder.",
+        "operationId": "list_folder_workflows_folders__folder_id__workflows_get",
+        "parameters": [
+          {
+            "name": "folder_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Folder Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Workflow"
+                  },
+                  "title": "Response List Folder Workflows Folders  Folder Id  Workflows Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/cloud/apps": {
       "delete": {
         "summary": "Delete Cloud App",
@@ -4177,7 +5110,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": true,
                   "title": "Response Delete Cloud App Cloud Apps Delete"
                 }
               }
@@ -4232,10 +5164,69 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "additionalProperties": true
+                    "type": "object"
                   },
                   "title": "Response List Chat Conversations Chats Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{chat_id}/title": {
+      "patch": {
+        "summary": "Update Chat Title",
+        "description": "Update the title of a chat conversation.\n\nArgs:\n    chat_id: ID of the chat conversation to update\n    title: New title for the chat\n    auth: Authentication context\n\nReturns:\n    Success status",
+        "operationId": "update_chat_title_chats__chat_id__title_patch",
+        "parameters": [
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chat Id"
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "New title for the chat",
+              "title": "Title"
+            },
+            "description": "New title for the chat"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
                 }
               }
             }
@@ -4383,7 +5374,6 @@
           "filters": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4544,7 +5534,6 @@
           "agent_data": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4561,6 +5550,32 @@
         ],
         "title": "ChatMessage",
         "description": "Simple chat message model for chat persistence."
+      },
+      "ChunkGroup": {
+        "properties": {
+          "main_chunk": {
+            "$ref": "#/components/schemas/ChunkResult"
+          },
+          "padding_chunks": {
+            "items": {
+              "$ref": "#/components/schemas/ChunkResult"
+            },
+            "type": "array",
+            "title": "Padding Chunks"
+          },
+          "total_chunks": {
+            "type": "integer",
+            "title": "Total Chunks",
+            "description": "Total number of chunks in this group"
+          }
+        },
+        "type": "object",
+        "required": [
+          "main_chunk",
+          "total_chunks"
+        ],
+        "title": "ChunkGroup",
+        "description": "Represents a group of chunks: one main match + its padding chunks"
       },
       "ChunkResult": {
         "properties": {
@@ -4581,7 +5596,6 @@
             "title": "Chunk Number"
           },
           "metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -4610,6 +5624,12 @@
               }
             ],
             "title": "Download Url"
+          },
+          "is_padding": {
+            "type": "boolean",
+            "title": "Is Padding",
+            "description": "Whether this chunk was added as padding",
+            "default": false
           }
         },
         "type": "object",
@@ -4664,7 +5684,6 @@
           "filters": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4705,6 +5724,13 @@
               }
             ],
             "title": "Use Colpali"
+          },
+          "padding": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Padding",
+            "description": "Number of additional chunks/pages to retrieve before and after matched chunks (ColPali only)",
+            "default": 0
           },
           "graph_name": {
             "anyOf": [
@@ -4815,7 +5841,6 @@
 
               },
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4853,7 +5878,6 @@
           "llm_config": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4913,7 +5937,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4930,6 +5953,26 @@
         ],
         "title": "CompletionResponse",
         "description": "Response from completion generation"
+      },
+      "ConfiguredAction": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "title": "Action Id",
+            "description": "Registry identifier of the action to execute"
+          },
+          "parameters": {
+            "type": "object",
+            "title": "Parameters",
+            "description": "JSON-serialisable parameters for the action"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action_id"
+        ],
+        "title": "ConfiguredAction",
+        "description": "A single step inside a *Workflow* configuration.\n\nThe concrete implementation is looked-up at runtime via the *action_id* in\nthe Action Registry (see *core.workflows.registry*)."
       },
       "ConnectorAuthStatus": {
         "properties": {
@@ -5086,7 +6129,6 @@
           "filters": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5255,7 +6297,6 @@
             "title": "Model Name"
           },
           "config": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           }
@@ -5286,7 +6327,6 @@
             "title": "Model Name"
           },
           "config": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           }
@@ -5307,13 +6347,6 @@
             "type": "string",
             "title": "External Id"
           },
-          "owner": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object",
-            "title": "Owner"
-          },
           "content_type": {
             "type": "string",
             "title": "Content Type"
@@ -5330,12 +6363,10 @@
             "title": "Filename"
           },
           "metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "storage_info": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Storage Info"
           },
@@ -5347,24 +6378,12 @@
             "title": "Storage Files"
           },
           "system_metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
           "additional_metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Additional Metadata"
-          },
-          "access_control": {
-            "additionalProperties": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "type": "object",
-            "title": "Access Control"
           },
           "chunk_ids": {
             "items": {
@@ -5372,11 +6391,43 @@
             },
             "type": "array",
             "title": "Chunk Ids"
+          },
+          "folder_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id"
+          },
+          "app_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App Id"
           }
         },
         "type": "object",
         "required": [
-          "owner",
           "content_type"
         ],
         "title": "Document",
@@ -5464,7 +6515,6 @@
             "title": "Document Id"
           },
           "metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -5472,7 +6522,6 @@
             "$ref": "#/components/schemas/DocumentContent"
           },
           "additional_metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Additional Metadata"
           }
@@ -5503,7 +6552,6 @@
             "title": "Type"
           },
           "properties": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Properties"
           },
@@ -5548,7 +6596,6 @@
           "properties": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5707,13 +6754,6 @@
             ],
             "title": "Description"
           },
-          "owner": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object",
-            "title": "Owner"
-          },
           "document_ids": {
             "anyOf": [
               {
@@ -5729,33 +6769,50 @@
             "title": "Document Ids"
           },
           "system_metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
-          "access_control": {
-            "additionalProperties": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "type": "object",
-            "title": "Access Control"
-          },
           "rules": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
             "title": "Rules"
+          },
+          "workflow_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Workflow Ids",
+            "description": "List of workflow IDs to run on document ingestion"
+          },
+          "app_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App Id"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id"
           }
         },
         "type": "object",
         "required": [
-          "name",
-          "owner"
+          "name"
         ],
         "title": "Folder",
         "description": "Represents a folder that contains documents"
@@ -5915,12 +6972,10 @@
             "title": "Relationships"
           },
           "metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "system_metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
@@ -5934,7 +6989,6 @@
           "filters": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5953,22 +7007,38 @@
             "format": "date-time",
             "title": "Updated At"
           },
-          "owner": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object",
-            "title": "Owner"
-          },
-          "access_control": {
-            "additionalProperties": {
-              "items": {
+          "folder_name": {
+            "anyOf": [
+              {
                 "type": "string"
               },
-              "type": "array"
-            },
-            "type": "object",
-            "title": "Access Control"
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Name"
+          },
+          "end_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End User Id"
+          },
+          "app_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App Id"
           }
         },
         "type": "object",
@@ -6007,6 +7077,45 @@
         "type": "object",
         "title": "GraphPromptOverrides",
         "description": "Container for graph-related prompt overrides.\n\nUse this class when customizing prompts for graph operations like\ncreate_graph() and update_graph(), which only support entity extraction\nand entity resolution customizations.\n\nThis class enforces that only graph-relevant override types are used."
+      },
+      "GroupedChunkResponse": {
+        "properties": {
+          "chunks": {
+            "items": {
+              "$ref": "#/components/schemas/ChunkResult"
+            },
+            "type": "array",
+            "title": "Chunks",
+            "description": "Flat list of all chunks (for backward compatibility)"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/ChunkGroup"
+            },
+            "type": "array",
+            "title": "Groups",
+            "description": "Grouped chunks for UI display"
+          },
+          "total_results": {
+            "type": "integer",
+            "title": "Total Results",
+            "description": "Total number of unique chunks"
+          },
+          "has_padding": {
+            "type": "boolean",
+            "title": "Has Padding",
+            "description": "Whether padding was applied to any results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "chunks",
+          "groups",
+          "total_results",
+          "has_padding"
+        ],
+        "title": "GroupedChunkResponse",
+        "description": "Response that includes both flat results and grouped results for UI"
       },
       "HTTPValidationError": {
         "properties": {
@@ -6052,7 +7161,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -6065,7 +7173,6 @@
             "anyOf": [
               {
                 "items": {
-                  "additionalProperties": true,
                   "type": "object"
                 },
                 "type": "array"
@@ -6101,13 +7208,11 @@
             "title": "Filename"
           },
           "metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "rules": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -6156,6 +7261,79 @@
         "title": "IngestTextRequest",
         "description": "Request model for ingesting text content"
       },
+      "LogResponse": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "operation_type": {
+            "type": "string",
+            "title": "Operation Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "tokens_used": {
+            "type": "integer",
+            "title": "Tokens Used"
+          },
+          "duration_ms": {
+            "type": "number",
+            "title": "Duration Ms"
+          },
+          "app_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App Id"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "user_id",
+          "operation_type",
+          "status",
+          "tokens_used",
+          "duration_ms"
+        ],
+        "title": "LogResponse",
+        "description": "Public serialisable view of a UsageRecord."
+      },
       "ManualCredentialsAuthResponse": {
         "properties": {
           "auth_type": {
@@ -6191,7 +7369,6 @@
       "ManualCredentialsRequest": {
         "properties": {
           "credentials": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Credentials"
           }
@@ -6211,7 +7388,6 @@
             "default": "metadata_extraction"
           },
           "schema": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Schema"
           }
@@ -6227,7 +7403,6 @@
             "title": "Provider"
           },
           "config_data": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Config Data"
           }
@@ -6251,7 +7426,6 @@
             "title": "Provider"
           },
           "config_data": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Config Data"
           },
@@ -6280,7 +7454,6 @@
       "ModelConfigUpdate": {
         "properties": {
           "config_data": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Config Data"
           }
@@ -6307,7 +7480,6 @@
             "title": "Provider"
           },
           "config": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           },
@@ -6478,7 +7650,6 @@
           "filters": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -6519,6 +7690,13 @@
               }
             ],
             "title": "Use Colpali"
+          },
+          "padding": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Padding",
+            "description": "Number of additional chunks/pages to retrieve before and after matched chunks (ColPali only)",
+            "default": 0
           },
           "graph_name": {
             "anyOf": [
@@ -6639,7 +7817,6 @@
             "title": "Provider"
           },
           "config": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           }
@@ -6726,7 +7903,6 @@
           "additional_filters": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -6829,7 +8005,198 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "Workflow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "owner_id": {
+            "type": "string",
+            "title": "Owner Id",
+            "description": "Organization / developer ID owning this workflow"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id",
+            "description": "End-user ID when created in a narrowed scope"
+          },
+          "app_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App Id",
+            "description": "App ID when created inside an application context"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/ConfiguredAction"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Steps",
+            "description": "Ordered list of actions to execute"
+          },
+          "system_metadata": {
+            "type": "object",
+            "title": "System Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "owner_id",
+          "steps"
+        ],
+        "title": "Workflow",
+        "description": "High-level definition of a multi-step document processing workflow."
+      },
+      "WorkflowRun": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "workflow_id": {
+            "type": "string",
+            "title": "Workflow Id"
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "app_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WorkflowRunStatus",
+            "default": "queued"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "results_per_step": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Results Per Step"
+          },
+          "final_output": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Output"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "system_metadata": {
+            "type": "object",
+            "title": "System Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "workflow_id",
+          "document_id"
+        ],
+        "title": "WorkflowRun",
+        "description": "Represents a concrete execution of a *Workflow* against a document."
+      },
+      "WorkflowRunStatus": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "completed",
+          "failed"
+        ],
+        "title": "WorkflowRunStatus",
+        "description": "Allowed status values for *WorkflowRun* objects."
       }
     }
   }
 }
+
