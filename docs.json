@@ -84,7 +84,15 @@
       },
       {
         "tab": "API Reference",
-        "openapi": "api-reference/openapi.json"
+        "openapi": "api-reference/openapi.json",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "api-reference/getting-started"
+            ]
+          }
+        ]
       },
       {
         "tab": "Python SDK",

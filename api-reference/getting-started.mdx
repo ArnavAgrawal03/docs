@@ -1,0 +1,109 @@
+---
+title: Getting Started with Morphik API
+description: Quick guide to start using the Morphik API
+---
+
+![Copy URI from Morphik Dashboard](/assets/copy_uri.png)
+
+## Getting Your API Token
+
+Once you have your Morphik URI from the UI, you can extract the token and start making API requests.
+
+### Extracting the Token from URI
+
+Your Morphik URI looks like this:
+```
+morphik://your-app-name:YOUR_JWT_TOKEN@your-morphik-instance.com:8000
+```
+
+Extract the JWT token - it's the part between `:` and `@`. You'll use this token in the `Authorization` header for all API calls.
+
+## Making Your First Query
+
+### Basic Query Example
+
+The API endpoint is typically available at `api.morphik.ai` for cloud instances.
+
+```bash
+curl -X POST https://api.morphik.ai/query \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "What is the main purpose of this document?",
+    "k": 5,
+    "use_colpali": true
+  }'
+```
+
+### JavaScript Example
+
+```javascript
+const API_BASE_URL = 'https://api.morphik.ai';
+const AUTH_TOKEN = 'YOUR_JWT_TOKEN'; // Extract from your URI
+
+async function queryMorphik(query) {
+  const response = await fetch(`${API_BASE_URL}/query`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: query,
+      k: 5,
+      use_colpali: true,
+      max_tokens: 1024,
+      temperature: 0.3
+    }),
+  });
+
+  const data = await response.json();
+  console.log('Answer:', data.completion);
+  console.log('Sources:', data.sources);
+}
+
+// Usage
+queryMorphik('What are the key features of this product?');
+```
+
+### Python Example
+
+```python
+import requests
+
+API_BASE_URL = 'https://api.morphik.ai'
+AUTH_TOKEN = 'YOUR_JWT_TOKEN'  # Extract from your URI
+
+def query_morphik(query):
+    response = requests.post(
+        f'{API_BASE_URL}/query',
+        headers={
+            'Authorization': f'Bearer {AUTH_TOKEN}',
+            'Content-Type': 'application/json',
+        },
+        json={
+            'query': query,
+            'k': 5,
+            'use_colpali': True,
+            'max_tokens': 1024,
+            'temperature': 0.3
+        }
+    )
+    
+    data = response.json()
+    print('Answer:', data['completion'])
+    print('Sources:', data['sources'])
+
+# Usage
+query_morphik('What are the key features of this product?')
+```
+
+## Common Query Parameters
+
+- `query` - Your question or prompt (required)
+- `k` - Number of document chunks to retrieve (default: 4)
+- `use_colpali` - Enable multimodal search (default: false)
+- `folder_name` - Limit search to specific folder
+- `stream_response` - Enable streaming responses
+
+That's it! You're ready to start querying your documents with Morphik.
