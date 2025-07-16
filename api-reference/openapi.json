@@ -16,7 +16,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/HealthCheckResponse"
                 }
               }
             }
@@ -46,7 +46,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/ModelsResponse"
                 }
               }
             }
@@ -568,7 +568,8 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "title": "Updates"
+                "additionalProperties": true,
+                "title": "Workflow Updates"
               }
             }
           }
@@ -1421,7 +1422,8 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "type": "object"
+                    "type": "object",
+                    "additionalProperties": true
                   },
                   "title": "Response List Api Keys Api Keys Get"
                 }
@@ -1991,6 +1993,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Finalize Manual Auth Ee Connectors  Connector Type  Auth Finalize Post"
                 }
               }
@@ -2164,6 +2167,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Ingest File From Connector Ee Connectors  Connector Type  Ingest Post"
                 }
               }
@@ -2217,6 +2221,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Disconnect From Connector Ee Connectors  Connector Type  Disconnect Post"
                 }
               }
@@ -2396,7 +2401,7 @@
     "/batch/documents": {
       "post": {
         "summary": "Batch Get Documents",
-        "description": "Retrieve multiple documents by their IDs in a single batch operation.\n\nArgs:\n    request: Dictionary containing:\n        - document_ids: List of document IDs to retrieve\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n\nReturns:\n    List[Document]: List of documents matching the IDs",
+        "description": "Retrieve multiple documents by their IDs in a single batch operation.\n\nArgs:\n    batch_request: Dictionary containing:\n        - document_ids: List of document IDs to retrieve\n        - folder_name: Optional folder to scope the operation to\n        - end_user_id: Optional end-user ID to scope the operation to\n    auth: Authentication context\n\nReturns:\n    List[Document]: List of documents matching the IDs",
         "operationId": "batch_get_documents_batch_documents_post",
         "parameters": [
           {
@@ -2415,7 +2420,8 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "title": "Request"
+                "additionalProperties": true,
+                "title": "Batch Request"
               }
             }
           }
@@ -2470,7 +2476,8 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "title": "Request"
+                "additionalProperties": true,
+                "title": "Batch Request"
               }
             }
           }
@@ -2679,6 +2686,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Agent Query Agent Post"
                 }
               }
@@ -2700,29 +2708,9 @@
     "/documents": {
       "post": {
         "summary": "List Documents",
-        "description": "List accessible documents.\n\nArgs:\n    auth: Authentication context\n    skip: Number of documents to skip\n    limit: Maximum number of documents to return\n    filters: Optional metadata filters\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n\nReturns:\n    List[Document]: List of accessible documents",
+        "description": "List accessible documents.\n\nArgs:\n    request: Request body containing filters and pagination\n    auth: Authentication context\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n\nReturns:\n    List[Document]: List of accessible documents",
         "operationId": "list_documents_documents_post",
         "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 0,
-              "title": "Skip"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10000,
-              "title": "Limit"
-            }
-          },
           {
             "name": "folder_name",
             "in": "query",
@@ -2772,18 +2760,11 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "anyOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Filters"
+                "$ref": "#/components/schemas/ListDocumentsRequest"
               }
             }
           }
@@ -2894,7 +2875,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/DocumentDeleteResponse"
                 }
               }
             }
@@ -2944,6 +2925,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Get Document Status Documents  Document Id  Status Get"
                 }
               }
@@ -2978,6 +2960,28 @@
             }
           },
           {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -3003,29 +3007,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Folder Name"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3093,7 +3074,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/DocumentDownloadUrlResponse"
                 }
               }
             }
@@ -3291,7 +3272,7 @@
     "/documents/{document_id}/update_metadata": {
       "post": {
         "summary": "Update Document Metadata",
-        "description": "Update only a document's metadata.\n\nArgs:\n    document_id: ID of the document to update\n    metadata: New metadata to merge with existing metadata\n    auth: Authentication context\n\nReturns:\n    Document: Updated document metadata",
+        "description": "Update only a document's metadata.\n\nArgs:\n    document_id: ID of the document to update\n    metadata_updates: New metadata to merge with existing metadata\n    auth: Authentication context\n\nReturns:\n    Document: Updated document metadata",
         "operationId": "update_document_metadata_documents__document_id__update_metadata_post",
         "parameters": [
           {
@@ -3319,7 +3300,8 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "title": "Metadata"
+                "additionalProperties": true,
+                "title": "Metadata Updates"
               }
             }
           }
@@ -3465,7 +3447,8 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object"
+                    "type": "object",
+                    "additionalProperties": true
                   },
                   "title": "Response Get Recent Usage Usage Recent Get"
                 }
@@ -3544,6 +3527,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Create Cache Cache Create Post"
                 }
               }
@@ -3594,6 +3578,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Get Cache Cache  Name  Get"
                 }
               }
@@ -3668,7 +3653,7 @@
     "/cache/{name}/add_docs": {
       "post": {
         "summary": "Add Docs To Cache",
-        "description": "Manually add documents to an existing cache.\n\nArgs:\n    name: Name of the target cache.\n    docs: List of document IDs to insert.\n    auth: Authentication context used for authorization.\n\nReturns:\n    A dictionary indicating whether the documents were queued for addition.",
+        "description": "Manually add documents to an existing cache.\n\nArgs:\n    name: Name of the target cache.\n    document_ids: List of document IDs to insert.\n    auth: Authentication context used for authorization.\n\nReturns:\n    A dictionary indicating whether the documents were queued for addition.",
         "operationId": "add_docs_to_cache_cache__name__add_docs_post",
         "parameters": [
           {
@@ -3699,7 +3684,7 @@
                 "items": {
                   "type": "string"
                 },
-                "title": "Docs"
+                "title": "Document Ids"
               }
             }
           }
@@ -4088,7 +4073,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/FolderDeleteResponse"
                 }
               }
             }
@@ -4146,7 +4131,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/DocumentAddToFolderResponse"
                 }
               }
             }
@@ -4202,7 +4187,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/DocumentDeleteResponse"
                 }
               }
             }
@@ -4236,6 +4221,28 @@
             }
           },
           {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -4261,29 +4268,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Folder Name"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -4338,6 +4322,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Delete Graph Graph  Name  Delete"
                 }
               }
@@ -4362,6 +4347,28 @@
         "description": "List all graphs the user has access to.\n\nThis endpoint retrieves all graphs the user has access to.\n\nArgs:\n    auth: Authentication context\n    folder_name: Optional folder to scope the operation to\n    end_user_id: Optional end-user ID to scope the operation to\n\nReturns:\n    List[Graph]: List of graph objects",
         "operationId": "list_graphs_graphs_get",
         "parameters": [
+          {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
           {
             "name": "end_user_id",
             "in": "query",
@@ -4388,29 +4395,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Folder Name"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -4455,6 +4439,28 @@
             }
           },
           {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -4480,29 +4486,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Folder Name"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -4510,6 +4493,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Get Graph Visualization Graph  Name  Visualization Get"
                 }
               }
@@ -4603,6 +4587,28 @@
             }
           },
           {
+            "name": "folder_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Name"
+            }
+          },
+          {
             "name": "end_user_id",
             "in": "query",
             "required": false,
@@ -4628,29 +4634,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Folder Name"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -4658,6 +4641,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Get Graph Status Graph  Name  Status Get"
                 }
               }
@@ -4724,6 +4708,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Check Workflow Status Graph Workflow  Workflow Id  Status Get"
                 }
               }
@@ -4889,7 +4874,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/FolderRuleResponse"
                 }
               }
             }
@@ -4948,6 +4933,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Associate Workflow To Folder Folders  Folder Id  Workflows  Workflow Id  Post"
                 }
               }
@@ -5005,6 +4991,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Disassociate Workflow From Folder Folders  Folder Id  Workflows  Workflow Id  Delete"
                 }
               }
@@ -5110,6 +5097,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Delete Cloud App Cloud Apps Delete"
                 }
               }
@@ -5164,7 +5152,8 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object"
+                    "type": "object",
+                    "additionalProperties": true
                   },
                   "title": "Response List Chat Conversations Chats Get"
                 }
@@ -5226,7 +5215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/ChatTitleResponse"
                 }
               }
             }
@@ -5265,6 +5254,16 @@
             ],
             "title": "Chat Id",
             "description": "Optional chat session ID for persisting conversation history"
+          },
+          "display_mode": {
+            "type": "string",
+            "enum": [
+              "formatted",
+              "raw"
+            ],
+            "title": "Display Mode",
+            "description": "Display mode for images: 'formatted' (default) creates bounding boxes with Gemini, 'raw' returns uncropped images",
+            "default": "formatted"
           }
         },
         "type": "object",
@@ -5273,13 +5272,6 @@
         ],
         "title": "AgentQueryRequest",
         "description": "Request model for agent queries"
-      },
-      "BaseModel": {
-        "properties": {
-
-        },
-        "type": "object",
-        "title": "BaseModel"
       },
       "BatchIngestResponse": {
         "properties": {
@@ -5374,6 +5366,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5534,6 +5527,7 @@
           "agent_data": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5550,6 +5544,30 @@
         ],
         "title": "ChatMessage",
         "description": "Simple chat message model for chat persistence."
+      },
+      "ChatTitleResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message",
+          "title"
+        ],
+        "title": "ChatTitleResponse",
+        "description": "Response for chat title update endpoint"
       },
       "ChunkGroup": {
         "properties": {
@@ -5596,6 +5614,7 @@
             "title": "Chunk Number"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -5684,6 +5703,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5841,6 +5861,7 @@
 
               },
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5878,6 +5899,7 @@
           "llm_config": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5903,7 +5925,7 @@
                 "type": "string"
               },
               {
-                "$ref": "#/components/schemas/BaseModel"
+                "$ref": "#/components/schemas/StructuredCompletion"
               }
             ],
             "title": "Completion"
@@ -5937,6 +5959,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5962,6 +5985,7 @@
             "description": "Registry identifier of the action to execute"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters",
             "description": "JSON-serialisable parameters for the action"
@@ -6129,6 +6153,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -6297,6 +6322,7 @@
             "title": "Model Name"
           },
           "config": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           }
@@ -6327,6 +6353,7 @@
             "title": "Model Name"
           },
           "config": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           }
@@ -6363,10 +6390,12 @@
             "title": "Filename"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "storage_info": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Storage Info"
           },
@@ -6378,10 +6407,12 @@
             "title": "Storage Files"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
           "additional_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Additional Metadata"
           },
@@ -6432,6 +6463,25 @@
         ],
         "title": "Document",
         "description": "Represents a document stored in the database documents collection"
+      },
+      "DocumentAddToFolderResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "DocumentAddToFolderResponse",
+        "description": "Response for adding document to folder endpoint"
       },
       "DocumentChatRequest": {
         "properties": {
@@ -6504,6 +6554,44 @@
         "title": "DocumentContent",
         "description": "Represents either a URL or content string"
       },
+      "DocumentDeleteResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "DocumentDeleteResponse",
+        "description": "Response for document deletion endpoint"
+      },
+      "DocumentDownloadUrlResponse": {
+        "properties": {
+          "download_url": {
+            "type": "string",
+            "title": "Download Url"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "download_url",
+          "expires_in"
+        ],
+        "title": "DocumentDownloadUrlResponse",
+        "description": "Response for document download URL endpoint"
+      },
       "DocumentResult": {
         "properties": {
           "score": {
@@ -6515,6 +6603,7 @@
             "title": "Document Id"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -6522,6 +6611,7 @@
             "$ref": "#/components/schemas/DocumentContent"
           },
           "additional_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Additional Metadata"
           }
@@ -6552,6 +6642,7 @@
             "title": "Type"
           },
           "properties": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Properties"
           },
@@ -6596,6 +6687,7 @@
           "properties": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -6769,11 +6861,13 @@
             "title": "Document Ids"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
           "rules": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -6841,6 +6935,44 @@
         ],
         "title": "FolderCreate",
         "description": "Request model for folder creation"
+      },
+      "FolderDeleteResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "FolderDeleteResponse",
+        "description": "Response for folder deletion endpoint"
+      },
+      "FolderRuleResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "FolderRuleResponse",
+        "description": "Response for folder rule setting endpoint"
       },
       "FolderSummary": {
         "properties": {
@@ -6972,10 +7104,12 @@
             "title": "Relationships"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           },
@@ -6989,6 +7123,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7130,6 +7265,25 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HealthCheckResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "HealthCheckResponse",
+        "description": "Response for health check endpoint"
+      },
       "IngestFromConnectorRequest": {
         "properties": {
           "file_id": {
@@ -7161,6 +7315,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7173,6 +7328,7 @@
             "anyOf": [
               {
                 "items": {
+                  "additionalProperties": true,
                   "type": "object"
                 },
                 "type": "array"
@@ -7208,11 +7364,13 @@
             "title": "Filename"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
           "rules": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -7261,6 +7419,38 @@
         "title": "IngestTextRequest",
         "description": "Request model for ingesting text content"
       },
+      "ListDocumentsRequest": {
+        "properties": {
+          "document_filters": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Filters",
+            "description": "Metadata filters for documents"
+          },
+          "skip": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Skip",
+            "default": 0
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "title": "Limit",
+            "default": 10000
+          }
+        },
+        "type": "object",
+        "title": "ListDocumentsRequest",
+        "description": "Request model for listing documents"
+      },
       "LogResponse": {
         "properties": {
           "timestamp": {
@@ -7302,6 +7492,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7369,6 +7560,7 @@
       "ManualCredentialsRequest": {
         "properties": {
           "credentials": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Credentials"
           }
@@ -7388,6 +7580,7 @@
             "default": "metadata_extraction"
           },
           "schema": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Schema"
           }
@@ -7403,6 +7596,7 @@
             "title": "Provider"
           },
           "config_data": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config Data"
           }
@@ -7426,6 +7620,7 @@
             "title": "Provider"
           },
           "config_data": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config Data"
           },
@@ -7454,6 +7649,7 @@
       "ModelConfigUpdate": {
         "properties": {
           "config_data": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config Data"
           }
@@ -7480,6 +7676,7 @@
             "title": "Provider"
           },
           "config": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           },
@@ -7503,6 +7700,56 @@
         ],
         "title": "ModelResponse",
         "description": "Response for a saved model."
+      },
+      "ModelsResponse": {
+        "properties": {
+          "chat_models": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Chat Models"
+          },
+          "embedding_models": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Embedding Models"
+          },
+          "default_models": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Default Models"
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Providers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "chat_models",
+          "embedding_models",
+          "default_models",
+          "providers"
+        ],
+        "title": "ModelsResponse",
+        "description": "Response for available models endpoint"
       },
       "NukeAppResponse": {
         "properties": {
@@ -7650,6 +7897,7 @@
           "filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7817,6 +8065,7 @@
             "title": "Provider"
           },
           "config": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           }
@@ -7898,11 +8147,21 @@
         "title": "StorageFileInfo",
         "description": "Information about a file stored in storage"
       },
+      "StructuredCompletion": {
+        "properties": {
+
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "StructuredCompletion",
+        "description": "Structured completion object for schema-based responses"
+      },
       "UpdateGraphRequest": {
         "properties": {
           "additional_filters": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -8066,6 +8325,7 @@
             "description": "Ordered list of actions to execute"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           }
@@ -8145,6 +8405,7 @@
           },
           "results_per_step": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -8153,6 +8414,7 @@
           "final_output": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -8173,6 +8435,7 @@
             "title": "Error"
           },
           "system_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "System Metadata"
           }
@@ -8199,4 +8462,3 @@
     }
   }
 }
-
