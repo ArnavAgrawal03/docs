@@ -8,7 +8,7 @@
     "dark": "#15803D"
   },
   "api": {
-    "openapi": "api-reference/openapi.json",
+    "openapi": "https://app.stainless.com/api/spec/documented/morphik/openapi.documented.yml",
     "playground": {
       "display": "interactive",
       "proxy": true
@@ -84,7 +84,7 @@
       },
       {
         "tab": "API Reference",
-        "openapi": "api-reference/openapi.json",
+        "openapi": "https://app.stainless.com/api/spec/documented/morphik/openapi.documented.yml",
         "groups": [
           {
             "group": "Getting Started",
