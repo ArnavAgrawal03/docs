@@ -24,8 +24,7 @@
             "group": "Get Started",
             "pages": [
               "introduction",
-              "getting-started",
-              "configuration"
+              "getting-started"
             ]
           },
           {
@@ -57,6 +56,13 @@
             "group": "Instance Management",
             "pages": [
               "api-reference/management-api"
+            ]
+          },
+          {
+            "group": "Self-Hosting",
+            "pages": [
+              "self-hosting",
+              "configuration"
             ]
           },
           {
