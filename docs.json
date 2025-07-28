@@ -3,9 +3,30 @@
   "theme": "mint",
   "name": "Morphik Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#000000",
+    "light": "#6B7280",
+    "dark": "#111827"
+  },
+  "fonts": {
+    "family": "Inter",
+    "heading": {
+      "family": "Playfair Display",
+      "weight": 400
+    },
+    "body": {
+      "family": "Inter",
+      "weight": 400
+    }
+  },
+  "appearance": {
+    "default": "light",
+    "strict": false
+  },
+  "background": {
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#0F0F0F"
+    }
   },
   "api": {
     "openapi": "https://app.stainless.com/api/spec/documented/morphik/openapi.documented.yml",
@@ -214,7 +235,8 @@
   },
   "logo": {
     "light": "/logo/light.png",
-    "dark": "/logo/dark.png"
+    "dark": "/logo/dark.png",
+    "href": "https://morphik.ai"
   },
   "navbar": {
     "links": [

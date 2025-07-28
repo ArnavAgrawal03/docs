@@ -299,7 +299,7 @@ For users who need to run Morphik on their own infrastructure, we provide two in
   <Tab title="Self Host - Docker (Advanced)">
     ## Using Docker
 
-    Morphik provides a streamlined Docker-based setup that includes all necessary components: the core API, PostgreSQL with pgvector, and Ollama for AI models.
+    Morphik provides a streamlined Docker-based setup that includes all necessary components: the core API, PostgreSQL with pgvector, Redis, and optionally Ollama for local AI models.
 
     <Note>
       If you are using an Apple Silicon (M-series) Mac, we highly recommend using the Direct Installation method instead of Docker. GPU passthrough is not supported via Docker on Apple Silicon, which can significantly impact performance.
@@ -307,67 +307,73 @@ For users who need to run Morphik on their own infrastructure, we provide two in
 
     ### Prerequisites
 
-    - Docker and Docker Compose installed on your system
+    - Docker and Docker Compose V2 installed on your system
     - At least 10GB of free disk space (for models and data)
     - 8GB\+ RAM recommended
 
     ### Quick Start
 
-    **Option&nbsp;A — Run the pre-built image**
+    **Option&nbsp;A — Using Pre-built Image (Recommended)**
 
-    This is the recommended method for most users. It uses an interactive script to set up and run Morphik with Docker Compose.
-
-    All you need is a single command:
+    This is the easiest way to get started with Morphik. Run this single command:
 
     ```bash
     curl -sSL https://raw.githubusercontent.com/morphik-org/morphik-core/main/install_docker.sh | bash
     ```
 
-    This script will:
-    1.  Check for Docker and Docker Compose.
-    2.  Warn you if you are on an Apple Silicon Mac and give you the option to proceed.
-    3.  Download the necessary `docker-compose.run.yml`.
-    4.  Create a `.env` file and ask you for your OpenAI API Key.
-    5.  Optionally allow you to customize the `morphik.toml` configuration before starting.
-    6.  Start all the services (`morphik`, `worker`, `postgres`, and `redis`).
+    The script handles all setup tasks including checking prerequisites, downloading configurations, and starting services. After installation:
 
-    The server will then be available at [http://localhost:8000](http://localhost:8000). To use local models with Ollama, you can run `docker compose -f docker-compose.run.yml --profile ollama up -d` after the installation script has completed.
+    ```bash
+    # To restart Morphik later
+    ./start-morphik.sh
+
+    # To stop all services
+    docker compose -f docker-compose.run.yml down
+    ```
+
+    The server will be available at the port specified in your `morphik.toml` configuration (default: 8000).
 
     ---
 
-    **Option&nbsp;B — Develop from source (build locally)**
-    <Note>
-    This option uses `docker-compose.yml` to build the image from the source code in this repository. The `start.sh` script simplifies this process.
-    </Note>
+    **Option&nbsp;B — Local Development**
+    
+    For developing and testing changes to Morphik:
+
     ```bash
     # Clone and enter the repo
     git clone https://github.com/morphik-org/morphik-core.git
     cd morphik-core
 
-    # Start everything (Postgres, Redis, Morphik) with sane defaults
-    chmod +x start.sh
-    ./start.sh
+    # Start development environment
+    ./start-dev.sh
     ```
 
-    Once the containers are up visit [http://localhost:8000/docs](http://localhost:8000/docs).
-
-    Need local models via Ollama?  Skip `start.sh` and run:
+    This builds the Docker image locally and starts all services. To include Ollama for local models:
 
     ```bash
-    docker compose --profile ollama up --build -d
+    docker compose --profile ollama up --build
     ```
 
     ---
 
-    ### Advanced configuration
+    ### Changing the Port
 
-    • **Change models** – edit `morphik.docker.toml` (for dev) or the file you mounted in Option A.  The most common edits are:
-      - switch `[completion] model` to `openai_gpt4-1` for full GPT-4, or any key in `[registered_models]`.
-      - lower `dimensions` back to 768 if you use a smaller embedding.
+    To run Morphik on a different port, edit the `morphik.toml` file:
 
-    • **Change ports / database** – edit `.env` (HOST, PORT, POSTGRES_URI).
+    ```toml
+    [api]
+    port = 9000  # Your custom port
+    ```
 
-    • **Persist data** – by default volumes declared in `docker-compose.yml` persist Postgres and storage across restarts.  For the pre-built image add `-v my_pg:/var/lib/postgresql/data` etc.
+    Then restart using the appropriate start script (`./start-morphik.sh` for production or `./start-dev.sh` for development).
+
+    ### Advanced Configuration
+
+    • **Change models** – Edit `morphik.toml` to switch between different models. See the `[registered_models]` section for available options.
+
+    • **Environment variables** – Customize settings in `.env` file (API keys, database connection, etc.)
+
+    • **Persist data** – Docker volumes automatically persist PostgreSQL data and uploaded files across restarts.
 
     ---
 
