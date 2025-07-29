@@ -321,17 +321,35 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     curl -sSL https://raw.githubusercontent.com/morphik-org/morphik-core/main/install_docker.sh | bash
     ```
 
-    The script handles all setup tasks including checking prerequisites, downloading configurations, and starting services. After installation:
+    The script handles all setup tasks including:
+    - Checking prerequisites (Docker, Docker Compose V2)
+    - Downloading configurations
+    - Prompting for your OpenAI API key (optional - press Enter to skip)
+    - **Offering to install the Admin UI** (optional but recommended)
+    - Starting all services
+
+    During installation, you'll be prompted:
+    1. To enter your OpenAI API key (optional - press Enter to skip and configure later)
+    2. Whether you'd like to install the Admin UI (recommended for easier management)
+
+    <Note>
+      Morphik supports 100s of models including OpenAI, Anthropic (Claude), Google Gemini, local models, and even custom models! You can configure your preferred provider in `morphik.toml` after installation.
+    </Note>
+
+    After installation:
 
     ```bash
-    # To restart Morphik later
+    # To restart Morphik later (automatically detects UI if installed)
     ./start-morphik.sh
 
     # To stop all services
     docker compose -f docker-compose.run.yml down
     ```
 
-    The server will be available at the port specified in your `morphik.toml` configuration (default: 8000).
+    The services will be available at:
+    - **API**: http://localhost:8000 (or your configured port)
+    - **API Documentation**: http://localhost:8000/docs
+    - **Admin UI** (if installed): http://localhost:3003
 
     ---
 
