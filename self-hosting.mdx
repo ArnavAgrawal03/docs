@@ -249,9 +249,10 @@ For users who need to run Morphik on their own infrastructure, we provide two in
         The script will:
 
         1. Create & activate a `.venv` with **uv**
-        2. Install `colpali-engine` (knowledge-graph generation)
-        3. Build `llama-cpp-python` (Metal acceleration on Apple Silicon)
-        4. Launch the server via `uv run start_server.py`
+        2. Ask about GPU availability for multimodal embeddings
+        3. Install `colpali-engine` (for multimodal document understanding)
+        4. Build `llama-cpp-python` (Metal acceleration on Apple Silicon)
+        5. Launch the server via `uv run start_server.py`
 
         <Note>
           You only need to run `./install_and_start.sh` the first time to set up
@@ -305,6 +306,20 @@ For users who need to run Morphik on their own infrastructure, we provide two in
       If you are using an Apple Silicon (M-series) Mac, we highly recommend using the Direct Installation method instead of Docker. GPU passthrough is not supported via Docker on Apple Silicon, which can significantly impact performance.
     </Note>
 
+    <Warning>
+      **Multimodal Embeddings and GPU Recommendations**
+      
+      Morphik achieves ultra-accurate document understanding through advanced multimodal embeddings that excel at processing images, PDFs, and complex layouts. While Morphik will work without a GPU, for best results we recommend using a GPU-enabled machine.
+      
+      The installer will ask if you want multimodal embeddings, and can be turned on and off later.
+      
+      To manually adjust multimodal embeddings, edit `morphik.toml`:
+      ```toml
+      [morphik]
+      enable_colpali = false  # Set to true when GPU is available
+      ```
+    </Warning>
+
     ### Prerequisites
 
     - Docker and Docker Compose V2 installed on your system
@@ -320,6 +335,13 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     ```bash
     curl -sSL https://raw.githubusercontent.com/morphik-org/morphik-core/main/install_docker.sh | bash
     ```
+
+    <video controls>
+      <source src="/assets/download_morphik.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    *This video demonstrates the installation flow where we select "No" for GPU support and "Yes" for the Admin UI. The initial startup took approximately 3-4 minutes without GPU. Note that with multimodal embeddings enabled, the initial startup may take longer.*
 
     The script handles all setup tasks including:
     - Checking prerequisites (Docker, Docker Compose V2)
@@ -345,6 +367,10 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     # To stop all services
     docker compose -f docker-compose.run.yml down
     ```
+
+    <Note>
+      To restart Morphik with a different configuration, first stop all services using `docker compose -f docker-compose.run.yml down`, modify your `morphik.toml` file, and then restart using `./start-morphik.sh`.
+    </Note>
 
     The services will be available at:
     - **API**: http://localhost:8000 (or your configured port)
