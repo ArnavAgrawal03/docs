@@ -1,464 +1,86 @@
 ---
 title: 'Configure Morphik'
-description: 'Get the most out of Morphik by customizing it to your needs'
+description: 'Exploring the tunable knobs via `morphik.toml`'
 ---
 
-Morphik's behavior can be fully customized through the `morphik.toml` configuration file. This file is the central place to configure all aspects of the system, from API settings to model providers, database connections, and processing options.
+Morphik uses the `morphik.toml` configuration file to control all aspects of the system.
 
-## Configuration Basics
+## Model Configuration
 
-The `morphik.toml` file uses the TOML format (Tom's Obvious Minimal Language) to organize settings into logical sections. Each section controls a specific component of the Morphik system:
+Morphik uses [LiteLLM](https://litellm.ai) to route to 100+ LLM providers with a unified interface. This means you can use models from OpenAI, Anthropic, Google, AWS Bedrock, Azure, Hugging Face, and many more - all with the same simple configuration format.
 
-```toml
-[section_name]
-setting1 = "value1"
-setting2 = 123
-```
+### Example Configurations
 
-When you first set up Morphik, you can:
-- Run `python quick_setup.py` for an interactive setup process
-- Copy and modify the example `morphik.toml` file
-- Create your own configuration file manually
-
-## Registered Models Approach
-
-Morphik uses a registered models approach which allows you to define hundreds of different models and reference them throughout your configuration. This makes it easy to:
-
-- Use different models for different tasks
-- Mix and match models based on your needs (e.g. smaller models for simpler tasks)
-- Configure model-specific settings in one place
-- Switch between providers without changing the rest of your configuration
-
-### Defining Registered Models
-
-First, register your models in the `[registered_models]` section:
+In your `morphik.toml`, define models in the LiteLLM format:
 
 ```toml
 [registered_models]
-# OpenAI models
-openai_gpt4-1 = { model_name = "gpt-4.1" }
-openai_gpt4-1-mini = { model_name = "gpt-4.1-mini" }
+# OpenAI
+openai_gpt4 = { model_name = "gpt-4" }
+openai_gpt4_mini = { model_name = "gpt-4-0125-preview" }
 
-# Azure OpenAI models
-azure_gpt4 = { model_name = "gpt-4", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-4-deployment" }
-azure_gpt35 = { model_name = "gpt-3.5-turbo", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-35-turbo-deployment" }
+# Anthropic
+claude_3_opus = { model_name = "claude-3-opus-20240229" }
+claude_3_sonnet = { model_name = "claude-3-sonnet-20240229" }
 
-# Anthropic models
-claude_opus = { model_name = "claude-3-opus-20240229" }
-claude_sonnet = { model_name = "claude-3-7-sonnet-latest" }
+# Google
+gemini_pro = { model_name = "gemini/gemini-pro" }
+gemini_flash = { model_name = "gemini/gemini-1.5-flash" }
 
-# Ollama models (modify api_base based on your deployment)
-# - Local Ollama: "http://localhost:11434" (default)
-# - Morphik in Docker, Ollama local: "http://host.docker.internal:11434"  
-# - Both in Docker: "http://ollama:11434"
-ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
-ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
-ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
+# Azure OpenAI
+azure_gpt4 = { model_name = "azure/gpt-4", api_base = "YOUR_AZURE_URL", api_key = "YOUR_KEY" }
 
-# Embedding models
-openai_embedding = { model_name = "text-embedding-3-small" }
-openai_embedding_large = { model_name = "text-embedding-3-large" }
-azure_embedding = { model_name = "text-embedding-ada-002", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "embedding-ada-002" }
+# AWS Bedrock
+bedrock_claude = { model_name = "bedrock/anthropic.claude-v2" }
+
+# And 100+ more providers...
 ```
 
-### Using Registered Models
-
-Then reference these models by their key in different sections:
+Then reference these models throughout your configuration:
 
 ```toml
 [completion]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-default_max_tokens = "1000"
-default_temperature = 0.5
+model = "claude_3_opus"  # Use any registered model
 
 [embedding]
-model = "ollama_embedding"  # Reference to registered model
-dimensions = 768
-similarity_metric = "cosine"
-
-[parser.vision]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-
-[rules]
-model = "ollama_qwen_vision"
-
-[graph]
-model = "ollama_qwen_vision"
+model = "openai_embedding"  # Use any registered embedding model
 ```
 
-This approach gives you maximum flexibility to use different models for different components, and even switch between local and cloud models as needed.
+## Local LLMs
 
-## Ollama Deployment Configurations
+Morphik can also run entirely with local LLMs. We directly integrate with two major local LLM servers:
 
-When using Ollama models, you need to configure the `api_base` parameter based on your deployment setup:
+### Ollama
+<img src="/assets/ollama.png" alt="Ollama" width="200" />
 
-### Local Development
-If both Morphik and Ollama are running locally:
-```toml
-ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
-ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
-```
-
-### Morphik in Docker, Ollama Local
-If you're running Morphik in Docker but Ollama locally on your machine:
-```toml
-ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://host.docker.internal:11434", vision = true }
-ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://host.docker.internal:11434" }
-```
-
-### Both in Docker
-If both Morphik and Ollama are running in Docker containers:
-```toml
-ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://ollama:11434", vision = true }
-ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://ollama:11434" }
-```
-
-<Tip>
-Simply modify the `api_base` parameter in your existing model definitions rather than creating separate model entries for each deployment scenario.
-</Tip>
-
-## Core Configuration Sections
-
-### API Server Settings
-
-Controls how the API server runs:
+[Ollama](https://ollama.ai) - Run Llama, Mistral, Gemma and other models locally.
 
 ```toml
-[api]
-host = "localhost"  # Use "0.0.0.0" for Docker
-port = 8000
-reload = true       # Hot reload for development
-```
-
-### Authentication
-
-Controls user authentication and permissions:
-
-```toml
-[auth]
-jwt_algorithm = "HS256"
-dev_mode = true  # Enables simplified auth for local development
-dev_entity_id = "dev_user"
-dev_entity_type = "developer"
-dev_permissions = ["read", "write", "admin"]
-```
-
-### LLM Completion Settings
-
-Configure the model used for generating text:
-
-```toml
-[completion]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-default_max_tokens = "1000"
-default_temperature = 0.5
-```
-
-### Database Connection
-
-Choose your document metadata database:
-
-```toml
-[database]
-provider = "postgres"
-
-# Or for MongoDB
-[database]
-provider = "mongodb"
-database_name = "morphik"
-collection_name = "documents"
-```
-
-### Embedding Configuration
-
-Configure vector embeddings generation:
-
-```toml
-[embedding]
-model = "ollama_embedding"  # Reference to registered model
-dimensions = 768
-similarity_metric = "cosine"
-```
-
-### Document Parsing
-
-Control how documents are processed and chunked:
-
-```toml
-[parser]
-chunk_size = 1000        # Characters per chunk
-chunk_overlap = 200      # Overlap between chunks
-use_unstructured_api = false
-use_contextual_chunking = false
-contextual_chunking_model = "ollama_qwen_vision"  # Reference to a key in registered_models
-```
-
-### Vision Processing
-
-Configure multimodal processing for images and videos:
-
-```toml
-[parser.vision]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-frame_sample_rate = -1   # Set to -1 to disable frame captioning
-```
-
-### Reranking
-
-Configure the cross-encoder reranker for improved retrieval:
-
-```toml
-# Enable reranking
-[reranker]
-use_reranker = true
-provider = "flag"
-model_name = "BAAI/bge-reranker-large"
-query_max_length = 256
-passage_max_length = 512
-use_fp16 = true
-device = "mps"  # "cpu", "cuda", or "mps"
-
-# Disable reranking
-[reranker]
-use_reranker = false
-```
-
-### Document Storage
-
-Choose where to store your document files:
-
-```toml
-# Local storage
-[storage]
-provider = "local"
-storage_path = "./storage"
-
-# AWS S3 storage
-[storage]
-provider = "aws-s3"
-region = "us-east-2"
-bucket_name = "morphik-storage"
-```
-
-### Vector Database
-
-Configure where vector embeddings are stored:
-
-```toml
-# PostgreSQL with pgvector
-[vector_store]
-provider = "pgvector"
-
-# MongoDB Atlas
-[vector_store]
-provider = "mongodb"
-database_name = "morphik"
-collection_name = "document_chunks"
-```
-
-### Rules Engine
-
-Configure document processing with rules:
-
-```toml
-[rules]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-batch_size = 4096
-```
-
-### Knowledge Graph
-
-Configure entity extraction and graph building:
-
-```toml
-[graph]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-enable_entity_resolution = true
-```
-
-### General Morphik Settings
-
-Control core platform features:
-
-```toml
-[morphik]
-enable_colpali = true    # Enable advanced retrieval
-mode = "self_hosted"     # "cloud" or "self_hosted"
-```
-
-### Telemetry
-
-Configure observability settings:
-
-```toml
-[telemetry]
-enabled = true
-honeycomb_enabled = true
-honeycomb_endpoint = "https://api.honeycomb.io"
-honeycomb_proxy_endpoint = "https://otel-proxy.onrender.com"
-service_name = "morphik-core"
-otlp_timeout = 10
-otlp_max_retries = 3
-otlp_retry_delay = 1
-otlp_max_export_batch_size = 512
-otlp_schedule_delay_millis = 5000
-otlp_max_queue_size = 2048
-```
-
-## Environment Variables
-
-Morphik uses environment variables for sensitive credentials and configuration that shouldn't be stored in the configuration file:
-
-- `OPENAI_API_KEY`: Your OpenAI API key
-- `ANTHROPIC_API_KEY`: Your Anthropic API key
-- `JWT_SECRET_KEY`: Secret for authentication tokens
-- `POSTGRES_URI`: PostgreSQL connection string
-- `MONGODB_URI`: MongoDB connection string
-- `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY`: For S3 storage
-- `ASSEMBLYAI_API_KEY`: For video transcription
-- `UNSTRUCTURED_API_KEY`: For enhanced document parsing (optional)
-- `HONEYCOMB_API_KEY`: For telemetry (optional)
-
-## Complete Configuration Example
-
-Here's a complete example showing the structure of a morphik.toml file with registered models:
-
-```toml
-[api]
-host = "localhost"  # Use "0.0.0.0" for Docker
-port = 8000
-reload = true
-
-[auth]
-jwt_algorithm = "HS256"
-dev_mode = true
-dev_entity_id = "dev_user"
-dev_entity_type = "developer"
-dev_permissions = ["read", "write", "admin"]
-
 [registered_models]
-# OpenAI models
-openai_gpt4-1 = { model_name = "gpt-4.1" }
-openai_gpt4-1-mini = { model_name = "gpt-4.1-mini" }
-
-# Azure OpenAI models
-azure_gpt4 = { model_name = "gpt-4", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-4-deployment" }
-azure_gpt35 = { model_name = "gpt-3.5-turbo", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "gpt-35-turbo-deployment" }
-
-# Anthropic models
-claude_opus = { model_name = "claude-3-opus-20240229" }
-claude_sonnet = { model_name = "claude-3-7-sonnet-latest" }
-
-# Ollama models (modify api_base based on your deployment)
-# - Local Ollama: "http://localhost:11434" (default)
-# - Morphik in Docker, Ollama local: "http://host.docker.internal:11434"  
-# - Both in Docker: "http://ollama:11434"
-ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5vl:latest", api_base = "http://localhost:11434", vision = true }
-ollama_llama_vision = { model_name = "ollama_chat/llama3.2-vision", api_base = "http://localhost:11434", vision = true }
+# Ollama models
+ollama_llama = { model_name = "ollama_chat/llama3.2", api_base = "http://localhost:11434" }
+ollama_qwen_vision = { model_name = "ollama_chat/qwen2.5:72b", api_base = "http://localhost:11434", vision = true }
 ollama_embedding = { model_name = "ollama/nomic-embed-text", api_base = "http://localhost:11434" }
-
-# Embedding models
-openai_embedding = { model_name = "text-embedding-3-small" }
-openai_embedding_large = { model_name = "text-embedding-3-large" }
-azure_embedding = { model_name = "text-embedding-ada-002", api_base = "YOUR_AZURE_URL_HERE", api_version = "2023-05-15", deployment_id = "embedding-ada-002" }
-
-[completion]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-default_max_tokens = "1000"
-default_temperature = 0.5
-
-[database]
-provider = "postgres"  # or "mongodb"
-
-[embedding]
-model = "ollama_embedding"  # Reference to registered model
-dimensions = 768
-similarity_metric = "cosine"
-
-[parser]
-chunk_size = 1000
-chunk_overlap = 200
-use_unstructured_api = false
-use_contextual_chunking = false
-contextual_chunking_model = "ollama_qwen_vision"  # Reference to a key in registered_models
-
-[parser.vision]
-model = "ollama_qwen_vision"  # Reference to a key in registered_models
-frame_sample_rate = -1
-
-[reranker]
-use_reranker = true
-provider = "flag"
-model_name = "BAAI/bge-reranker-large"
-query_max_length = 256
-passage_max_length = 512
-use_fp16 = true
-device = "mps"  # "cpu", "cuda", or "mps"
-
-[storage]
-provider = "local"  # or "aws-s3"
-storage_path = "./storage"
-
-[vector_store]
-provider = "pgvector"  # or "mongodb"
-
-[rules]
-model = "ollama_qwen_vision"
-batch_size = 4096
-
-[morphik]
-enable_colpali = true
-mode = "self_hosted"  # "cloud" or "self_hosted"
-
-[graph]
-model = "ollama_qwen_vision"
-enable_entity_resolution = true
-
-[telemetry]
-enabled = true
-honeycomb_enabled = true
-honeycomb_endpoint = "https://api.honeycomb.io"
-honeycomb_proxy_endpoint = "https://otel-proxy.onrender.com"
-service_name = "morphik-core"
 ```
 
-## Mixing and Matching Models
+### 🍋 Lemonade
 
-With the registered models approach, you can easily optimize your configuration:
-
-- Use powerful models like Claude Opus for knowledge graph generation
-- Use smaller, faster models for simple parsing tasks
-- Use OpenAI models for some tasks and Anthropic models for others
-- Use Ollama for local development and cloud models for production
-
-For example:
+[Lemonade Server](https://lemonade-server.ai/) - Optimized local LLM server for AMD GPUs and NPUs.
 
 ```toml
-[parser.vision]
-model = "ollama_llama_vision"  # Use Llama vision model for image analysis
-
-[rules]
-model = "claude_sonnet"  # Use Claude Sonnet for rules processing
-
-[completion]
-model = "ollama_qwen_vision"  # Use Qwen vision model for general completion
+[registered_models]
+# Lemonade models
+lemonade_qwen = { model_name = "openai/Qwen2.5-VL-7B-Instruct-GGUF", api_base = "http://localhost:8020/api/v1", vision = true }
+lemonade_embedding = { model_name = "openai/nomic-embed-text-v1-GGUF", api_base = "http://localhost:8020/api/v1" }
 ```
 
-## Docker Configuration Adjustments
+### Docker Deployments
 
-When using Docker, make these changes:
-
-1. Set `host = "0.0.0.0"` in the `[api]` section
-2. For Ollama integration, use models with api_base set to `"http://ollama:11434"`
-3. Use container names in your database connection strings
-
-For more details on Docker deployment, check out the `DOCKER.md` file in the repository.
+When running Morphik in Docker:
+- Local services: Use `http://host.docker.internal:PORT`
+- Both in Docker: Use container names (e.g., `http://ollama:11434`)
 
 ## Need Help?
 
-If you're having trouble with your configuration:
-
-1. Check the logs for error messages
-2. Run `python quick_setup.py` for guided setup
-3. Join our [Discord community](https://discord.gg/BwMtv3Zaju)
-4. Open an issue on our [GitHub repository](https://github.com/morphik-org/morphik-core)
+1. Join our [Discord community](https://discord.gg/BwMtv3Zaju)
+2. Check [GitHub](https://github.com/morphik-org/morphik-core) for issues
