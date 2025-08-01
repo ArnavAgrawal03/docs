@@ -347,12 +347,16 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     - Checking prerequisites (Docker, Docker Compose V2)
     - Downloading configurations
     - Prompting for your OpenAI API key (optional - press Enter to skip)
+    - **Setting up authentication** (optional but recommended for production)
     - **Offering to install the Admin UI** (optional but recommended)
     - Starting all services
 
     During installation, you'll be prompted:
     1. To enter your OpenAI API key (optional - press Enter to skip and configure later)
-    2. Whether you'd like to install the Admin UI (recommended for easier management)
+    2. To set a LOCAL_URI_TOKEN for authentication:
+       - **Skip for local-only access**: Press Enter to enable development mode (`dev_mode=true`)
+       - **Set for production/external access**: Enter a secure token to enable authentication (`dev_mode=false`)
+    3. Whether you'd like to install the Admin UI (recommended for easier management)
 
     <Note>
       Morphik supports 100s of models including OpenAI, Anthropic (Claude), Google Gemini, local models, and even custom models! You can configure your preferred provider in `morphik.toml` after installation.
@@ -376,6 +380,114 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     - **API**: http://localhost:8000 (or your configured port)
     - **API Documentation**: http://localhost:8000/docs
     - **Admin UI** (if installed): http://localhost:3003
+
+    ### Authentication and Connection URIs
+
+    Morphik provides flexible authentication options:
+
+    **Development Mode (Local Access Only)**
+    - If you skipped setting a LOCAL_URI_TOKEN during installation, Morphik runs in `dev_mode=true`
+    - No authentication required for local API access
+    - Perfect for local development and testing
+    - **Not secure for production or external access**
+
+    **Production Mode (Secure External Access)**
+    - If you set a LOCAL_URI_TOKEN during installation, Morphik runs in `dev_mode=false`
+    - Authentication required for all API requests
+    - To generate authorized connection URIs:
+
+    <Steps>
+      <Step title="Access the API Documentation">
+        Navigate to http://localhost:8000/docs in your browser
+        
+        ![Generate Local URI endpoint in Swagger UI](/assets/generate_local_uri_api_docs.png)
+      </Step>
+      <Step title="Find the /generate_local_uri endpoint">
+        Scroll down to find the `/generate_local_uri` endpoint in the Management API section
+      </Step>
+      <Step title="Generate your connection URI">
+        1. Click on the endpoint to expand it
+        2. Click "Try it out"
+        3. Fill in the request parameters:
+           - **name**: A descriptive name for this connection (e.g., "admin")
+           - **expiry_days**: How long the token should remain valid (default: 30)
+           - **password_token**: Your LOCAL_URI_TOKEN from installation
+           - **server_mode**: 
+             - Set to `true` if you want to access Morphik from outside the server
+             - Set to `false` for local access only (uses localhost)
+        4. Click "Execute"
+        
+        The response will contain a secure connection URI that includes authentication tokens for your client applications.
+      </Step>
+    </Steps>
+
+    <Note>
+      The generated URI contains authentication tokens and should be kept secure. Anyone with this URI can access your Morphik instance with the permissions embedded in the token.
+    </Note>
+
+    ### Using Your Connection URI
+
+    Once you have generated a connection URI, you can use it to connect to Morphik through:
+
+    **Option 1: Admin UI**
+    
+    If you have the Admin UI installed, you can paste your connection URI directly in the UI:
+
+    ![Paste connection URI in Admin UI](/assets/paste_in_ui.png)
+
+    The URI field is highlighted in red, showing where to paste your `morphik://` connection string.
+
+    **Option 2: Python SDK**
+
+    ```python
+    from morphik import Morphik
+
+    # Initialize Morphik with your connection URI
+    morphik = Morphik("morphik://admin:eyJhbGc...")  # Use your generated URI
+
+    # Ingest a file
+    doc = morphik.ingest_file(file_path="document.pdf")
+    doc.wait_for_completion()
+
+    # Query the ingested content
+    response = morphik.query("What is Morphik?")
+    print(response)  # "Morphik is the most accurate end-to-end RAG system"
+    ```
+
+    **Option 3: TypeScript/JavaScript SDK**
+
+    ```typescript
+    import Morphik from 'morphik';
+    import * as fs from 'fs';
+
+    // Extract the token from your URI
+    // URI format: morphik://name:token@host
+    const uri = "morphik://admin:eyJhbGc...";  // Your generated URI
+    const token = uri.split(':')[1].split('@')[0];
+
+    // Initialize Morphik client
+    const morphik = new Morphik({
+      apiKey: token,
+      baseURL: 'http://localhost:8000'  // Adjust based on your server_mode
+    });
+
+    // Ingest a file
+    const file = fs.createReadStream('document.pdf');
+    const doc = await morphik.ingest.ingestFile({ file });
+
+    // Wait for processing
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    // Query the content
+    const response = await morphik.query.generateCompletion({
+      query: 'What is Morphik?'
+    });
+    console.log(response.completion);  // "Morphik is the most accurate end-to-end RAG system"
+    ```
+
+    <Note>
+      **What is Morphik?** Morphik is the most accurate end-to-end RAG (Retrieval-Augmented Generation) system, designed to understand and process multi-modal documents with exceptional precision.
+    </Note>
 
     ---
 
