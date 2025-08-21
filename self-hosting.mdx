@@ -133,58 +133,13 @@ For users who need to run Morphik on their own infrastructure, we provide two in
           Desktop (macOS/Windows) or the Docker engine (Linux) and make sure the
           daemon is running.
         </Accordion>
-        <Accordion title="Optional: Running Local Models with Ollama">
-          <Tabs>
-            <Tab title="macOS">
-              If you want to run models locally instead of using cloud
-              providers, first install Ollama using Homebrew:
-
-              ```bash
-              brew install ollama
-              ```
-
-              Start Ollama:
-
-              ```bash
-              ollama serve
-              ```
-
-              Pull a model to use with Morphik (in a new terminal):
-
-              ```bash
-              ollama pull llama3.2
-              ```
-            </Tab>
-            <Tab title="Linux">
-              Install Ollama using the official installation script:
-
-              ```bash
-              curl -fsSL https://ollama.com/install.sh | sh
-              ```
-
-              Start Ollama:
-
-              ```bash
-              ollama serve
-              ```
-
-              Pull a model to use with Morphik (in a new terminal):
-
-              ```bash
-              ollama pull llama3.2
-              ```
-            </Tab>
-            <Tab title="Windows">
-              1. Download the Ollama installer from the [official website](https://ollama.com/download/windows).
-              2. Run the installer and follow the on-screen instructions.
-              3. After installation, Ollama will start automatically.
-              4. Open Command Prompt or PowerShell and pull a model:
-
-                 ```bash
-                 ollama pull llama3.2
-                 ```
-            </Tab>
-          </Tabs>
+        <Accordion title="Optional: Running Local Models">
+          Morphik supports fully local inference for both embeddings and completions through two powerful engines:
+          
+          - **Lemonade SDK** - Windows only, optimized for AMD GPUs/NPUs
+          - **Ollama** - Cross-platform (Windows, macOS, Linux)
+          
+          Both are pre-configured in Morphik. For detailed setup instructions, see our [Local Inference Guide](/local-inference).
         </Accordion>
       </Step>
 
@@ -300,7 +255,7 @@ For users who need to run Morphik on their own infrastructure, we provide two in
   <Tab title="Self Host - Docker (Advanced)">
     ## Using Docker
 
-    Morphik provides a streamlined Docker-based setup that includes all necessary components: the core API, PostgreSQL with pgvector, Redis, and optionally Ollama for local AI models.
+    Morphik provides a streamlined Docker-based setup that includes all necessary components: the core API, PostgreSQL with pgvector, and Redis for task queuing.
 
     <Note>
       If you are using an Apple Silicon (M-series) Mac, we highly recommend using the Direct Installation method instead of Docker. GPU passthrough is not supported via Docker on Apple Silicon, which can significantly impact performance.
@@ -504,11 +459,9 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     ./start-dev.sh
     ```
 
-    This builds the Docker image locally and starts all services. To include Ollama for local models:
-
-    ```bash
-    docker compose --profile ollama up --build
-    ```
+    This builds the Docker image locally and starts all services. 
+    
+    To include local inference models, see our [Local Inference Guide](/local-inference) for setting up Ollama or Lemonade SDK.
 
     ---
 
@@ -538,9 +491,10 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     The default configuration works out of the box and includes:
 
     - PostgreSQL with pgvector for document storage
-    - Ollama for AI models (embeddings and completions)
+    - Redis for task queuing
     - Local file storage
     - Basic authentication
+    - Optional: Local inference with [Ollama or Lemonade](/local-inference)
 
     You can customize your setup by creating a `.env` file:
 
@@ -568,39 +522,22 @@ For users who need to run Morphik on their own infrastructure, we provide two in
        # View specific service logs
        docker compose logs morphik
        docker compose logs postgres
-       docker compose logs ollama
+       docker compose logs redis
        ```
     2. **Database Issues**
        - Check PostgreSQL is healthy: `docker compose ps`
        - Verify database connection: `docker compose exec postgres psql -U morphik -d morphik`
 
-    3. **Model Download Issues**
-       - Check Ollama logs: `docker compose logs ollama`
-       - Ensure enough disk space for models
-       - Try restarting Ollama: `docker compose restart ollama`
-       - Verify that your Redis and Ollama configuration in `morphik.toml` matches your deployment:
+    3. **Local Model Issues**
+       - For local inference setup and troubleshooting, see our [Local Inference Guide](/local-inference)
+       - Verify that your Redis configuration in `morphik.toml` matches your deployment:
          - For Redis in Docker, use `host = "redis"` (not "localhost")
-         - If running Ollama in Docker, use `http://ollama:11434` endpoint
-         - If running Ollama locally but Morphik in Docker, use `http://host.docker.internal:11434`
-    4. **Ollama Memory Issues**
-       - If you see errors like "model requires more system memory than is available" in the logs:
-         - Increase Docker memory allocation in Docker Desktop:
-           1. Open Docker Desktop application
-           2. Click on Settings (gear icon)
-           3. Go to "Resources" section
-           4. Increase memory allocation to at least 6GB (8GB recommended)
-           5. Click "Apply & Restart"
-         - Alternatively, modify `morphik.toml` to use a smaller model
-         - Or switch to OpenAI API by uncommenting the OpenAI sections in `morphik.toml`
-       - For knowledge graph creation specifically, you can switch from Ollama to OpenAI:
-
-         ```toml
-         # Change this section in morphik.toml
-         [graph]
-         provider = "openai"
-         model_name = "gpt-4o-mini"
-         enable_entity_resolution = true
-         ```
+    4. **Memory Issues with Local Models**
+       - If using local models and encountering memory issues:
+         - Increase Docker memory allocation in Docker Desktop (Settings > Resources)
+         - Use smaller quantized models
+         - See our [Local Inference Guide](/local-inference) for model recommendations
+       - Alternatively, switch to cloud providers (OpenAI, Anthropic, etc.) in `morphik.toml`
     5. **Performance Issues**
        - Monitor resources: `docker stats`
        - Ensure sufficient RAM (8GB\+ recommended)

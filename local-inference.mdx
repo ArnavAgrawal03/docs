@@ -1,0 +1,379 @@
+---
+title: "Local Inference"
+description: "Run Morphik completely offline with local embedding and completion models"
+---
+
+Morphik comes with built-in support for running **both embeddings and completions** locally, ensuring your data never leaves your machine. Choose between two powerful local inference engines:
+
+- **Lemonade SDK** - Windows-only, optimized for AMD GPUs and NPUs
+- **Ollama** - Cross-platform (Windows, macOS, Linux), supports various hardware
+
+Both are pre-configured in Morphik and can be selected through the UI or configuration file.
+
+## Why Local Inference?
+
+Running models locally provides several key advantages:
+- **Complete Privacy**: Your data never leaves your machine
+- **No API Costs**: Eliminate ongoing API expenses
+- **Low Latency**: No network round-trips for inference
+- **Offline Capability**: Work without internet connectivity
+- **Hardware Acceleration**: Leverage your local GPU, NPU, or specialized AI processors
+
+<Tabs>
+  <Tab title="Lemonade SDK (Windows)">
+    <div style={{display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px'}}>
+      <img src="/images/amd-logo.svg" alt="AMD" style={{height: '60px', objectFit: 'contain'}} />
+      <span style={{fontSize: '48px'}}>🍋</span>
+      <div>
+        <h2 style={{margin: 0}}>Lemonade SDK - Windows Only</h2>
+        <p style={{margin: '5px 0 0 0', color: '#666'}}>Run embeddings & completions locally with AMD GPU/NPU acceleration</p>
+      </div>
+    </div>
+    
+    Lemonade SDK provides high-performance local inference on Windows, with optimizations for AMD hardware. It exposes an OpenAI-compatible API and is **already configured in Morphik**.
+    
+    <Note>
+      **Built-in Support**: Lemonade models are pre-configured in `morphik.toml` for both embeddings and completions. Simply install Lemonade Server and select the models in the UI.
+    </Note>
+    
+    ### System Requirements
+    
+    - **Windows 10/11 only** (x86/x64)
+    - **8GB+ RAM** (16GB recommended)
+    - **Python 3.10+**
+    - **Optional but recommended**: 
+      - AMD Ryzen AI 300 series (NPU acceleration)
+      - AMD Radeon 7000/9000 series (GPU acceleration)
+    
+    ### Quick Start
+    
+    <Steps>
+      <Step title="Install Lemonade SDK">
+        **Command Line Installation (Recommended):**
+        
+        ```bash
+        # Install with pip (Python 3.10+ required)
+        pip install lemonade-sdk[llm-oga]
+        
+        # For AMD GPU/NPU optimization (Windows)
+        pip install lemonade-sdk[oga-ryzenai] --extra-index-url=https://pypi.amd.com/simple
+        ```
+        
+        **Alternative: Windows GUI Installer**
+        
+        If you prefer a GUI installer on Windows, download `Lemonade_Server_Installer.exe` from the [Lemonade releases page](https://github.com/lemonade-sdk/lemonade/releases).
+      </Step>
+      
+      <Step title="Start Lemonade Server">
+        ```bash
+        # Start the server with large context window (important for RAG)
+        lemonade-server-dev server --port 8020 --ctx-size 100000
+        ```
+        
+        <Warning>
+          The `--ctx-size 100000` parameter is crucial for RAG applications to handle large document contexts.
+        </Warning>
+        
+        The server exposes an OpenAI-compatible API at `http://localhost:8020/api/v1`
+      </Step>
+      
+      <Step title="Configure Morphik - Two Options">
+        
+        ### Option 1: Using the UI (Recommended)
+        
+        1. Open Morphik UI and navigate to Settings
+        2. Click "Add Custom Model"
+        3. Configure as shown:
+        
+        <img src="/images/add_lemonade_custom.png" alt="Add Lemonade Model in UI" style={{maxWidth: '600px', margin: '20px 0'}} />
+        
+        Example configuration:
+        ```json
+        {
+          "model": "openai/Qwen2.5-VL-7B-Instruct-GGUF",
+          "api_base": "http://host.docker.internal:8020/api/v1",
+          "vision": true
+        }
+        ```
+        
+        ### Option 2: Edit morphik.toml
+        
+        Morphik comes with pre-configured Lemonade models. Check your `morphik.toml`:
+        
+        ```toml
+        # Lemonade models (already configured)
+        lemonade_qwen = { 
+          model_name = "openai/Qwen2.5-VL-7B-Instruct-GGUF", 
+          api_base = "http://localhost:8020/api/v1", 
+          vision = true 
+        }
+        lemonade_embedding = { 
+          model_name = "openai/nomic-embed-text-v1-GGUF", 
+          api_base = "http://localhost:8020/api/v1" 
+        }
+        
+        # To use Lemonade as default, update these sections:
+        [completion]
+        model = "lemonade_qwen"
+        
+        [embedding]
+        model = "lemonade_embedding"
+        ```
+        
+        <Warning>
+          When running Morphik in Docker, change `localhost` to `host.docker.internal` in the api_base URLs.
+        </Warning>
+      </Step>
+      
+      <Step title="Download and Use Models">
+        Once configured, you can:
+        
+        1. **Select Lemonade models in the UI chat interface**
+        2. **Download models as needed:**
+        ```bash
+        lemonade pull Qwen2.5-VL-7B-Instruct-GGUF
+        lemonade pull nomic-embed-text-v1-GGUF
+        ```
+        
+        3. **Start using Morphik with local inference!**
+      </Step>
+    </Steps>
+    
+    ### Supported Models
+    
+    Lemonade supports a wide range of models including:
+    - **Vision Models**: Qwen2.5-VL series (7B, 14B)
+    - **Text Models**: Llama, Mistral, Phi, Qwen families
+    - **Embeddings**: nomic-embed-text, BGE models
+    
+    ### Performance Tips
+    
+    - **Model Quantization**: Use GGUF quantized models for better performance
+    - **Hardware Acceleration**: Automatically detects and uses AMD GPUs/NPUs when available
+    - **Memory Management**: Models are cached after first download
+    
+    ### Troubleshooting
+    
+    <AccordionGroup>
+      <Accordion title="Connection Issues">
+        - Verify Lemonade Server is running: `curl http://localhost:8020/api/v1/models`
+        - For Docker: Use `host.docker.internal` instead of `localhost`
+        - Check firewall settings for port 8020
+      </Accordion>
+      
+      <Accordion title="Model Loading Errors">
+        - Ensure sufficient disk space (5-15GB per model)
+        - Try smaller quantized versions (Q4, Q5)
+        - Check model compatibility with `lemonade list`
+      </Accordion>
+      
+      <Accordion title="Performance Issues">
+        - Use GGUF quantized models for better performance
+        - Monitor GPU/NPU usage with system tools
+        - Adjust batch size and context length in model config
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  
+  <Tab title="Ollama (Cross-Platform)">
+    <div style={{display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px'}}>
+      <img src="/images/ollama-logo.png" alt="Ollama" style={{height: '60px', objectFit: 'contain'}} />
+      <div>
+        <h2 style={{margin: 0}}>Ollama - All Platforms</h2>
+        <p style={{margin: '5px 0 0 0', color: '#666'}}>Run embeddings & completions locally on Windows, macOS, or Linux</p>
+      </div>
+    </div>
+    
+    Ollama provides cross-platform local inference for both embeddings and completions. It's **already configured in Morphik** and supports various hardware accelerators.
+    
+    <Note>
+      **Built-in Support**: Ollama models are pre-configured in `morphik.toml` for both embeddings and completions. Simply install Ollama and select the models in the UI.
+    </Note>
+    
+    ### System Requirements
+    
+    - **macOS**: Apple Silicon (M1/M2/M3) or Intel Mac with 8GB+ RAM
+    - **Linux**: x86_64 or ARM64, 8GB+ RAM, optional NVIDIA GPU
+    - **Windows**: Windows 10/11, 8GB+ RAM, optional NVIDIA GPU
+    
+    ### Quick Start
+    
+    <Steps>
+      <Step title="Install Ollama">
+        <Tabs>
+          <Tab title="macOS">
+            ```bash
+            brew install ollama
+            # Or: curl -fsSL https://ollama.com/install.sh | sh
+            ```
+          </Tab>
+          <Tab title="Linux">
+            ```bash
+            curl -fsSL https://ollama.com/install.sh | sh
+            ```
+          </Tab>
+          <Tab title="Windows">
+            Download installer from [ollama.com/download](https://ollama.com/download/windows)
+          </Tab>
+        </Tabs>
+      </Step>
+      
+      <Step title="Start Ollama">
+        ```bash
+        # Start Ollama service
+        ollama serve
+        ```
+        
+        Or use Docker Compose with Morphik:
+        ```bash
+        docker compose --profile ollama -f docker-compose.run.yml up -d
+        ```
+      </Step>
+      
+      <Step title="Configure Morphik - Two Options">
+        
+        ### Option 1: Using the UI (Recommended)
+        
+        1. Open Morphik UI and navigate to Settings
+        2. Select Ollama models from the dropdown for:
+           - **Completion Model**: `ollama_qwen_vision` or `ollama_llama_vision`
+           - **Embedding Model**: `ollama_embedding` (nomic-embed-text)
+        
+        ### Option 2: Edit morphik.toml
+        
+        Morphik comes with pre-configured Ollama models:
+        
+        ```toml
+        # Already configured in morphik.toml
+        ollama_qwen_vision = { 
+          model_name = "ollama_chat/qwen2.5vl:latest", 
+          api_base = "http://localhost:11434", 
+          vision = true 
+        }
+        ollama_embedding = { 
+          model_name = "ollama/nomic-embed-text", 
+          api_base = "http://localhost:11434" 
+        }
+        
+        # To use Ollama as default:
+        [completion]
+        model = "ollama_qwen_vision"
+        
+        [embedding]
+        model = "ollama_embedding"
+        ```
+        
+        <Warning>
+          When running Morphik in Docker, change `localhost` to `ollama:11434` if using the Ollama profile, or `host.docker.internal:11434` if running Ollama separately.
+        </Warning>
+      </Step>
+      
+      <Step title="Download and Use Models">
+        Pull the pre-configured models:
+        
+        ```bash
+        # For embeddings (required for RAG)
+        ollama pull nomic-embed-text
+        
+        # For completions (choose one)
+        ollama pull qwen2.5vl:latest    # Vision-capable, 7B
+        ollama pull llama3.2-vision      # Vision-capable, 11B
+        ollama pull qwen2:1.5b          # Text-only, fast
+        ```
+        
+        Then select them in the UI chat interface!
+      </Step>
+    </Steps>
+    
+    ### Hardware Acceleration
+    
+    **Apple Silicon (M1/M2/M3)**
+    - Ollama automatically uses Metal for GPU acceleration
+    - No additional configuration needed
+    - Excellent performance on unified memory architecture
+    
+    **NVIDIA GPUs**
+    - Install CUDA drivers (11.8+ recommended)
+    - Ollama auto-detects and uses available GPUs
+    - Monitor usage: `nvidia-smi`
+    
+    **AMD GPUs (Linux)**
+    - ROCm support is experimental
+    - Set environment variable: `HSA_OVERRIDE_GFX_VERSION=10.3.0`
+    
+    ### Performance Tuning
+    
+    **Memory Management**
+    ```bash
+    # Set GPU memory limit (NVIDIA)
+    OLLAMA_MAX_VRAM=8GB ollama serve
+    
+    # Adjust number of parallel requests
+    OLLAMA_NUM_PARALLEL=4 ollama serve
+    
+    # Keep models loaded in memory
+    OLLAMA_KEEP_ALIVE=30m ollama serve
+    ```
+    
+    **Model Quantization**
+    
+    Ollama supports various quantization levels:
+    - `q4_0` - 4-bit quantization (smallest, fastest)
+    - `q5_1` - 5-bit quantization (balanced)
+    - `q8_0` - 8-bit quantization (best quality)
+    
+    ```bash
+    # Pull specific quantization
+    ollama pull llama3.2:3b-q4_0  # Smaller, faster
+    ollama pull llama3.2:3b-q8_0  # Better quality
+    ```
+    
+    ### Monitoring & Management
+    
+    **Check Status**
+    ```bash
+    # List loaded models
+    ollama list
+    
+    # View running models
+    ollama ps
+    
+    # Check API health
+    curl http://localhost:11434/api/tags
+    ```
+    
+    **Resource Usage**
+    ```bash
+    # Monitor in real-time
+    watch -n 1 ollama ps
+    
+    # Check model details
+    ollama show llama3.2 --modelfile
+    ```
+    
+    ### Creating Custom Models
+    
+    Create specialized models for your use case:
+    
+    ```dockerfile
+    # Modelfile
+    FROM llama3.2:3b
+    
+    # Set parameters
+    PARAMETER temperature 0.1
+    PARAMETER num_ctx 4096
+    
+    # Add system prompt
+    SYSTEM """You are a helpful assistant specialized in document analysis 
+    and information retrieval. Always provide accurate, concise responses 
+    based on the provided context."""
+    ```
+    
+    Build and use:
+    ```bash
+    ollama create morphik-assistant -f Modelfile
+    ollama run morphik-assistant
+    ```
+  </Tab>
+</Tabs>
+
