@@ -5,7 +5,7 @@ description: "Run Morphik completely offline with local embedding and completion
 
 Morphik comes with built-in support for running **both embeddings and completions** locally, ensuring your data never leaves your machine. Choose between two powerful local inference engines:
 
-- **Lemonade SDK** - Windows-only, optimized for AMD GPUs and NPUs
+- **Lemonade** - Windows-only, optimized for AMD GPUs and NPUs
 - **Ollama** - Cross-platform (Windows, macOS, Linux), supports various hardware
 
 Both are pre-configured in Morphik and can be selected through the UI or configuration file.
@@ -20,12 +20,12 @@ Running models locally provides several key advantages:
 - **Hardware Acceleration**: Leverage your local GPU, NPU, or specialized AI processors
 
 <Tabs>
-  <Tab title="Lemonade SDK (Windows)">
+  <Tab title="Lemonade">
     <div style={{display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px'}}>
       <img src="/images/amd-logo.svg" alt="AMD" style={{height: '60px', objectFit: 'contain'}} />
       <span style={{fontSize: '48px'}}>🍋</span>
       <div>
-        <h2 style={{margin: 0}}>Lemonade SDK - Windows Only</h2>
+        <h2 style={{margin: 0}}>Lemonade</h2>
         <p style={{margin: '5px 0 0 0', color: '#666'}}>Run embeddings & completions locally with AMD GPU/NPU acceleration</p>
       </div>
     </div>
@@ -48,94 +48,75 @@ Running models locally provides several key advantages:
     ### Quick Start
     
     <Steps>
-      <Step title="Install Lemonade SDK">
-        **Command Line Installation (Recommended):**
-        
-        ```bash
-        # Install with pip (Python 3.10+ required)
-        pip install lemonade-sdk[llm-oga]
-        
-        # For AMD GPU/NPU optimization (Windows)
-        pip install lemonade-sdk[oga-ryzenai] --extra-index-url=https://pypi.amd.com/simple
-        ```
-        
-        **Alternative: Windows GUI Installer**
-        
-        If you prefer a GUI installer on Windows, download `Lemonade_Server_Installer.exe` from the [Lemonade releases page](https://github.com/lemonade-sdk/lemonade/releases).
+      <Step title="Download Lemonade">
+        Download and install Lemonade from the official site: 
+        [lemonade-server.ai](https://lemonade-server.ai/).
       </Step>
       
       <Step title="Start Lemonade Server">
-        ```bash
-        # Start the server with large context window (important for RAG)
-        lemonade-server-dev server --port 8020 --ctx-size 100000
-        ```
-        
-        <Warning>
-          The `--ctx-size 100000` parameter is crucial for RAG applications to handle large document contexts.
-        </Warning>
-        
-        The server exposes an OpenAI-compatible API at `http://localhost:8020/api/v1`
+        Start the Lemonade server following their documentation. Make sure it is running and note the port.
+        The API is OpenAI-compatible (e.g., `/api/v1/models`).
       </Step>
       
       <Step title="Configure Morphik - Two Options">
-        
+
         ### Option 1: Using the UI (Recommended)
-        
-        1. Open Morphik UI and navigate to Settings
-        2. Click "Add Custom Model"
-        3. Configure as shown:
-        
-        <img src="/images/add_lemonade_custom.png" alt="Add Lemonade Model in UI" style={{maxWidth: '600px', margin: '20px 0'}} />
-        
-        Example configuration:
-        ```json
-        {
-          "model": "openai/Qwen2.5-VL-7B-Instruct-GGUF",
-          "api_base": "http://host.docker.internal:8020/api/v1",
-          "vision": true
-        }
-        ```
-        
+
+        1. Open the Morphik UI and go to Settings → Providers
+        2. Select "Lemonade" (🍋). No API key is required
+        3. Enter the host and port where Lemonade is running
+        4. Click "Discover Models" to auto-detect available models
+        5. Open Chat and use the model selector pill (top left) to pick a Lemonade model
+
+        <img src="/images/placeholder_lemonade_settings.png" 
+             alt="Lemonade provider settings with host and port"
+             style={{maxWidth: '640px', margin: '16px 0'}} />
+
+        <img src="/images/placeholder_lemonade_model_selector.png" 
+             alt="Chat model selector showing Lemonade model"
+             style={{maxWidth: '640px', margin: '16px 0'}} />
+
+        <Warning>
+          Running inside Docker? Use `host.docker.internal` instead of `localhost` for the host field.
+        </Warning>
+
         ### Option 2: Edit morphik.toml
-        
-        Morphik comes with pre-configured Lemonade models. Check your `morphik.toml`:
-        
+
+        You can also set Lemonade models directly in `morphik.toml` so they're used by default.
+        Ensure the `api_base` points to your Lemonade server:
+
         ```toml
-        # Lemonade models (already configured)
-        lemonade_qwen = { 
-          model_name = "openai/Qwen2.5-VL-7B-Instruct-GGUF", 
-          api_base = "http://localhost:8020/api/v1", 
-          vision = true 
+        lemonade_qwen = {
+          model_name = "openai/Qwen2.5-VL-7B-Instruct-GGUF",
+          api_base = "http://localhost:8020/api/v1",
+          vision = true
         }
-        lemonade_embedding = { 
-          model_name = "openai/nomic-embed-text-v1-GGUF", 
-          api_base = "http://localhost:8020/api/v1" 
+        lemonade_embedding = {
+          model_name = "openai/nomic-embed-text-v1-GGUF",
+          api_base = "http://localhost:8020/api/v1"
         }
-        
-        # To use Lemonade as default, update these sections:
+
         [completion]
         model = "lemonade_qwen"
-        
+
         [embedding]
         model = "lemonade_embedding"
         ```
-        
-        <Warning>
-          When running Morphik in Docker, change `localhost` to `host.docker.internal` in the api_base URLs.
-        </Warning>
       </Step>
       
       <Step title="Download and Use Models">
         Once configured, you can:
-        
-        1. **Select Lemonade models in the UI chat interface**
-        2. **Download models as needed:**
-        ```bash
-        lemonade pull Qwen2.5-VL-7B-Instruct-GGUF
-        lemonade pull nomic-embed-text-v1-GGUF
-        ```
-        
+
+        1. **Select Lemonade models in the Chat model selector** (🍋)
+        2. **Models download automatically** on first selection/use if not present
         3. **Start using Morphik with local inference!**
+
+        <Warning>
+          If your system has under 16GB RAM, prefer models under ~4B parameters or smaller quantizations
+          (e.g., Q4/Q5). Larger models may fail to load or will be very slow on low-memory systems.
+          If you are not using a vision-capable model, turn off ColPali in Chat settings
+          (Chat settings → ColPali) to avoid vision-dependent paths.
+        </Warning>
       </Step>
     </Steps>
     
@@ -149,6 +130,7 @@ Running models locally provides several key advantages:
     ### Performance Tips
     
     - **Model Quantization**: Use GGUF quantized models for better performance
+    - **Low-memory systems**: Under 16GB RAM, prefer models under 4B parameters
     - **Hardware Acceleration**: Automatically detects and uses AMD GPUs/NPUs when available
     - **Memory Management**: Models are cached after first download
     
@@ -156,7 +138,8 @@ Running models locally provides several key advantages:
     
     <AccordionGroup>
       <Accordion title="Connection Issues">
-        - Verify Lemonade Server is running: `curl http://localhost:8020/api/v1/models`
+        - Verify server health: `curl http://localhost:8020/health`
+        - List models: `curl http://localhost:8020/api/v1/models`
         - For Docker: Use `host.docker.internal` instead of `localhost`
         - Check firewall settings for port 8020
       </Accordion>
@@ -175,7 +158,7 @@ Running models locally provides several key advantages:
     </AccordionGroup>
   </Tab>
   
-  <Tab title="Ollama (Cross-Platform)">
+  <Tab title="Ollama">
     <div style={{display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px'}}>
       <img src="/images/ollama-logo.png" alt="Ollama" style={{height: '60px', objectFit: 'contain'}} />
       <div>

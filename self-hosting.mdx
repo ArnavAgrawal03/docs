@@ -159,54 +159,40 @@ For users who need to run Morphik on their own infrastructure, we provide two in
         ```
       </Step>
 
-      <Step title="Setting Up the Environment">
-        <h4>Installing Python Dependencies</h4>
+      <Step title="Run the Installer Script">
+        Choose the installer for your OS:
 
-        <Note>
-          While it is not required, we highly recommend using a virtual environment to ensure dependencies from other projects do not conflict with Morphik. You may use managers like `uv` or `poetry`, but for this guide, we will use the built-in `venv` module.
-
-          Morphik currently supports Python 3.12 as the latest version. We recommend using Python 3.12 for optimal compatibility.
-        </Note>
-        You don't need to create a virtual-env or run `uv sync` yourself—the
-        installer script will handle everything, including installing **uv** if
-        it's missing. If you prefer a manual setup at some point, install uv
-        globally (`pip install --upgrade uv`) and run `uv sync` to recreate the
-        environment, but this is entirely optional.
-
-        uv reads the `pyproject.toml` / `uv.lock` files, so all dependencies
-        (including optional ones like `unstructured`) are declared in one place.
-
-        <Note>
-          If you need additional NLTK data you can still download it afterwards:
+        <Tabs>
+          <Tab title="macOS/Linux">
+          From the project root, run:
 
           ```bash
-          python -m nltk.downloader averaged_perceptron_tagger punkt
+          # Make the script executable
+          chmod +x install_and_start.sh
+
+          # Run the installer
+          ./install_and_start.sh
           ```
-        </Note>
+          </Tab>
+          <Tab title="Windows (PowerShell)">
+          From the project root, run in PowerShell:
 
-        ---
+          ```powershell
+          Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+          ./install_and_start.ps1
+          ```
 
-      </Step>
+          This script installs dependencies with uv, attempts a prebuilt
+          `llama-cpp-python` wheel, and starts the server.
+          </Tab>
+        </Tabs>
 
-      <Step title="Run the Installer Script">
-        From the project root, run the one-liner below – it auto-detects your
-        platform (macOS or Linux), sets any required build flags, installs
-        dependencies, and starts the server:
-
-        ```bash
-        # Make the script executable
-        chmod +x install_and_start.sh
-
-        # Run the installer
-        ./install_and_start.sh
-        ```
-
-        The script will:
+        The installers will:
 
         1. Create & activate a `.venv` with **uv**
-        2. Ask about GPU availability for multimodal embeddings
+        2. Ask about GPU availability for multimodal embeddings (macOS/Linux)
         3. Install `colpali-engine` (for multimodal document understanding)
-        4. Build `llama-cpp-python` (Metal acceleration on Apple Silicon)
+        4. Install or build `llama-cpp-python` (Metal on Apple Silicon, wheel on Windows)
         5. Launch the server via `uv run start_server.py`
 
         <Note>
@@ -223,7 +209,7 @@ For users who need to run Morphik on their own infrastructure, we provide two in
       <Step title="Setting up the Server Parameters">
         At this point, you may want to customize the server - such as use a different model, enable or disable certain features, etc. - you can do so by editing the `morphik.toml` file. 
         
-        Morphik now uses a registered models approach, which allows you to define hundreds of different models in one place and reference them throughout your configuration. This makes it easy to mix and match models based on your needs (e.g., smaller models for simpler tasks). You can find more details about configuration [here](/configuration).
+        Morphik uses a registered models approach, which allows you to define hundreds of different models in one place and reference them throughout your configuration. This makes it easy to mix and match models based on your needs (e.g., smaller models for simpler tasks). You can find more details about configuration [here](/configuration).
 
         The installer copies `.env.example` to `.env` automatically if it's
         missing. After the script finishes, open `.env` to add any API keys (e.g.
