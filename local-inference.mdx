@@ -62,22 +62,23 @@ Running models locally provides several key advantages:
 
         ### Option 1: Using the UI (Recommended)
 
-        1. Open the Morphik UI and go to Settings → Providers
+        1. Open the Morphik UI and go to Settings → API Keys
         2. Select "Lemonade" (🍋). No API key is required
         3. Enter the host and port where Lemonade is running
-        4. Click "Discover Models" to auto-detect available models
-        5. Open Chat and use the model selector pill (top left) to pick a Lemonade model
-
-        <img src="/images/placeholder_lemonade_settings.png" 
-             alt="Lemonade provider settings with host and port"
-             style={{maxWidth: '640px', margin: '16px 0'}} />
-
-        <img src="/images/placeholder_lemonade_model_selector.png" 
-             alt="Chat model selector showing Lemonade model"
-             style={{maxWidth: '640px', margin: '16px 0'}} />
+          <img src="/images/add_port_to_lemonade.png" 
+               alt="Lemonade provider settings with host and port"
+               style={{maxWidth: '640px', margin: '16px 0'}} />
+        4. Open Chat and use the model selector pill (top left) to pick a Lemonade model
+          <img src="/images/see_lemonade_models_in_chat.png" 
+               alt="Chat model selector showing Lemonade models"
+               style={{maxWidth: '640px', margin: '16px 0'}} />
 
         <Warning>
           Running inside Docker? Use `host.docker.internal` instead of `localhost` for the host field.
+        </Warning>
+
+        <Warning>
+          If you are not using a vision-capable model, turn off ColPali in chat settings (settings → ColPali) to avoid vision-dependent paths.
         </Warning>
 
         ### Option 2: Edit morphik.toml
@@ -103,30 +104,13 @@ Running models locally provides several key advantages:
         model = "lemonade_embedding"
         ```
       </Step>
-      
-      <Step title="Download and Use Models">
-        Once configured, you can:
-
-        1. **Select Lemonade models in the Chat model selector** (🍋)
-        2. **Models download automatically** on first selection/use if not present
-        3. **Start using Morphik with local inference!**
-
-        <Warning>
-          If your system has under 16GB RAM, prefer models under ~4B parameters or smaller quantizations
-          (e.g., Q4/Q5). Larger models may fail to load or will be very slow on low-memory systems.
-          If you are not using a vision-capable model, turn off ColPali in Chat settings
-          (Chat settings → ColPali) to avoid vision-dependent paths.
-        </Warning>
-      </Step>
     </Steps>
     
-    ### Supported Models
-    
-    Lemonade supports a wide range of models including:
-    - **Vision Models**: Qwen2.5-VL series (7B, 14B)
-    - **Text Models**: Llama, Mistral, Phi, Qwen families
-    - **Embeddings**: nomic-embed-text, BGE models
-    
+    <Warning>
+      If your system has under 16GB RAM, prefer models under ~4B parameters or smaller quantizations
+      (e.g., Q4/Q5). Larger models may fail to load or will be very slow on low-memory systems.
+    </Warning>
+
     ### Performance Tips
     
     - **Model Quantization**: Use GGUF quantized models for better performance
