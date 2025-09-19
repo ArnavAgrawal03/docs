@@ -271,11 +271,21 @@ For users who need to run Morphik on their own infrastructure, we provide two in
 
     **Option&nbsp;A — Using Pre-built Image (Recommended)**
 
-    This is the easiest way to get started with Morphik. Run this single command:
+    This is the easiest way to get started with Morphik. Run the command for your OS:
 
-    ```bash
-    curl -sSL https://raw.githubusercontent.com/morphik-org/morphik-core/main/install_docker.sh | bash
-    ```
+    <Tabs>
+      <Tab title="macOS/Linux">
+      ```bash
+      curl -sSL https://raw.githubusercontent.com/morphik-org/morphik-core/main/install_docker.sh | bash
+      ```
+      </Tab>
+      <Tab title="Windows (PowerShell)">
+      ```powershell
+      Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+      iwr -useb https://raw.githubusercontent.com/morphik-org/morphik-core/main/install_docker.ps1 -OutFile install_docker.ps1; .\install_docker.ps1
+      ```
+      </Tab>
+    </Tabs>
 
     <video controls>
       <source src="/assets/download_morphik.mp4" type="video/mp4" />
@@ -305,13 +315,26 @@ For users who need to run Morphik on their own infrastructure, we provide two in
 
     After installation:
 
-    ```bash
-    # To restart Morphik later (automatically detects UI if installed)
-    ./start-morphik.sh
+    <Tabs>
+      <Tab title="macOS/Linux">
+      ```bash
+      # To restart Morphik later (auto-detects UI if installed)
+      ./start-morphik.sh
 
-    # To stop all services
-    docker compose -f docker-compose.run.yml down
-    ```
+      # To stop all services
+      docker compose -f docker-compose.run.yml down
+      ```
+      </Tab>
+      <Tab title="Windows (PowerShell)">
+      ```powershell
+      # To restart Morphik later (auto-detects UI if installed)
+      ./start-morphik.ps1
+
+      # To stop all services
+      docker compose -f docker-compose.run.yml down
+      ```
+      </Tab>
+    </Tabs>
 
     <Note>
       To restart Morphik with a different configuration, first stop all services using `docker compose -f docker-compose.run.yml down`, modify your `morphik.toml` file, and then restart using `./start-morphik.sh`.
