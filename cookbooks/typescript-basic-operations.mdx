@@ -1,0 +1,207 @@
+---
+title: "TypeScript Basic Operations"
+description: "End-to-end walkthrough of ingestion, retrieval, and LLM handoff with the Morphik TypeScript SDK."
+---
+This cookbook walks through the core Morphik workflow in TypeScript—multimodal ingestion for high-accuracy retrieval, text ingestion for OCR-driven chunks, and piping the results into the LLM you control.
+
+> **Prerequisites**
+> - Install the Morphik SDK: `npm install morphik`
+> - Provide credentials via `MORPHIK_API_KEY`
+> - For the optional OpenAI example, set `OPENAI_API_KEY` and (optionally) `OPENAI_MODEL`
+
+## 1. Initialize the Morphik client
+
+```ts
+import fs from 'fs';
+import Morphik from 'morphik';
+
+const client = new Morphik({
+  apiKey: process.env.MORPHIK_API_KEY!,
+  baseURL: 'https://api.morphik.ai',
+});
+
+const filePath = 'path/to/document.pdf';
+const QUESTION = 'What are the key takeaways from the uploaded document?';
+```
+
+## 2. Helper utilities
+
+```ts
+function getDocumentId(document: any): string {
+  if (document.external_id) return document.external_id;
+
+  const systemMetadata = document.system_metadata as { document_id?: unknown } | undefined;
+  if (systemMetadata?.document_id && typeof systemMetadata.document_id === 'string') {
+    return systemMetadata.document_id;
+  }
+
+  throw new Error('Document response did not include an external_id or document_id.');
+}
+
+async function waitForProcessing(documentId: string) {
+  const timeoutMs = 120_000;
+  const intervalMs = 2_000;
+  const started = Date.now();
+
+  while (true) {
+    const status = await client.documents.getStatus(documentId);
+    const state = (status as any).status ?? (status as any).document_status;
+
+    if (state === 'completed') return;
+    if (state === 'failed') throw new Error(`Document ${documentId} failed to process.`);
+    if (Date.now() - started > timeoutMs) throw new Error('Processing timed out.');
+
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+}
+
+async function logSources(sources: any[] | undefined, label: string) {
+  if (!sources?.length) {
+    console.log(`${label}: no sources returned.`);
+    return;
+  }
+
+  const chunkDetails = await client.batch.retrieveChunks({
+    body: {
+      sources: sources.map((source) => ({
+        document_id: source.document_id,
+        chunk_number: source.chunk_number,
+      })),
+    },
+  });
+
+  chunkDetails.forEach((chunk: any, index: number) => {
+    const preview = chunk.content.slice(0, 120).replace(/\s+/g, ' ');
+    console.log(`${label} #${index + 1} doc ${chunk.document_id} chunk ${chunk.chunk_number}: ${preview}`);
+  });
+}
+```
+
+## 3. Multimodal workflow (direct file indexing)
+
+This path indexes the original file contents directly, yielding higher accuracy for scanned pages, tables, and images.
+
+```ts
+const multimodalDocument = await client.ingest.ingestFile({
+  file: fs.createReadStream(filePath),
+  metadata: JSON.stringify({ demo_variant: 'multimodal' }),
+  use_colpali: true,
+});
+
+await waitForProcessing(getDocumentId(multimodalDocument));
+```
+
+### Retrieve multimodal chunks first
+
+```ts
+const multimodalChunks = await client.retrieve.chunks.create({
+  query: QUESTION,
+  use_colpali: true,
+  k: 4,
+  padding: 1,
+  filters: { demo_variant: 'multimodal' },
+});
+```
+
+At this point you can either:
+- ask Morphik to draft the answer for you, or
+- forward the curated chunks to your own LLM (see [Use your own LLM](#5-use-your-own-llm-openai-example)).
+
+### Option A: generate a Morphik completion (multimodal)
+
+```ts
+const multimodalAnswer = await client.query.generateCompletion({
+  query: QUESTION,
+  use_colpali: true,
+  k: 4,
+  filters: { demo_variant: 'multimodal' },
+});
+
+console.log('Multimodal answer:', multimodalAnswer.completion);
+await logSources(multimodalAnswer.sources, 'Multimodal source');
+```
+
+## 4. Text workflow (OCR + chunking)
+
+This path OCRs the document before chunking it, making the text immediately available for retrieval.
+
+```ts
+const standardDocument = await client.ingest.ingestFile({
+  file: fs.createReadStream(filePath),
+  metadata: JSON.stringify({ demo_variant: 'standard' }),
+});
+```
+
+### Retrieve text chunks first
+
+```ts
+const textChunks = await client.retrieve.chunks.create({
+  query: QUESTION,
+  use_colpali: false,
+  k: 4,
+  padding: 1,
+  filters: { demo_variant: 'standard' },
+});
+```
+
+Choose the same fork as above:
+- stick with Morphik completions for a managed response, or
+- jump to [Use your own LLM](#5-use-your-own-llm-openai-example) to prompt your custom model with these chunks.
+
+### Option A: generate a Morphik completion (text)
+
+```ts
+const textAnswer = await client.query.generateCompletion({
+  query: QUESTION,
+  use_colpali: false,
+  k: 4,
+  filters: { demo_variant: 'standard' },
+});
+
+console.log('Text answer:', textAnswer.completion);
+await logSources(textAnswer.sources, 'Text source');
+```
+
+## 5. Use your own LLM (OpenAI example)
+
+For production workloads, forward Morphik's curated context to your preferred LLM. This gives you full control over system prompts, orchestration, and rate limits, while Morphik focuses on delivering retrieval tools your agent can trust.
+
+```ts
+import OpenAI from 'openai';
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// Text-only prompt
+const textContext = textChunks
+  .map((chunk: any, idx: number) => `Source #${idx + 1}:\n${chunk.content}`)
+  .join('\n\n');
+
+const textResponse = await openai.responses.create({
+  model: process.env.OPENAI_MODEL ?? 'gpt-4o-mini',
+  input: [{
+    role: 'user',
+    content: [{ type: 'text', text: `Use the context below to answer.\n\n${textContext}\n\nQuestion: ${QUESTION}` }],
+  }],
+});
+
+// Multimodal prompt (only includes chunks with image URLs)
+const imageChunks = multimodalChunks.filter(
+  (chunk: any) => chunk.download_url && chunk.content_type?.startsWith('image/'),
+);
+
+const multimodalResponse = await openai.responses.create({
+  model: process.env.OPENAI_MODEL ?? 'gpt-4o-mini',
+  input: [{
+    role: 'user',
+    content: [
+      { type: 'text', text: `Answer using only these images.\nQuestion: ${QUESTION}` },
+      ...imageChunks.map((chunk: any) => ({
+        type: 'image_url',
+        image_url: { url: chunk.download_url },
+      })),
+    ],
+  }],
+});
+```
+
+Morphik stays focused on high-quality retrieval and chunking. Pair it with the LLM of your choice to enforce your policies, prompts, and cost controls end to end.

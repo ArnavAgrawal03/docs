@@ -70,7 +70,8 @@
           {
             "group": "Cookbooks",
             "pages": [
-              "cookbooks/agent-workflows"
+              "cookbooks/agent-workflows",
+              "cookbooks/typescript-basic-operations"
             ]
           },
           {
