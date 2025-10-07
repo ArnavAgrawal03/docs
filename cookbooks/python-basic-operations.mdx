@@ -1,0 +1,426 @@
+---
+title: "Python SDK Basic Operations"
+description: "End-to-end walkthrough of ingestion, retrieval, and LLM integration using the Morphik Python SDK."
+---
+
+This cookbook walks through the core Morphik workflow using the Python SDK—multimodal ingestion for high-accuracy retrieval, text ingestion for OCR-driven chunks, and integrating with your own LLM.
+
+> **Prerequisites**
+> - Install the Morphik SDK: `pip install morphik`
+> - Provide credentials via Morphik URI
+> - For the optional OpenAI example, set `OPENAI_API_KEY`
+
+> **Note on Async Support**
+> This guide uses the synchronous `Morphik` client. An async version `AsyncMorphik` is also available for async workflows with the same API.
+
+> **Note on Streaming**
+> Response streaming is not currently available in the Python SDK as of version 0.2.12. This feature will be added in a future release.
+
+## 1. Initialize the Morphik client
+
+```python
+from morphik import Morphik
+
+# Initialize with Morphik URI
+client = Morphik(
+    uri="morphik://your-name:your-token@api.morphik.ai"
+)
+
+QUESTION = "What are the key takeaways from the uploaded document?"
+```
+
+## 2. Multimodal ingestion (ColPali)
+
+This path indexes the original file contents directly, yielding higher accuracy for scanned pages, tables, and images.
+
+```python
+# Ingest with ColPali (multimodal)
+multimodal_doc = client.ingest_file(
+    file="path/to/document.pdf",
+    metadata={"demo_variant": "multimodal"},
+    use_colpali=True
+)
+
+print(f"Ingested document: {multimodal_doc.external_id}")
+print(f"Status: {multimodal_doc.status}")
+```
+
+### Wait for processing to complete
+
+```python
+# Wait for processing using built-in method
+doc = client.wait_for_document_completion(
+    multimodal_doc.external_id,
+    timeout_seconds=120,
+    check_interval_seconds=2
+)
+print(f"Document {doc.external_id} processing completed!")
+```
+
+## 3. Text ingestion (OCR + chunking)
+
+This path OCRs the document before chunking it, making the text immediately available for retrieval.
+
+```python
+# Ingest without ColPali (standard text extraction)
+text_doc = client.ingest_file(
+    file="path/to/document.pdf",
+    metadata={"demo_variant": "standard"},
+    use_colpali=False
+)
+
+# Wait for processing
+client.wait_for_document_completion(text_doc.external_id, timeout_seconds=120)
+```
+
+## 4. Query with Morphik completion
+
+Generate a completion directly using Morphik's configured LLM.
+
+### Multimodal query (ColPali)
+
+```python
+# Query with multimodal chunks
+multimodal_response = client.query(
+    query=QUESTION,
+    use_colpali=True,
+    k=4,
+    filters={"demo_variant": "multimodal"}
+)
+
+print(f"Multimodal answer: {multimodal_response.completion}")
+print(f"Token usage: {multimodal_response.usage}")
+print(f"Sources: {len(multimodal_response.sources)} chunks used")
+```
+
+### Text query (standard)
+
+```python
+# Query with text chunks
+text_response = client.query(
+    query=QUESTION,
+    use_colpali=False,
+    k=4,
+    filters={"demo_variant": "standard"}
+)
+
+print(f"Text answer: {text_response.completion}")
+```
+
+## 5. Query with system prompt override
+
+Override the default system prompt to customize the LLM's behavior and response style.
+
+```python
+# Pirate assistant example
+pirate_response = client.query(
+    query="What is this document about?",
+    k=3,
+    prompt_overrides={
+        "query": {
+            "system_prompt": (
+                "You are a pirate assistant. Always respond in pirate speak "
+                "with arrr and matey! Be entertaining while staying accurate "
+                "to the document content."
+            )
+        }
+    }
+)
+
+print(f"Pirate response: {pirate_response.completion}")
+# Output: "Arrr, me hearty! This here document be talkin' about..."
+```
+
+### Legal expert example
+
+```python
+# Legal expert persona
+legal_response = client.query(
+    query="What are the key terms?",
+    k=4,
+    prompt_overrides={
+        "query": {
+            "system_prompt": (
+                "You are a legal expert. Analyze the document and provide "
+                "insights in formal legal language. Always cite specific "
+                "sections when making claims."
+            )
+        }
+    }
+)
+
+print(f"Legal analysis: {legal_response.completion}")
+```
+
+### Custom prompt template
+
+You can also override the prompt template that formats the context and question:
+
+```python
+# Financial analyst with custom template
+financial_response = client.query(
+    query="What are the revenue figures?",
+    k=4,
+    prompt_overrides={
+        "query": {
+            "system_prompt": "You are a financial analyst. Provide precise numerical answers.",
+            "prompt_template": (
+                "Based on the following financial data:\n\n"
+                "{context}\n\n"
+                "Analyze and answer: {question}\n\n"
+                "Provide specific numbers and percentages where available."
+            )
+        }
+    }
+)
+```
+
+## 6. Retrieve chunks for your own LLM
+
+For production workloads, retrieve Morphik's curated chunks and forward them to your preferred LLM. This gives you full control over prompts, orchestration, and rate limits.
+
+### Step 1: Retrieve relevant chunks
+
+```python
+# Retrieve multimodal chunks
+chunks = client.retrieve_chunks(
+    query=QUESTION,
+    use_colpali=True,
+    k=4,
+    padding=1,  # Get 1 additional chunk before/after each match
+    filters={"demo_variant": "multimodal"}
+)
+
+print(f"Retrieved {len(chunks)} chunks")
+
+# Inspect chunk details
+for i, chunk in enumerate(chunks):
+    print(f"\nChunk {i + 1}:")
+    print(f"  Document: {chunk.document_id}")
+    print(f"  Score: {chunk.score:.2f}")
+    print(f"  Content preview: {chunk.content[:100]}...")
+    if chunk.download_url:
+        print(f"  Image URL: {chunk.download_url}")
+```
+
+### Step 2: Forward to your LLM (OpenAI example)
+
+#### Text-only chunks with OpenAI
+
+```python
+from openai import OpenAI
+
+openai_client = OpenAI()
+
+# Retrieve text chunks
+text_chunks = client.retrieve_chunks(
+    query=QUESTION,
+    use_colpali=False,
+    k=4,
+    filters={"demo_variant": "standard"}
+)
+
+# Build context from chunks
+context = "\n\n".join([
+    f"Source #{i + 1}:\n{chunk.content}"
+    for i, chunk in enumerate(text_chunks)
+])
+
+# Query OpenAI
+openai_response = openai_client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {
+            "role": "system",
+            "content": "You are a helpful assistant. Use only the provided context to answer questions."
+        },
+        {
+            "role": "user",
+            "content": f"Context:\n\n{context}\n\nQuestion: {QUESTION}"
+        }
+    ]
+)
+
+print(openai_response.choices[0].message.content)
+```
+
+#### Multimodal chunks with OpenAI (vision)
+
+```python
+# Retrieve multimodal chunks with images
+multimodal_chunks = client.retrieve_chunks(
+    query=QUESTION,
+    use_colpali=True,
+    k=4,
+    filters={"demo_variant": "multimodal"}
+)
+
+# Filter chunks that have image URLs
+image_chunks = [
+    chunk for chunk in multimodal_chunks
+    if chunk.download_url and chunk.content_type
+    and chunk.content_type.startswith("image/")
+]
+
+# Build multimodal content
+content = [
+    {
+        "type": "text",
+        "text": f"Answer using these images.\n\nQuestion: {QUESTION}"
+    }
+]
+
+# Add images
+for chunk in image_chunks:
+    content.append({
+        "type": "image_url",
+        "image_url": {"url": chunk.download_url}
+    })
+
+# Query OpenAI with vision
+vision_response = openai_client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": content}]
+)
+
+print(vision_response.choices[0].message.content)
+```
+
+### Step 3: Using other LLM providers
+
+The same pattern works with any LLM provider. Morphik handles retrieval and chunking; you control the completion.
+
+#### Anthropic Claude
+
+```python
+from anthropic import Anthropic
+
+anthropic_client = Anthropic()
+
+# Build context
+context = "\n\n".join([f"Source #{i + 1}:\n{c.content}" for i, c in enumerate(text_chunks)])
+
+# Query Claude
+claude_response = anthropic_client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[{
+        "role": "user",
+        "content": f"Context:\n\n{context}\n\nQuestion: {QUESTION}"
+    }]
+)
+
+print(claude_response.content[0].text)
+```
+
+#### Google Gemini
+
+```python
+import google.generativeai as genai
+
+genai.configure(api_key="your-google-api-key")
+model = genai.GenerativeModel("gemini-pro")
+
+# Build context and query
+prompt = f"Context:\n\n{context}\n\nQuestion: {QUESTION}"
+
+# Query Gemini
+gemini_response = model.generate_content(prompt)
+print(gemini_response.text)
+```
+
+## 7. Working with folders and user scopes
+
+Morphik supports organizing documents into folders and scoping queries by end users.
+
+```python
+# Query within a specific folder
+folder_response = client.get_folder_by_name("my-folder").query(
+    query=QUESTION,
+    k=4
+)
+
+# Scope to a specific end user
+user_response = client.signin("user-123").query(
+    query=QUESTION,
+    k=4
+)
+
+# Combine folder and user scoping
+scoped_response = client.get_folder_by_name("my-folder").signin("user-123").query(
+    query=QUESTION,
+    k=4
+)
+```
+
+## 8. Additional features
+
+### Chat history
+
+Maintain conversation context across queries:
+
+```python
+chat_response = client.query(
+    query="What is the main topic?",
+    chat_id="conversation-123",
+    k=4
+)
+
+# Follow-up question with context
+followup_response = client.query(
+    query="Can you elaborate on that?",
+    chat_id="conversation-123",
+    k=4
+)
+```
+
+### Structured output
+
+Extract structured data using Pydantic models:
+
+```python
+from pydantic import BaseModel
+from typing import List
+
+class DocumentSummary(BaseModel):
+    title: str
+    key_points: List[str]
+    category: str
+
+structured_response = client.query(
+    query="Summarize this document",
+    k=4,
+    schema=DocumentSummary
+)
+
+# Response is now a dictionary matching the schema
+print(structured_response.completion)
+# Output: {"title": "...", "key_points": [...], "category": "..."}
+```
+
+### Custom LLM configuration
+
+Use a different LLM for specific queries:
+
+```python
+custom_llm_response = client.query(
+    query=QUESTION,
+    k=4,
+    llm_config={
+        "model": "gpt-4o",
+        "api_key": "your-openai-key"
+    }
+)
+```
+
+## Summary
+
+The Morphik Python SDK provides flexible integration options:
+
+1. **Managed completions**: Use Morphik's configured LLM with optional system prompt overrides
+2. **Bring your own LLM**: Retrieve curated chunks and forward to any LLM provider
+3. **Multimodal support**: Handle both text and visual content seamlessly
+4. **Full control**: Override system prompts, prompt templates, and completion parameters
+5. **Organization**: Folder and user-based scoping for multi-tenant applications
+
+This separation of concerns lets you focus on your application logic while Morphik handles high-quality retrieval and chunking.

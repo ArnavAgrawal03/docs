@@ -72,7 +72,8 @@
             "pages": [
               "cookbooks/agent-workflows",
               "cookbooks/api-basic-operations",
-              "cookbooks/typescript-basic-operations"
+              "cookbooks/typescript-basic-operations",
+              "cookbooks/python-basic-operations"
             ]
           },
           {
