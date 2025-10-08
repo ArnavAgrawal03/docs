@@ -1,0 +1,46 @@
+---
+title: "list_folders"
+description: "List all folders available to the client"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def list_folders() -> List[Folder]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def list_folders() -> List[Folder]
+    ```
+  </Tab>
+</Tabs>
+
+## Returns
+
+- `List[Folder]`: Collection of folders the current auth context can access.
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    for folder in db.list_folders():
+        print(folder.name, folder.id)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folders = await db.list_folders()
+        for folder in folders:
+            print(folder.name, folder.id)
+    ```
+  </Tab>
+</Tabs>

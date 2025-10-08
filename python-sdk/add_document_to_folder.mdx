@@ -1,0 +1,59 @@
+---
+title: "add_document_to_folder"
+description: "Add an existing document to a folder"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def add_document_to_folder(
+        folder_id_or_name: str,
+        document_id: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def add_document_to_folder(
+        folder_id_or_name: str,
+        document_id: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `folder_id_or_name` (str): Folder identifier. Accepts either the folder's UUID or its name.
+- `document_id` (str): Identifier of the document to move into the folder.
+
+## Returns
+
+- `Dict[str, str]`: Dictionary with `status` and `message` describing the result.
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder("marketing_docs")
+
+    db.add_document_to_folder(folder.id, "doc_123")
+    db.add_document_to_folder("marketing_docs", "doc_456")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder("marketing_docs")
+
+        await db.add_document_to_folder(folder.id, "doc_123")
+        await db.add_document_to_folder("marketing_docs", "doc_456")
+    ```
+  </Tab>
+</Tabs>

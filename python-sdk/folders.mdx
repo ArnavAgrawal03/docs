@@ -5,7 +5,9 @@ description: "Organize and isolate data into logical folder groups in Morphik"
 
 ## Overview
 
-Folders in Morphik provide a way to organize documents into logical groups. This is particularly useful for multi-project environments where you want to maintain separation between different contexts. Documents within a folder are isolated from those in other folders, allowing for clean organization and data separation.
+Folders in Morphik provide a way to organize documents into logical groups. This is particularly useful for multi-project environments where you want to maintain separation between different contexts. Documents within a folder are isolated from those in other folders, allowing for clean organization and data separation.  
+
+> ℹ️ All folder APIs accept **either the folder’s UUID or its name**. Use whichever identifier you already have—Morphik resolves it automatically.
 
 ## Creating and Accessing Folders
 
@@ -19,8 +21,9 @@ Folders in Morphik provide a way to organize documents into logical groups. This
     # Create a new folder
     folder = db.create_folder("marketing_docs")
     
-    # Access an existing folder
+    # Access an existing folder by name or UUID
     folder = db.get_folder("marketing_docs")
+    folder_by_id = db.get_folder(folder.id)
     ```
   </Tab>
   <Tab title="Async">
@@ -31,8 +34,9 @@ Folders in Morphik provide a way to organize documents into logical groups. This
         # Create a new folder
         folder = db.create_folder("marketing_docs")
         
-        # Access an existing folder
-        folder = db.get_folder("marketing_docs")
+        # Access an existing folder by name or UUID
+        folder = await db.get_folder("marketing_docs")
+        folder_by_id = await db.get_folder(folder.id)
     ```
   </Tab>
 </Tabs>
@@ -101,6 +105,49 @@ All the core document operations available on the main Morphik client are also a
 - `create_graph` - Create a knowledge graph from documents in this folder
 - `update_graph` - Update a knowledge graph with new documents from this folder
 - `delete_document_by_filename` - Delete a document by filename from this folder
+
+## Managing Existing Documents and Folders
+
+You can move previously ingested documents into a folder, remove them, or delete the entire folder. The SDK methods accept a folder name or UUID.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder("marketing_docs")
+    
+    document_id = "doc_123"
+
+    # Add an existing document to the folder (name or UUID works)
+    db.add_document_to_folder(folder.id, document_id)
+    db.add_document_to_folder("marketing_docs", document_id)
+
+    # Remove the document from the folder
+    db.remove_document_from_folder("marketing_docs", document_id)
+
+    # Delete the folder (also removes its documents)
+    db.delete_folder(folder.id)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder("marketing_docs")
+        document_id = "doc_123"
+
+        await db.add_document_to_folder(folder.id, document_id)
+        await db.add_document_to_folder("marketing_docs", document_id)
+
+        await db.remove_document_from_folder("marketing_docs", document_id)
+
+        await db.delete_folder(folder.id)
+    ```
+  </Tab>
+</Tabs>
 
 ## Using Custom LLM Configuration with Folders
 

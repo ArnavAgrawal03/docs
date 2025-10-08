@@ -154,13 +154,19 @@
               "python-sdk/get_document_by_filename"
             ]
           },
-          {
-            "group": "Data Organization",
-            "pages": [
-              "python-sdk/folders",
-              "python-sdk/users"
-            ]
-          },
+        {
+          "group": "Data Organization",
+          "pages": [
+            "python-sdk/folders",
+            "python-sdk/create_folder",
+            "python-sdk/list_folders",
+            "python-sdk/get_folder",
+            "python-sdk/add_document_to_folder",
+            "python-sdk/remove_document_from_folder",
+            "python-sdk/delete_folder",
+            "python-sdk/users"
+          ]
+        },
           {
             "group": "Document Updates",
             "pages": [

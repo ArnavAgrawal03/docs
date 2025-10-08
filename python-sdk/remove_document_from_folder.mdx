@@ -1,0 +1,59 @@
+---
+title: "remove_document_from_folder"
+description: "Remove a document from a folder"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def remove_document_from_folder(
+        folder_id_or_name: str,
+        document_id: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def remove_document_from_folder(
+        folder_id_or_name: str,
+        document_id: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `folder_id_or_name` (str): Folder identifier. Accepts either the folder's UUID or its name.
+- `document_id` (str): Identifier of the document to remove.
+
+## Returns
+
+- `Dict[str, str]`: Dictionary with `status` and `message` describing the outcome.
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder("marketing_docs")
+
+    db.remove_document_from_folder(folder.id, "doc_123")
+    db.remove_document_from_folder("marketing_docs", "doc_456")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder("marketing_docs")
+
+        await db.remove_document_from_folder(folder.id, "doc_123")
+        await db.remove_document_from_folder("marketing_docs", "doc_456")
+    ```
+  </Tab>
+</Tabs>

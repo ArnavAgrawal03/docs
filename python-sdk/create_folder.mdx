@@ -1,0 +1,55 @@
+---
+title: "create_folder"
+description: "Create a new folder for organizing documents"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def create_folder(
+        name: str,
+        description: Optional[str] = None,
+    ) -> Folder
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def create_folder(
+        name: str,
+        description: Optional[str] = None,
+    ) -> Folder
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `name` (str): Folder name. Must be unique per app and cannot contain `/`.
+- `description` (str, optional): Optional description of the folder.
+
+> ⚠️ Nested folders are not supported. Use underscores (`_`) to mimic hierarchy (e.g., `team_reports_q1`).
+
+## Returns
+
+- `Folder`: Newly created folder object.
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.create_folder("marketing_docs", description="All marketing collateral")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.create_folder("marketing_docs", description="All marketing collateral")
+    ```
+  </Tab>
+</Tabs>

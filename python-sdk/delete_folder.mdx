@@ -1,0 +1,52 @@
+---
+title: "delete_folder"
+description: "Delete a folder and its documents"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def delete_folder(
+        folder_id_or_name: str,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def delete_folder(
+        folder_id_or_name: str,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `folder_id_or_name` (str): Folder identifier. Accepts either the folder's UUID or its name.
+
+## Returns
+
+- `Dict[str, Any]`: Dictionary containing `status` and `message` describing the deletion.
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    db.delete_folder("marketing_docs")
+    db.delete_folder("bfd74128-8539-4050-8938-542d6ee68be0")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        await db.delete_folder("marketing_docs")
+        await db.delete_folder("bfd74128-8539-4050-8938-542d6ee68be0")
+    ```
+  </Tab>
+</Tabs>

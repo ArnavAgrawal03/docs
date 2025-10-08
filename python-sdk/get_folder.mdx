@@ -1,0 +1,54 @@
+---
+title: "get_folder"
+description: "Retrieve a folder by name or UUID"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_folder(
+        folder_id_or_name: str,
+    ) -> Folder
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_folder(
+        folder_id_or_name: str,
+    ) -> Folder
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `folder_id_or_name` (str): Folder identifier. Accepts either the folder's UUID or its name.
+
+## Returns
+
+- `Folder`: Folder object that can be used to scope operations (ingest, query, etc.).
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder("marketing_docs")
+    same_folder = db.get_folder(folder.id)
+    assert folder.id == same_folder.id
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder("marketing_docs")
+        same_folder = await db.get_folder(folder.id)
+        assert folder.id == same_folder.id
+    ```
+  </Tab>
+</Tabs>
