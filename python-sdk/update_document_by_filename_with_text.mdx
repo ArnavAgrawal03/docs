@@ -11,7 +11,6 @@ description: "Update a document identified by filename with new text content"
         content: str,
         new_filename: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        rules: Optional[List] = None,
         update_strategy: str = "add",
         use_colpali: Optional[bool] = None,
     ) -> Document
@@ -24,7 +23,6 @@ description: "Update a document identified by filename with new text content"
         content: str,
         new_filename: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        rules: Optional[List] = None,
         update_strategy: str = "add",
         use_colpali: Optional[bool] = None,
     ) -> Document
@@ -38,7 +36,6 @@ description: "Update a document identified by filename with new text content"
 - `content` (str): The new content to add
 - `new_filename` (str, optional): Optional new filename for the document
 - `metadata` (Dict[str, Any], optional): Additional metadata to update
-- `rules` (List, optional): Optional list of rules to apply to the content
 - `update_strategy` (str, optional): Strategy for updating the document (currently only 'add' is supported). Defaults to 'add'.
 - `use_colpali` (bool, optional): Whether to use multi-vector embedding. If not specified, defaults to True.
 

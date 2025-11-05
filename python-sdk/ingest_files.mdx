@@ -60,9 +60,6 @@ description: "Batch ingest multiple files into Morphik"
 - `metadata` (Dict[str, Any] | List[Dict[str, Any]], optional): Metadata to apply to the files. Can be either:
    - A single dict to apply to all files
    - A list of dicts, one per file (must match the length of `files`)
-- `rules` (List, optional): Rules to apply during ingestion. Can be either:
-   - A single list of rules to apply to all files
-   - A list of rule lists, one per file
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model. Defaults to True.
 - `parallel` (bool, optional): Whether to process files in parallel. Defaults to True.
 
@@ -111,70 +108,6 @@ An object containing:
     result = await db.ingest_files(
         files=files,
         metadata=metadata_list
-    )
-    ```
-  </Tab>
-</Tabs>
-
-### Per-File Rules
-
-<Tabs>
-  <Tab title="Sync">
-    ```python
-    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
-    from pydantic import BaseModel
-    
-    class ReportMetadata(BaseModel):
-        title: str
-        author: str
-        
-    class DataMetadata(BaseModel):
-        rows: int
-        columns: int
-        
-    # Define different rules for each file
-    rules_list = [
-        [MetadataExtractionRule(schema=ReportMetadata)],
-        [MetadataExtractionRule(schema=DataMetadata)],
-        [NaturalLanguageRule(prompt="Extract key points only")]
-    ]
-    
-    files = ["report.pdf", "data.csv", "presentation.pptx"]
-    
-    result = db.ingest_files(
-        files=files,
-        rules=rules_list,
-        parallel=True
-    )
-    ```
-  </Tab>
-  
-  <Tab title="Async">
-    ```python
-    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
-    from pydantic import BaseModel
-    
-    class ReportMetadata(BaseModel):
-        title: str
-        author: str
-        
-    class DataMetadata(BaseModel):
-        rows: int
-        columns: int
-        
-    # Define different rules for each file
-    rules_list = [
-        [MetadataExtractionRule(schema=ReportMetadata)],
-        [MetadataExtractionRule(schema=DataMetadata)],
-        [NaturalLanguageRule(prompt="Extract key points only")]
-    ]
-    
-    files = ["report.pdf", "data.csv", "presentation.pptx"]
-    
-    result = await db.ingest_files(
-        files=files,
-        rules=rules_list,
-        parallel=True
     )
     ```
   </Tab>

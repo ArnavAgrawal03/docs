@@ -10,7 +10,6 @@ description: "Ingest a text document into Morphik"
         content: str,
         filename: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        rules: Optional[List[RuleOrDict]] = None,
         use_colpali: bool = True,
     ) -> Document
     ```
@@ -21,7 +20,6 @@ description: "Ingest a text document into Morphik"
         content: str,
         filename: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        rules: Optional[List[RuleOrDict]] = None,
         use_colpali: bool = True,
     ) -> Document
     ```
@@ -33,9 +31,6 @@ description: "Ingest a text document into Morphik"
 - `content` (str): Text content to ingest
 - `filename` (str, optional): Optional filename for the document
 - `metadata` (Dict[str, Any], optional): Optional metadata dictionary
-- `rules` (List[RuleOrDict], optional): Optional list of rules to apply during ingestion. Can be:
-  - `MetadataExtractionRule`: Extract metadata using a schema
-  - `NaturalLanguageRule`: Transform content using natural language
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to ingest the text (slower, but significantly better retrieval accuracy for text and images). Defaults to True.
 
 ## Returns
@@ -48,49 +43,25 @@ description: "Ingest a text document into Morphik"
   <Tab title="Sync">
     ```python
     from morphik import Morphik
-    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
-    from pydantic import BaseModel
-    
-    class DocumentInfo(BaseModel):
-        title: str
-        author: str
-        date: str
-    
+
     db = Morphik()
-    
+
     doc = db.ingest_text(
         "Machine learning is fascinating...",
         metadata={"category": "tech"},
-        rules=[
-            # Extract metadata using schema
-            MetadataExtractionRule(schema=DocumentInfo),
-            # Transform content
-            NaturalLanguageRule(prompt="Shorten the content, use keywords")
-        ]
+        use_colpali=True,
     )
     ```
   </Tab>
   <Tab title="Async">
     ```python
     from morphik import AsyncMorphik
-    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
-    from pydantic import BaseModel
-    
-    class DocumentInfo(BaseModel):
-        title: str
-        author: str
-        date: str
-    
+
     async with AsyncMorphik() as db:
         doc = await db.ingest_text(
             "Machine learning is fascinating...",
             metadata={"category": "tech"},
-            rules=[
-                # Extract metadata using schema
-                MetadataExtractionRule(schema=DocumentInfo),
-                # Transform content
-                NaturalLanguageRule(prompt="Shorten the content, use keywords")
-            ]
+            use_colpali=True,
         )
     ```
   </Tab>

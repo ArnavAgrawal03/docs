@@ -10,7 +10,6 @@ description: "Ingest a file document into Morphik"
         file: Union[str, bytes, BinaryIO, Path],
         filename: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        rules: Optional[List[RuleOrDict]] = None,
         use_colpali: bool = True,
     ) -> Document
     ```
@@ -21,7 +20,6 @@ description: "Ingest a file document into Morphik"
         file: Union[str, bytes, BinaryIO, Path],
         filename: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        rules: Optional[List[RuleOrDict]] = None,
         use_colpali: bool = True,
     ) -> Document
     ```
@@ -33,9 +31,6 @@ description: "Ingest a file document into Morphik"
 - `file` (Union[str, bytes, BinaryIO, Path]): File to ingest (path string, bytes, file object, or Path)
 - `filename` (str, optional): Name of the file
 - `metadata` (Dict[str, Any], optional): Optional metadata dictionary
-- `rules` (List[RuleOrDict], optional): Optional list of rules to apply during ingestion. Can be:
-  - `MetadataExtractionRule`: Extract metadata using a schema
-  - `NaturalLanguageRule`: Transform content using natural language
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to ingest the file (slower, but significantly better retrieval accuracy for images). Defaults to True.
 
 ## Returns
@@ -48,47 +43,27 @@ description: "Ingest a file document into Morphik"
   <Tab title="Sync">
     ```python
     from morphik import Morphik
-    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
-    from pydantic import BaseModel
-    
-    class DocumentInfo(BaseModel):
-        title: str
-        author: str
-        department: str
-    
+
     db = Morphik()
-    
+
     doc = db.ingest_file(
         "document.pdf",
         filename="document.pdf",
-        metadata={"category": "research"},
-        rules=[
-            MetadataExtractionRule(schema=DocumentInfo),
-            NaturalLanguageRule(prompt="Extract key points only")
-        ]
+        metadata={"category": "research", "owner": "alice"},
+        use_colpali=True,
     )
     ```
   </Tab>
   <Tab title="Async">
     ```python
     from morphik import AsyncMorphik
-    from morphik.rules import MetadataExtractionRule, NaturalLanguageRule
-    from pydantic import BaseModel
-    
-    class DocumentInfo(BaseModel):
-        title: str
-        author: str
-        department: str
-    
+
     async with AsyncMorphik() as db:
         doc = await db.ingest_file(
             "document.pdf",
             filename="document.pdf",
-            metadata={"category": "research"},
-            rules=[
-                MetadataExtractionRule(schema=DocumentInfo),
-                NaturalLanguageRule(prompt="Extract key points only")
-            ]
+            metadata={"category": "research", "owner": "alice"},
+            use_colpali=True,
         )
     ```
   </Tab>
