@@ -1,0 +1,168 @@
+---
+title: "query_document"
+description: "Run a one-off Morphik On-the-Fly analysis with optional ingestion follow-up"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def query_document(
+        file: Union[str, bytes, BinaryIO, Path],
+        prompt: str,
+        schema: Optional[Union[Dict[str, Any], Type[BaseModel], BaseModel, str]] = None,
+        ingestion_options: Optional[Dict[str, Any]] = None,
+        filename: Optional[str] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
+    ) -> DocumentQueryResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def query_document(
+        file: Union[str, bytes, BinaryIO, Path],
+        prompt: str,
+        schema: Optional[Union[Dict[str, Any], Type[BaseModel], BaseModel, str]] = None,
+        ingestion_options: Optional[Dict[str, Any]] = None,
+        filename: Optional[str] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
+    ) -> DocumentQueryResponse
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `file` (Union[str, bytes, BinaryIO, Path]): Document to analyse inline. Accepts a file path, bytes buffer, or file-like object.
+- `prompt` (str): Instruction Morphik On-the-Fly should execute against the document.
+- `schema` (dict | BaseModel | Type[BaseModel] | str, optional): Schema that enforces structured output. Accepts a plain dict, a Pydantic model or class, or a pre-serialized JSON string.
+- `ingestion_options` (Dict[str, Any], optional): Controls follow-up ingestion. Supported keys:
+  - `ingest` (bool): Queue the file for ingestion after analysis.
+  - `metadata` (dict): Metadata supplied with the request. When `schema` yields a JSON object, those fields are merged into this metadata before ingestion.
+  - `use_colpali` (bool): Override the embedding strategy used during ingestion.
+  - `folder_name` (str | list[str]): Folder scope for the queued ingestion.
+  - `end_user_id` (str): End-user scope for the queued ingestion.
+  Unsupported keys are ignored.
+- `filename` (str, optional): Filename override when uploading bytes or file-like objects.
+- `folder_name` (str | list[str], optional): Folder scope applied to the inline request. Automatically set when calling from folder helpers; merged into `ingestion_options` if not already present.
+- `end_user_id` (str, optional): End-user scope for the inline request. Automatically set when using user scope helpers; merged into `ingestion_options` if not already present.
+
+## Returns
+
+- `DocumentQueryResponse`: Contains `structured_output`, `text_output`, `input_metadata`, `combined_metadata`, and ingestion status. When ingestion is requested and the schema produces a JSON object, `combined_metadata` reflects the union of the supplied metadata and the extracted fields used for ingestion.
+
+## Behaviour
+
+- **Structured extraction:** When `schema` is provided, Morphik validates the response against the schema. If the structured output is a dict, it is returned in `structured_output` and copied to `extracted_metadata`.
+- **Metadata merge:** `combined_metadata` is always derived from the original `metadata` supplied in `ingestion_options`. When structured extraction returns a dict, those fields are merged into the metadata before any ingestion takes place.
+- **Ingestion queuing:** Setting `ingest=True` enqueues the document for ingestion (requires `write` permission). The response includes `ingestion_enqueued` and, when available, an `ingestion_document` stub you can monitor.
+
+## Examples
+
+### Extract structured data and ingest
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from typing import Optional
+
+    from pydantic import BaseModel
+    from morphik import Morphik
+
+
+    class ContractSummary(BaseModel):
+        parties: list[str]
+        effective_date: str
+        auto_renew: Optional[bool]
+
+
+    db = Morphik()
+
+    result = db.query_document(
+        file="contracts/acme_supply.pdf",
+        prompt="Extract the parties, effective date, and whether the agreement auto-renews.",
+        schema=ContractSummary,
+        ingestion_options={
+            "ingest": True,
+            "metadata": {"source": "contracts", "region": "NA"},
+            "folder_name": "contracts",
+        },
+    )
+
+    print(result.structured_output)
+    print(result.combined_metadata)  # original metadata merged with schema fields
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from typing import Optional
+
+    import asyncio
+    from pydantic import BaseModel
+    from morphik import AsyncMorphik
+
+
+    class ContractSummary(BaseModel):
+        parties: list[str]
+        effective_date: str
+        auto_renew: Optional[bool]
+
+
+    async def run():
+        async with AsyncMorphik() as db:
+            result = await db.query_document(
+                file="contracts/acme_supply.pdf",
+                prompt="Extract the parties, effective date, and whether the agreement auto-renews.",
+                schema=ContractSummary,
+                ingestion_options={
+                    "ingest": True,
+                    "metadata": {"source": "contracts", "region": "NA"},
+                    "use_colpali": False,
+                },
+            )
+
+            print(result.structured_output)
+            print(result.ingestion_enqueued)
+
+
+    asyncio.run(run())
+    ```
+  </Tab>
+</Tabs>
+
+### Quick inline analysis without ingestion
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    summary = db.query_document(
+        file="notes.pdf",
+        prompt="Summarize the key takeaways in two sentences.",
+    )
+
+    print(summary.text_output)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async def main():
+        async with AsyncMorphik() as db:
+            summary = await db.query_document(
+                file="notes.pdf",
+                prompt="Summarize the key takeaways in two sentences.",
+            )
+
+            print(summary.text_output)
+
+
+    asyncio.run(main())
+    ```
+  </Tab>
+</Tabs>

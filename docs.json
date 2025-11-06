@@ -138,7 +138,9 @@
             "group": "Document Ingestion",
             "pages": [
               "python-sdk/ingest_text",
-              "python-sdk/ingest_file"
+              "python-sdk/ingest_file",
+              "python-sdk/ingest_files",
+              "python-sdk/query_document"
             ]
           },
           {

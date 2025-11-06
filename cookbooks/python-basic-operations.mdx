@@ -175,7 +175,47 @@ financial_response = client.query(
 )
 ```
 
-## 6. Retrieve chunks for your own LLM
+## 6. Morphik On-the-Fly document query
+
+Analyse a document inline with Morphik On-the-Fly before committing it to long-term storage. You can enforce structured output and decide whether to enqueue ingestion afterwards.
+
+```python
+document_query = client.query_document(
+    file="path/to/document.pdf",
+    prompt="Extract the parties, effective date, and governing jurisdiction.",
+    schema={
+        "parties": {"type": "ARRAY"},
+        "effective_date": "date",
+        "jurisdiction": "string",
+    },
+    ingestion_options={
+        "ingest": True,
+        "metadata": {"source": "contracts"},
+        "use_colpali": True,
+    }
+)
+
+print("Structured output:", document_query.structured_output)
+print("Ingestion queued:", document_query.ingestion_enqueued)
+```
+
+Folder and user scoping work exactly like other SDK calls:
+
+```python
+folder_query = client.get_folder_by_name("contracts").query_document(
+    file="path/to/nda.pdf",
+    prompt="Summarize the non-disclosure obligations.",
+    ingestion_options={"ingest": False}
+)
+
+user_query = client.signin("end-user-42").query_document(
+    file="path/to/statement.pdf",
+    prompt="Capture the account balance and due date.",
+    ingestion_options={"metadata": {"channel": "upload"}}
+)
+```
+
+## 7. Retrieve chunks for your own LLM
 
 For production workloads, retrieve Morphik's curated chunks and forward them to your preferred LLM. This gives you full control over prompts, orchestration, and rate limits.
 
@@ -329,7 +369,7 @@ gemini_response = model.generate_content(prompt)
 print(gemini_response.text)
 ```
 
-## 7. Working with folders and user scopes
+## 8. Working with folders and user scopes
 
 Morphik supports organizing documents into folders and scoping queries by end users.
 
@@ -353,7 +393,7 @@ scoped_response = client.get_folder_by_name("my-folder").signin("user-123").quer
 )
 ```
 
-## 8. Additional features
+## 9. Additional features
 
 ### Chat history
 
@@ -420,7 +460,8 @@ The Morphik Python SDK provides flexible integration options:
 1. **Managed completions**: Use Morphik's configured LLM with optional system prompt overrides
 2. **Bring your own LLM**: Retrieve curated chunks and forward to any LLM provider
 3. **Multimodal support**: Handle both text and visual content seamlessly
-4. **Full control**: Override system prompts, prompt templates, and completion parameters
-5. **Organization**: Folder and user-based scoping for multi-tenant applications
+4. **Morphik On-the-Fly**: Run inline analyses with structured output and optional ingestion
+5. **Full control**: Override system prompts, prompt templates, and completion parameters
+6. **Organization**: Folder and user-based scoping for multi-tenant applications
 
 This separation of concerns lets you focus on your application logic while Morphik handles high-quality retrieval and chunking.
