@@ -63,6 +63,10 @@ description: "Batch ingest multiple files into Morphik"
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model. Defaults to True.
 - `parallel` (bool, optional): Whether to process files in parallel. Defaults to True.
 
+### Typed Metadata
+
+When specifying `metadata`, you can include Python `datetime`, `date`, `Decimal`, or numeric types. The SDK normalizes them, sends the accompanying `metadata_types`, and unlocks the advanced queries outlined in [Metadata Filtering](/concepts/metadata-filtering).
+
 ## Returns
 
 An object containing:

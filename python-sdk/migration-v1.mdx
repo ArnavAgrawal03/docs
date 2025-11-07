@@ -1,0 +1,193 @@
+---
+title: "Migration Guide: v0.x to v1.0"
+description: "Guide for upgrading from Morphik SDK v0.x to v1.0"
+---
+
+## Installation
+
+```bash
+pip install --upgrade morphik
+```
+
+## Breaking Changes
+
+### 1. `list_documents()` Return Type
+
+**What changed:** The method now returns a `ListDocsResponse` object instead of `List[Document]`.
+
+#### Before (v0.x)
+```python
+docs = db.list_documents()
+for doc in docs:
+    process(doc)
+```
+
+#### After (v1.0)
+```python
+response = db.list_documents()
+for doc in response.documents:  # Access via .documents
+    process(doc)
+```
+
+**Why?** The new structure provides:
+- Pagination metadata (`has_more`, `next_skip`, `total_count`)
+- Aggregates (status counts, folder counts)
+- Sorting capabilities
+- Better support for large datasets
+
+### 2. Pagination Pattern Changes
+
+#### Before (v0.x)
+```python
+page1 = db.list_documents(skip=0, limit=10)
+page2 = db.list_documents(skip=10, limit=10)
+# No way to know if more pages exist
+```
+
+#### After (v1.0)
+```python
+page1 = db.list_documents(skip=0, limit=10)
+if page1.has_more:
+    page2 = db.list_documents(skip=page1.next_skip, limit=10)
+```
+
+Or with total count:
+```python
+response = db.list_documents(limit=10, include_total_count=True)
+print(f"Page 1 of {response.total_count // 10 + 1}")
+```
+
+## New Features
+
+### Sorting
+
+Sort documents by any field:
+
+```python
+# Most recently updated first
+response = db.list_documents(sort_by="updated_at", sort_direction="desc")
+
+# Alphabetically by filename
+response = db.list_documents(sort_by="filename", sort_direction="asc")
+```
+
+Available sort fields:
+- `created_at` - Creation timestamp
+- `updated_at` - Last modification timestamp
+- `filename` - Document filename
+- `external_id` - Document ID
+
+### Aggregates
+
+Get document counts without retrieving all documents:
+
+```python
+# Status breakdown
+response = db.list_documents(
+    limit=0,  # Don't need documents
+    include_status_counts=True
+)
+print(response.status_counts)
+# {"completed": 100, "processing": 5, "failed": 2}
+
+# Folder distribution
+response = db.list_documents(include_folder_counts=True)
+for folder in response.folder_counts:
+    print(f"{folder.folder}: {folder.count} docs")
+```
+
+### Completed-Only Filter
+
+Filter to only completed documents:
+
+```python
+response = db.list_documents(completed_only=True)
+# Only returns successfully processed documents
+```
+
+### Total Count
+
+Get total matching documents for pagination:
+
+```python
+response = db.list_documents(
+    filters={"department": "sales"},
+    include_total_count=True
+)
+print(f"Found {response.total_count} sales documents")
+```
+
+## Migration Checklist
+
+- [ ] Update `list_documents()` calls to access `.documents` property
+- [ ] Update pagination logic to use `has_more` and `next_skip`
+- [ ] Consider using `include_total_count` for better UX
+- [ ] Add sorting if needed for your use case
+- [ ] Test with filters to ensure they still work correctly
+- [ ] Update any type hints from `List[Document]` to `ListDocsResponse`
+
+## Common Migration Patterns
+
+### Pattern 1: Simple Iteration
+
+```python
+# Before
+for doc in db.list_documents():
+    process(doc)
+
+# After
+for doc in db.list_documents().documents:
+    process(doc)
+```
+
+### Pattern 2: Pagination Loop
+
+```python
+# Before
+skip = 0
+while True:
+    docs = db.list_documents(skip=skip, limit=100)
+    if not docs:
+        break
+    for doc in docs:
+        process(doc)
+    skip += 100
+
+# After
+skip = 0
+while True:
+    response = db.list_documents(skip=skip, limit=100)
+    if not response.documents:
+        break
+    for doc in response.documents:
+        process(doc)
+    if not response.has_more:
+        break
+    skip = response.next_skip
+```
+
+### Pattern 3: Count Documents
+
+```python
+# Before (had to fetch all)
+all_docs = db.list_documents()
+count = len(all_docs)
+
+# After (much more efficient)
+response = db.list_documents(limit=1, include_total_count=True)
+count = response.total_count
+```
+
+## Getting Help
+
+- [Documentation](/python-sdk)
+- [GitHub Issues](https://github.com/morphik-org/morphik-core/issues)
+- [Discord Community](https://discord.gg/morphik)
+
+## Rollback
+
+If you need to rollback to v0.x:
+
+```bash
+pip install morphik==0.2.15
+```

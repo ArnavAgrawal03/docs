@@ -1,0 +1,149 @@
+---
+title: "Metadata Filtering"
+description: "Canonical reference for Morphik’s metadata filter DSL and typed comparisons."
+---
+
+Morphik lets you filter documents and chunks directly in the database using a concise JSON filter syntax. The same structure powers the REST API, Python SDK (sync + async), folder helpers, `UserScope`, caches, and knowledge-graph builders, so you can define a filter once and reuse it everywhere.
+
+<Note>
+  Prefer server-side filters over client-side post-processing. You’ll reduce bandwidth, improve performance, and keep behavior consistent between endpoints.
+</Note>
+
+## Where Filters Apply
+
+You can pass `filters` (or `document_filters`) to:
+
+- Retrieval endpoints: [`retrieve_chunks`](/python-sdk/retrieve_chunks), [`retrieve_docs`](/python-sdk/retrieve_docs), [`query`](/python-sdk/query), [`query_document`](/python-sdk/query_document) ingestion options.
+- Listing/management: [`list_documents`](/python-sdk/list_documents), document/folder analytics, graph create/update, caches, chat history, and anywhere an SDK method exposes a `filters` argument.
+
+## Quick Start
+
+```python
+from datetime import datetime
+from morphik import Morphik
+
+db = Morphik()
+filters = {
+    "$and": [
+        {"department": {"$eq": "research"}},
+        {"priority": {"$gte": 40}},
+        {"start_date": {"$lte": datetime.now().isoformat()}},
+        {"tags": {"$contains": {"value": "contract"}}}
+    ]
+}
+
+chunks = db.retrieve_chunks("project delta highlights", filters=filters, k=6)
+```
+
+### Typed Metadata
+
+Typed comparisons (numbers, decimals, dates, datetimes) rely on `metadata_types`. Supply the per-field hints during ingest or metadata updates:
+
+```python
+doc = db.ingest_text(
+    content="SOW for Delta",
+    metadata={
+        "priority": 42,
+        "start_date": "2024-01-15T12:30:00Z",
+        "end_date": "2024-12-31",
+        "cost": "1234.56"
+    },
+    metadata_types={
+        "priority": "number",
+        "start_date": "datetime",
+        "end_date": "date",
+        "cost": "decimal"
+    }
+)
+```
+
+If you omit a hint, Morphik infers one automatically for simple scalars, but explicitly declaring types is recommended for reliable range queries.
+
+## Implicit vs Explicit Syntax
+
+- **Implicit equality** – Bare key/value pairs (`{"status": "active"}`) use JSON containment and are ideal for simple matching. They also check whether an array contains the value.
+- **Explicit operators** – Wrap a field in an operator object to unlock typed comparisons, set logic, regex, substring checks, etc. (`{"status": {"$ne": "archived"}}`).
+
+## Operator Reference
+
+### Equality & Comparison
+
+| Operator | Description | Example |
+| --- | --- | --- |
+| `$eq` / implicit value | Equality (also matches scalars in arrays). | `{"status": {"$eq": "completed"}}` |
+| `$ne` | Not equal. | `{"status": {"$ne": "archived"}}` |
+| `$gt`, `$gte`, `$lt`, `$lte` | Greater/less-than comparisons for numbers, decimals, dates, datetimes, and strings (`$eq/$ne` only). Requires correct `metadata_types`. | `{"priority": {"$gte": 40}}`, `{"end_date": {"$lt": "2025-01-01"}}` |
+
+### Set Membership
+
+| Operator | Description | Example |
+| --- | --- | --- |
+| `$in` | Matches any operand in the provided list. | `{"status": {"$in": ["completed", "processing"]}}` |
+| `$nin` | Matches when the value is *not* in the list. | `{"region": {"$nin": ["EU", "LATAM"]}}` |
+
+### Type & Existence
+
+| Operator | Description | Example |
+| --- | --- | --- |
+| `$exists` | Field must (or must not) exist. Accepts booleans or truthy strings. | `{"external_id": {"$exists": true}}` |
+| `$type` | Field must have one of the supported metadata types (`string`, `number`, `decimal`, `datetime`, `date`, `boolean`, `array`, `object`, `null`). | `{"start_date": {"$type": "datetime"}}` |
+
+### String & Pattern Matching
+
+| Operator | Description | Example |
+| --- | --- | --- |
+| `$contains` | Case-insensitive substring match by default; accepts `{ "value": "...", "case_sensitive": bool }`. Works on scalars and array entries. | `{"title": {"$contains": "Q4 Summary"}}` |
+| `$regex` | PostgreSQL regex match. Accepts a raw string pattern or `{ "pattern": "...", "flags": "i" }` (only the `i` flag is supported). Works on scalars and arrays. | `{"folder": {"$regex": {"pattern": "^fin", "flags": "i"}}}` |
+
+### Logical Composition
+
+| Operator | Description |
+| --- | --- |
+| `$and` | All nested clauses must match (non-empty list). |
+| `$or` | At least one nested clause must match. |
+| `$nor` | None of the nested clauses may match (`NOT (A OR B)`). |
+| `$not` | Inverts a single clause. |
+
+Mix logical operators freely with field-level operators for complex expressions.
+
+## Common Patterns
+
+### Current Window Between Start/End
+
+```json
+{
+  "$and": [
+    {"start_date": {"$lte": "2024-06-01T00:00:00Z"}},
+    {"end_date": {"$gte": "2024-06-01T00:00:00Z"}}
+  ]
+}
+```
+
+### Folder/User Scope plus Metadata
+
+```python
+folder = db.get_folder("legal")
+scoped = folder.signin("user-42")
+
+filters = {"priority": {"$gte": 50}}
+response = scoped.list_documents(filters=filters, include_total_count=True)
+```
+
+### Array Membership & Substring
+
+```json
+{
+  "$and": [
+    {"tags": {"$contains": {"value": "contract"}}},
+    {"tags": {"$regex": {"pattern": "quarter", "flags": "i"}}}
+  ]
+}
+```
+
+## Troubleshooting
+
+- **“Unsupported metadata filter operator …”** – Double-check spelling and operand type (lists for `$in`, non-empty arrays for `$and`, etc.).
+- **“Metadata field … expects type …”** – The server couldn’t coerce the operand to the declared type. Ensure numbers/dates are valid JSON scalars or native Python types before serialization.
+- **Range query returns nothing** – Confirm the target documents were ingested/updated with the corresponding `metadata_types`. Re-ingest or call `update_document_metadata` with the proper type hints if necessary.
+
+Still stuck? Share your filter payload and endpoint at `founders@morphik.ai` or on [Discord](https://discord.gg/H7RN3XdGu3).

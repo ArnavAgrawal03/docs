@@ -36,6 +36,22 @@ description: "Retrieve relevant chunks from Morphik"
 - `min_score` (float, optional): Minimum similarity threshold. Defaults to 0.0.
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to retrieve the chunks (only works for documents ingested with `use_colpali=True`). Defaults to True.
 
+## Metadata Filters
+
+Filters follow the same JSON syntax across the API. See the [Metadata Filtering guide](/concepts/metadata-filtering) for supported operators and typed comparisons. Example:
+
+```python
+filters = {
+    "$and": [
+        {"department": {"$eq": "research"}},
+        {"priority": {"$gte": 40}},
+        {"start_date": {"$lte": "2024-06-01T00:00:00Z"}}
+    ]
+}
+
+chunks = db.retrieve_chunks("delta status", filters=filters, k=6)
+```
+
 ## Returns
 
 - `List[FinalChunkResult]`: List of chunk results

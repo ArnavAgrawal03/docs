@@ -64,6 +64,27 @@ Generate completion using relevant chunks as context.
 - `schema` (Type[BaseModel] | Dict[str, Any], optional): Optional schema for structured output, can be a Pydantic model or a JSON schema dict
 - `llm_config` (Dict[str, Any], optional): Optional LiteLLM-compatible model configuration (e.g., model name, API key, base URL). Allows overriding the default LLM configuration on a per-query basis. Defaults to None.
 
+## Metadata Filters
+
+Use the same JSON filters described in the [Metadata Filtering concept](/concepts/metadata-filtering) to restrict which documents feed into the completion. Example:
+
+```python
+filters = {
+    "$and": [
+        {"project": {"$eq": "delta"}},
+        {"start_date": {"$lte": "2024-06-01T00:00:00Z"}},
+        {"end_date": {"$gte": "2024-06-01T00:00:00Z"}}
+    ]
+}
+
+response = db.query(
+    "Summarize current scope changes",
+    filters=filters,
+    k=6,
+    temperature=0.3
+)
+```
+
 ## Returns
 
 - `CompletionResponse`: Response containing the completion, source information, and potentially structured output.

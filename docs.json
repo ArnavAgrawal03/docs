@@ -55,7 +55,8 @@
               "concepts/morphik-agent",
               "concepts/user-folder-scoping",
               "concepts/colpali",
-              "concepts/knowledge-graphs"
+              "concepts/knowledge-graphs",
+              "concepts/metadata-filtering"
             ]
           },
           {
@@ -141,6 +142,12 @@
               "python-sdk/ingest_file",
               "python-sdk/ingest_files",
               "python-sdk/query_document"
+            ]
+          },
+          {
+            "group": "Migration Guides",
+            "pages": [
+              "python-sdk/migration-v1"
             ]
           },
           {

@@ -27,6 +27,10 @@ description: "Update a document's metadata only"
 - `document_id` (str): ID of the document to update
 - `metadata` (Dict[str, Any]): Metadata to update
 
+### Typed Metadata
+
+You can supply Python `datetime`, `date`, `Decimal`, and numeric types in `metadata`. The SDK serializes them with the correct `metadata_types`, so subsequent filters can leverage the operators from the [Metadata Filtering guide](/concepts/metadata-filtering).
+
 ## Returns
 
 - `Document`: Updated document metadata

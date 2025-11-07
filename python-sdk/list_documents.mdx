@@ -3,73 +3,189 @@ title: "list_documents"
 description: "List accessible documents in Morphik"
 ---
 
+<Note>
+  **v1.0 Breaking Change:** This method now returns a `ListDocsResponse` object instead of `List[Document]`.
+  Access documents via `response.documents`. See [Migration Guide](/python-sdk/migration-v1).
+</Note>
+
 <Tabs>
   <Tab title="Sync">
     ```python
     def list_documents(
-        skip: int = 0, 
-        limit: int = 100, 
-        filters: Optional[Dict[str, Any]] = None
-    ) -> List[Document]
+        skip: int = 0,
+        limit: int = 100,
+        filters: Optional[Dict[str, Any]] = None,
+        include_total_count: bool = False,
+        include_status_counts: bool = False,
+        include_folder_counts: bool = False,
+        completed_only: bool = False,
+        sort_by: Optional[str] = "updated_at",
+        sort_direction: str = "desc"
+    ) -> ListDocsResponse
     ```
   </Tab>
   <Tab title="Async">
     ```python
     async def list_documents(
-        skip: int = 0, 
-        limit: int = 100, 
-        filters: Optional[Dict[str, Any]] = None
-    ) -> List[Document]
+        skip: int = 0,
+        limit: int = 100,
+        filters: Optional[Dict[str, Any]] = None,
+        include_total_count: bool = False,
+        include_status_counts: bool = False,
+        include_folder_counts: bool = False,
+        completed_only: bool = False,
+        sort_by: Optional[str] = "updated_at",
+        sort_direction: str = "desc"
+    ) -> ListDocsResponse
     ```
   </Tab>
 </Tabs>
 
 ## Parameters
 
-- `skip` (int, optional): Number of documents to skip. Defaults to 0.
+- `skip` (int, optional): Number of documents to skip for pagination. Defaults to 0.
 - `limit` (int, optional): Maximum number of documents to return. Defaults to 100.
-- `filters` (Dict[str, Any], optional): Optional filters
+- `filters` (Dict[str, Any], optional): Metadata filters to apply
+- `include_total_count` (bool, optional): Include total count of matching documents. Defaults to False.
+- `include_status_counts` (bool, optional): Include counts grouped by processing status. Defaults to False.
+- `include_folder_counts` (bool, optional): Include counts grouped by folder. Defaults to False.
+- `completed_only` (bool, optional): Only return documents with completed status. Defaults to False.
+- `sort_by` (str, optional): Field to sort by (`created_at`, `updated_at`, `filename`, `external_id`). Defaults to "updated_at".
+- `sort_direction` (str, optional): Sort direction (`asc` or `desc`). Defaults to "desc".
+
+### Metadata Filters
+
+Pass any JSON filter described in the [Metadata Filtering guide](/concepts/metadata-filtering) via the `filters` argument. Example:
+
+```python
+filters = {
+    "$and": [
+        {"department": {"$eq": "research"}},
+        {"priority": {"$gte": 40}},
+        {"start_date": {"$lte": "2024-06-01"}}
+    ]
+}
+
+response = db.list_documents(filters=filters, include_total_count=True)
+```
 
 ## Returns
 
-- `List[Document]`: List of accessible documents
+`ListDocsResponse` object with the following properties:
+
+- `documents` (List[Document]): The list of documents
+- `skip` (int): Pagination offset used
+- `limit` (int): Limit used
+- `returned_count` (int): Number of documents in this response
+- `total_count` (Optional[int]): Total matching documents (if `include_total_count=True`)
+- `has_more` (bool): Whether more documents exist beyond this page
+- `next_skip` (Optional[int]): Skip value to use for the next page
+- `status_counts` (Optional[Dict[str, int]]): Document counts by status (if requested)
+- `folder_counts` (Optional[List]): Document counts by folder (if requested)
 
 ## Examples
+
+### Basic Usage
 
 <Tabs>
   <Tab title="Sync">
     ```python
     from morphik import Morphik
-    
+
     db = Morphik()
-    
-    # Get first page
-    docs = db.list_documents(limit=10)
-    for doc in docs:
-        print(f"Document ID: {doc.external_id}")
-        print(f"Filename: {doc.filename}")
-        print(f"Metadata: {doc.metadata}")
-        print("---")
-    
-    # Get next page
-    next_page = db.list_documents(skip=10, limit=10, filters={"department": "research"})
+
+    # Basic listing
+    response = db.list_documents(limit=10)
+    print(f"Returned {response.returned_count} documents")
+
+    for doc in response.documents:
+        print(f"Document: {doc.filename}")
     ```
   </Tab>
   <Tab title="Async">
     ```python
     from morphik import AsyncMorphik
-    
+
     async with AsyncMorphik() as db:
-        # Get first page
-        docs = await db.list_documents(limit=10)
-        for doc in docs:
-            print(f"Document ID: {doc.external_id}")
-            print(f"Filename: {doc.filename}")
-            print(f"Metadata: {doc.metadata}")
-            print("---")
-        
-        # Get next page
-        next_page = await db.list_documents(skip=10, limit=10, filters={"department": "research"})
+        response = await db.list_documents(limit=10)
+
+        for doc in response.documents:
+            print(f"Document: {doc.filename}")
+    ```
+  </Tab>
+</Tabs>
+
+### Pagination with Total Count
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    # Get total count and paginate
+    response = db.list_documents(limit=10, include_total_count=True)
+    print(f"Showing {response.returned_count} of {response.total_count} documents")
+
+    # Check if more pages exist
+    if response.has_more:
+        next_page = db.list_documents(skip=response.next_skip, limit=10)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    response = await db.list_documents(limit=10, include_total_count=True)
+
+    if response.has_more:
+        next_page = await db.list_documents(skip=response.next_skip, limit=10)
+    ```
+  </Tab>
+</Tabs>
+
+### Sorting and Filtering
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    # Sort by creation date, newest first
+    response = db.list_documents(
+        sort_by="created_at",
+        sort_direction="desc",
+        filters={"department": "research"}
+    )
+
+    # Only completed documents
+    response = db.list_documents(completed_only=True)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    response = await db.list_documents(
+        sort_by="created_at",
+        sort_direction="desc",
+        filters={"department": "research"}
+    )
+    ```
+  </Tab>
+</Tabs>
+
+### Aggregates and Counts
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    # Get status breakdown
+    response = db.list_documents(include_status_counts=True)
+    print(response.status_counts)
+    # {"completed": 42, "processing": 3, "failed": 1}
+
+    # Get folder distribution
+    response = db.list_documents(include_folder_counts=True)
+    for folder in response.folder_counts:
+        print(f"{folder.folder}: {folder.count} documents")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    response = await db.list_documents(include_status_counts=True)
+    print(response.status_counts)
     ```
   </Tab>
 </Tabs>

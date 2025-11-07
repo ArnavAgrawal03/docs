@@ -36,6 +36,22 @@ description: "Retrieve relevant documents from Morphik"
 - `min_score` (float, optional): Minimum similarity threshold. Defaults to 0.0.
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to retrieve the documents (only works for documents ingested with `use_colpali=True`). Defaults to True.
 
+## Metadata Filters
+
+Filters share a common JSON DSL. Review the [Metadata Filtering guide](/concepts/metadata-filtering) for supported operators and typed comparisons. Example:
+
+```python
+filters = {
+    "$and": [
+        {"department": {"$eq": "research"}},
+        {"priority": {"$gte": 40}},
+        {"start_date": {"$lte": "2024-06-01"}}
+    ]
+}
+
+docs = db.retrieve_docs("budget summary", filters=filters, k=5)
+```
+
 ## Returns
 
 - `List[DocumentResult]`: List of document results

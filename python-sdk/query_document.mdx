@@ -48,6 +48,10 @@ description: "Run a one-off Morphik On-the-Fly analysis with optional ingestion 
 - `folder_name` (str | list[str], optional): Folder scope applied to the inline request. Automatically set when calling from folder helpers; merged into `ingestion_options` if not already present.
 - `end_user_id` (str, optional): End-user scope for the inline request. Automatically set when using user scope helpers; merged into `ingestion_options` if not already present.
 
+### Metadata Filters
+
+Some `ingestion_options` workflows or follow-up ingestion steps require metadata filters. Use the JSON operators documented in [Metadata Filtering](/concepts/metadata-filtering) to keep behavior consistent with other endpoints.
+
 ## Returns
 
 - `DocumentQueryResponse`: Contains `structured_output`, `text_output`, `input_metadata`, `combined_metadata`, and ingestion status. When ingestion is requested and the schema produces a JSON object, `combined_metadata` reflects the union of the supplied metadata and the extracted fields used for ingestion.

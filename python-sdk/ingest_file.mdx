@@ -33,6 +33,10 @@ description: "Ingest a file document into Morphik"
 - `metadata` (Dict[str, Any], optional): Optional metadata dictionary
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to ingest the file (slower, but significantly better retrieval accuracy for images). Defaults to True.
 
+### Typed Metadata
+
+Use Python-native values (e.g., `datetime`, `date`, `Decimal`) in the `metadata` dict. The SDK serializes them and adds the corresponding `metadata_types`, so you can run the advanced filters documented in [Metadata Filtering](/concepts/metadata-filtering).
+
 ## Returns
 
 - `Document`: Metadata of the ingested document
