@@ -28,6 +28,22 @@ With Morphik's MCP integration, you can:
 
 Morphik's MCP support is provided through the `@morphik/mcp` package, which acts as a bridge between Morphik and MCP-compatible AI assistants. 
 
+### Transport Modes
+
+You can run the MCP server in either transport mode:
+
+- **StdIO (default):** `npx @morphik/mcp --uri=<your-uri>`  
+  - Best for Claude Desktop and other local MCP clients that speak StdIO.  
+  - Supports optional `--allowed-dir=dir1,dir2` to sandbox file ingestion.
+
+- **Streamable HTTP:**  
+  1. `npm install && npm run build:streamable` (once)  
+  2. `node build/index_http.js --uri=<your-uri> --allowed-dir=~/Documents`  
+  - Exposes `/mcp` for JSON RPC requests and `/health` for monitoring.  
+  - Ideal for web environments or remote deployments where StdIO isn’t available.
+
+Both transports load the same tool registry described below; only the connection protocol differs.
+
 ### Prerequisites
 
 - A running Morphik server (local or cloud)
@@ -78,15 +94,35 @@ For local Morphik server, you can either omit the `--uri` parameter or use `--ur
 
 Once configured:
 
-1. Close and restart Claude Desktop.
-2. Claude will now have access to the following tools:
-   - `retrieve-chunks`: Search for relevant chunks from your knowledge base
-   - `retrieve-docs`: Search for entire documents in your knowledge base
-   - `query`: Generate a completion using relevant context
-   - `list-documents`: List available documents
-   - `get-document`: Get a specific document's details
-   - `ingest-text`: Add new text to your knowledge base
-   - `delete-document`: Remove a document from your knowledge base
+1. Close and restart Claude Desktop (or reconnect your MCP client).
+2. Claude can now invoke Morphik’s MCP tools (the same set is available whether you connect via StdIO or Streamable HTTP):
+
+> **Tip:** Only expose the tools you actually need in your MCP client configuration. Disabling unused tools keeps LLMs focused and reduces the chance they pick a less relevant action.
+
+### Ingestion
+
+- `ingest-text`: Push raw text with optional metadata/folder scopes.
+- `ingest-file-from-path`: Upload a file from disk (uses the MCP server’s `--allowed-dir` sandbox).
+- `ingest-file-from-base64`: Upload bytes provided by the client (handy when running in Streamable mode).
+- `ingest-files-from-paths`: Batch upload multiple files with shared or per-file metadata.
+
+### Retrieval & Navigation
+
+- `retrieve-chunks`: Identical to Morphik App’s “find relevant pages” flow. Returns the most relevant text/image pages with optional padding, folder scopes, and metadata filters.
+- `retrieve-docs`: Returns whole documents instead of individual chunks.
+- `get-pages-in-range`: Fetch up to 10 consecutive pages from a document for deep dives.
+
+### Document Management & Metadata
+
+- `list-documents`: Calls `/documents/list_docs`, so Claude can paginate large libraries, fetch counts, or only specific fields while respecting folder/end-user scopes.
+- `get-document`: Retrieves metadata for a specific document ID.
+- `check-ingestion-status`: Polls ingestion/processing state for a document.
+- `delete-document`: Removes a document and its derived data.
+- `morphik-filters`: View, set, or clear typed metadata filters (eq/regex/number_range/date_range). Any active filter automatically applies to `retrieve-*` and `list-documents`.
+
+### File Navigation (for ingestion workflows)
+
+- `list-allowed-directories`, `list-directory`, `search-files`, `get-file-info`: Help Claude browse only the directories you explicitly allow when starting the MCP server.
 
 {/* TODO: Add screenshot of Claude Desktop with Morphik MCP
 
