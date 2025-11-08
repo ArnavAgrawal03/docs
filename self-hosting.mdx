@@ -287,6 +287,10 @@ For users who need to run Morphik on their own infrastructure, we provide two in
       </Tab>
     </Tabs>
 
+    <Note>
+      Run the installer from the folder where you want Morphik to live (for example `~/morphik-core`). The script writes `docker-compose.run.yml`, `.env`, `morphik.toml`, and the helper scripts (`start-morphik.*` / `stop-morphik.*`) into the directory where you run the command.
+    </Note>
+
     <video controls>
       <source src="/assets/download_morphik.mp4" type="video/mp4" />
       Your browser does not support the video tag.
@@ -300,6 +304,8 @@ For users who need to run Morphik on their own infrastructure, we provide two in
     - Prompting for your OpenAI API key (optional - press Enter to skip)
     - **Setting up authentication** (optional but recommended for production)
     - **Offering to install the Admin UI** (optional but recommended)
+    - Copying the Admin UI bundle directly from the Morphik image (with a GitHub fallback) when you opt in, so the UI launches even if you haven't cloned the repo
+    - Generating `start-morphik.*` and `stop-morphik.*` helpers so you can restart or clean up services safely later
     - Starting all services
 
     During installation, you'll be prompted:
@@ -321,8 +327,9 @@ For users who need to run Morphik on their own infrastructure, we provide two in
       # To restart Morphik later (auto-detects UI if installed)
       ./start-morphik.sh
 
-      # To stop all services
-      docker compose -f docker-compose.run.yml down
+      # To stop all services and clean up containers/networks/volumes
+      ./stop-morphik.sh
+      # (Runs docker compose down --volumes --remove-orphans with any active profiles)
       ```
       </Tab>
       <Tab title="Windows (PowerShell)">
@@ -330,14 +337,15 @@ For users who need to run Morphik on their own infrastructure, we provide two in
       # To restart Morphik later (auto-detects UI if installed)
       ./start-morphik.ps1
 
-      # To stop all services
-      docker compose -f docker-compose.run.yml down
+      # To stop all services and clean up containers/networks/volumes
+      ./stop-morphik.ps1
+      # (Runs docker compose down --volumes --remove-orphans with any active profiles)
       ```
       </Tab>
     </Tabs>
 
     <Note>
-      To restart Morphik with a different configuration, first stop all services using `docker compose -f docker-compose.run.yml down`, modify your `morphik.toml` file, and then restart using `./start-morphik.sh`.
+      Use the generated `./stop-morphik.sh` (or `./stop-morphik.ps1` on Windows) whenever you need to shut Morphik down. It automatically includes the UI profile if installed and runs `docker compose down --volumes --remove-orphans`, so no containers or networks linger. After stopping, update `morphik.toml` as needed and restart with `./start-morphik.sh`.
     </Note>
 
     The services will be available at:
