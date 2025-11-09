@@ -28,6 +28,18 @@
       "dark": "#0F0F0F"
     }
   },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
   "api": {
     "openapi": "https://app.stainless.com/api/spec/documented/morphik/openapi.documented.yml",
     "playground": {

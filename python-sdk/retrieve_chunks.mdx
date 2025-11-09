@@ -12,6 +12,8 @@ description: "Retrieve relevant chunks from Morphik"
         k: int = 4,
         min_score: float = 0.0,
         use_colpali: bool = True,
+        padding: int = 0,
+        output_format: Optional[str] = None,
     ) -> List[FinalChunkResult]
     ```
   </Tab>
@@ -23,6 +25,8 @@ description: "Retrieve relevant chunks from Morphik"
         k: int = 4,
         min_score: float = 0.0,
         use_colpali: bool = True,
+        padding: int = 0,
+        output_format: Optional[str] = None,
     ) -> List[FinalChunkResult]
     ```
   </Tab>
@@ -35,6 +39,8 @@ description: "Retrieve relevant chunks from Morphik"
 - `k` (int, optional): Number of results. Defaults to 4.
 - `min_score` (float, optional): Minimum similarity threshold. Defaults to 0.0.
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to retrieve the chunks (only works for documents ingested with `use_colpali=True`). Defaults to True.
+- `padding` (int, optional): Number of additional chunks/pages to retrieve before and after matched chunks (ColPali only). Defaults to 0.
+- `output_format` (str, optional): Controls how image chunks are returned. Set to `"url"` to receive presigned URLs; omit or set to `"base64"` (default) to receive base64 content.
 
 ## Metadata Filters
 
@@ -69,11 +75,14 @@ chunks = db.retrieve_chunks("delta status", filters=filters, k=6)
         "What are the key findings?",
         filters={"department": "research"},
         k=5,
-        min_score=0.5
+        min_score=0.5,
+        padding=1,
+        output_format="url",  # Return image chunks as presigned URLs
     )
     
     for chunk in chunks:
         print(f"Score: {chunk.score}")
+        # For image chunks with output_format="url", content will be a URL string
         print(f"Content: {chunk.content}")
         print(f"Document ID: {chunk.document_id}")
         print(f"Chunk Number: {chunk.chunk_number}")
@@ -90,11 +99,14 @@ chunks = db.retrieve_chunks("delta status", filters=filters, k=6)
             "What are the key findings?",
             filters={"department": "research"},
             k=5,
-            min_score=0.5
+            min_score=0.5,
+            padding=1,
+            output_format="url",  # Return image chunks as presigned URLs
         )
         
         for chunk in chunks:
             print(f"Score: {chunk.score}")
+            # For image chunks with output_format="url", content will be a URL string
             print(f"Content: {chunk.content}")
             print(f"Document ID: {chunk.document_id}")
             print(f"Chunk Number: {chunk.chunk_number}")
@@ -116,3 +128,12 @@ The `FinalChunkResult` objects returned by this method have the following proper
 - `content_type` (str): Content type
 - `filename` (Optional[str]): Original filename
 - `download_url` (Optional[str]): URL to download full document 
+
+## Image URL output
+
+- When `output_format="url"` is provided, image chunks are returned as presigned HTTPS URLs in `content`. This is convenient for UIs and LLMs that accept remote image URLs (e.g., via `image_url`).
+- When `output_format` is omitted or set to `"base64"` (default), image chunks are returned as base64 data (the SDK attempts to decode these into a `PIL.Image` for `FinalChunkResult.content`).
+- Text chunks are unaffected by `output_format` and are always returned as strings.
+- The `download_url` field may be populated for image chunks. When using `output_format="url"`, it will typically match `content` for those chunks.
+
+Tip: To download the original raw file for a document, use [`get_document_download_url`](./get_document_download_url).
