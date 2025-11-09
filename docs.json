@@ -289,8 +289,5 @@
       "x": "https://x.com/ArnavAgrawal03",
       "github": "https://github.com/morphik-org/morphik-core"
     }
-  },
-  "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
   }
 }
